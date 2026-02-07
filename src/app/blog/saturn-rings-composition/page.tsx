@@ -32,10 +32,23 @@ const faqSchema = {
     ]
 };
 
+// Article Schema
+const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "What Are Saturn's Rings Made Of? Ice, Rock, and Mystery",
+    "description": "Discover the composition and origin of Saturn's iconic rings.",
+    "author": { "@type": "Organization", "name": "OrbitQuest" },
+    "publisher": { "@type": "Organization", "name": "OrbitQuest", "url": "https://orbitquest.games" },
+    "datePublished": "2026-01-01",
+    "dateModified": "2026-01-18"
+};
+
 export default function SaturnRingsBlog() {
     return (
         <>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
             <Header />
 
             <main className="flex-1 py-16">

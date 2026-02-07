@@ -59,7 +59,7 @@ const articleSchema = {
     "publisher": {
         "@type": "Organization",
         "name": "OrbitQuest",
-        "url": "https://orbitquest.coredrivn.com"
+        "url": "https://orbitquest.games"
     },
     "datePublished": "2026-01-01",
     "dateModified": "2026-01-18"

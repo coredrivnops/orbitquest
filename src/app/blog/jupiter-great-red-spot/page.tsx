@@ -53,7 +53,7 @@ const articleSchema = {
     "headline": "Jupiter's Great Red Spot: A Storm Bigger Than Earth",
     "description": "Learn about the most famous storm in our solar system.",
     "author": { "@type": "Organization", "name": "OrbitQuest" },
-    "publisher": { "@type": "Organization", "name": "OrbitQuest" },
+    "publisher": { "@type": "Organization", "name": "OrbitQuest", "url": "https://orbitquest.games" },
     "datePublished": "2026-01-01",
     "dateModified": "2026-01-18"
 };

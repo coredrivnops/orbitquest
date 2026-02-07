@@ -40,10 +40,23 @@ const faqSchema = {
     ]
 };
 
+// Article Schema
+const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Olympus Mons: The Largest Volcano in Our Solar System",
+    "description": "Explore Olympus Mons, Mars' giant shield volcano standing nearly three times the height of Mount Everest.",
+    "author": { "@type": "Organization", "name": "OrbitQuest" },
+    "publisher": { "@type": "Organization", "name": "OrbitQuest", "url": "https://orbitquest.games" },
+    "datePublished": "2026-01-01",
+    "dateModified": "2026-01-18"
+};
+
 export default function OlympusMons() {
     return (
         <>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
             <Header />
 
             <main className="flex-1 py-16">
