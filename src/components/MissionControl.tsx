@@ -3,9 +3,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getPlanetsInOrder, canUnlock, Planet, getMainJourneyPlanets } from '@/lib/gameTypes';
+import { getPlanetsInOrder, canUnlock, Planet, getMainJourneyPlanets, isBossChallengeUnlocked, getGamesRequiredForBoss, PLANETS } from '@/lib/gameTypes';
 import { loadProgress, unlockPlanet } from '@/lib/localStorage';
 import { PlanetOrb } from './PlanetOrb';
+import Confetti from './Confetti';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { RotatingFunFacts } from './PlanetTooltip';
+import { AchievementsDisplay } from './Achievements';
 
 // Shooting star component
 function ShootingStar({ delay }: { delay: number }) {
@@ -19,6 +23,137 @@ function ShootingStar({ delay }: { delay: number }) {
                 boxShadow: '0 0 6px 2px rgba(255,255,255,0.5)'
             }}
         />
+    );
+}
+
+// Sun Boss Challenge Section Component
+function SunBossChallengeSection() {
+    const [isUnlocked, setIsUnlocked] = useState(false);
+    const [progress, setProgress] = useState({ played: 0, required: 0 });
+
+    useEffect(() => {
+        const playerProgress = loadProgress();
+        const gamesPlayed = playerProgress.gamesPlayedAtLeastOnce || [];
+        const unlock = isBossChallengeUnlocked(gamesPlayed);
+        setIsUnlocked(unlock);
+
+        const required = getGamesRequiredForBoss();
+        setProgress({
+            played: gamesPlayed.length,
+            required: required.length
+        });
+    }, []);
+
+    const progressPercent = progress.required > 0 ? (progress.played / progress.required) * 100 : 0;
+
+    return (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Link
+                href="/games/sun"
+                className="group relative block rounded-2xl overflow-hidden border-2 border-amber-500/40 hover:border-amber-400/80 transition-all duration-500 hover:shadow-[0_0_60px_rgba(251,191,36,0.3)]"
+            >
+                {/* Animated gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-950 via-orange-900 to-red-950 opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-600/10 via-orange-600/10 to-red-600/10 animate-aurora" />
+
+                {/* Animated stars and solar particles */}
+                <div className="absolute inset-0 overflow-hidden">
+                    {[...Array(20)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute w-1 h-1 bg-amber-300 rounded-full animate-pulse"
+                            style={{
+                                left: `${5 + Math.random() * 90}%`,
+                                top: `${10 + Math.random() * 80}%`,
+                                animationDelay: `${Math.random() * 2}s`,
+                                opacity: 0.4 + Math.random() * 0.4
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Sun visual - left side */}
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 w-40 h-40 md:w-56 md:h-56">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_0_80px_30px_rgba(251,191,36,0.5)] animate-pulse" />
+                    <div className="absolute inset-4 rounded-full bg-gradient-to-br from-amber-300 to-orange-500" />
+                    {/* Solar flares */}
+                    <div className="absolute -top-4 left-1/2 w-4 h-12 bg-gradient-to-t from-amber-500 to-transparent rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                    <div className="absolute top-1/2 -right-4 w-12 h-4 bg-gradient-to-r from-amber-500 to-transparent rounded-full opacity-60 animate-pulse" style={{ animationDelay: '1s' }} />
+                </div>
+
+                {/* Lock overlay if not unlocked */}
+                {!isUnlocked && (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                        <div className="absolute top-4 right-4 px-4 py-2 bg-red-500/20 text-red-300 rounded-full text-sm font-bold border border-red-500/30">
+                            🔒 LOCKED
+                        </div>
+                    </div>
+                )}
+
+                {/* Content */}
+                <div className="relative py-8 px-8 pl-24 md:pl-40 flex flex-col md:flex-row items-center justify-between gap-4 z-20">
+                    <div className="text-center md:text-left">
+                        <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
+                            <span className="px-3 py-1 bg-gradient-to-r from-amber-500/30 to-red-500/30 text-amber-400 text-sm rounded-full font-bold border border-amber-500/30 animate-pulse">
+                                ☀️ FINAL BOSS
+                            </span>
+                            {isUnlocked && (
+                                <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full font-bold border border-green-500/30">
+                                    ✓ UNLOCKED
+                                </span>
+                            )}
+                        </div>
+                        <h3 className="font-heading text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 mb-1">
+                            Solar Showdown: Defend the Sun!
+                        </h3>
+                        <p className="text-amber-300 text-sm md:text-base mb-2">
+                            {isUnlocked ? (
+                                <>The alien armada approaches! <span className="text-amber-400 font-bold">Command your squadron!</span></>
+                            ) : (
+                                <>Play <span className="text-amber-400 font-bold">ALL games at least once</span> to unlock this epic arcade battle!</>
+                            )}
+                        </p>
+
+                        {/* Progress bar - only show if not unlocked */}
+                        {!isUnlocked && (
+                            <div className="mt-3 max-w-xs mx-auto md:mx-0">
+                                <div className="flex justify-between text-xs text-amber-300/70 mb-1">
+                                    <span>Games Played</span>
+                                    <span>{progress.played}/{progress.required}</span>
+                                </div>
+                                <div className="w-full h-2 bg-amber-900/50 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
+                                        style={{ width: `${progressPercent}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden sm:flex flex-col items-center text-center px-4 border-l border-amber-500/30">
+                            <span className="text-2xl mb-1">🎮</span>
+                            <span className="text-amber-300 text-xs">Arcade Mode</span>
+                        </div>
+                        <div className="hidden sm:flex flex-col items-center text-center px-4 border-l border-amber-500/30">
+                            <span className="text-2xl mb-1">👽</span>
+                            <span className="text-orange-300 text-xs">10 Waves</span>
+                        </div>
+                        <button className={`px-6 py-3 font-bold rounded-xl transition-all flex items-center gap-2 ${isUnlocked
+                                ? 'bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(251,191,36,0.4)]'
+                                : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
+                            }`}>
+                            <span>☀️</span>
+                            <span>{isUnlocked ? 'Enter Battle' : 'Locked'}</span>
+                            {isUnlocked && <span className="group-hover:translate-x-1 transition-transform">→</span>}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Glowing edge */}
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-60" />
+            </Link>
+        </section>
     );
 }
 
@@ -42,6 +177,7 @@ function FloatingPlanet({ color, size, x, y, duration }: {
     );
 }
 
+
 export default function MissionControl() {
     const router = useRouter();
     const [progress, setProgress] = useState({
@@ -52,6 +188,7 @@ export default function MissionControl() {
     });
     const [isLoaded, setIsLoaded] = useState(false);
     const [unlockingPlanet, setUnlockingPlanet] = useState<string | null>(null);
+    const [showConfetti, setShowConfetti] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // Load progress and set up listeners
@@ -101,6 +238,9 @@ export default function MissionControl() {
         const result = unlockPlanet(planet.id, planet.stardustCost);
 
         if (result.success) {
+            // 🎉 Trigger confetti celebration!
+            setShowConfetti(true);
+
             // Update local state immediately
             setProgress({
                 ...result.progress,
@@ -112,11 +252,11 @@ export default function MissionControl() {
                 detail: { planetId: planet.id }
             }));
 
-            // Navigate to the game after a brief animation
+            // Navigate to the game after confetti animation
             setTimeout(() => {
                 setUnlockingPlanet(null);
                 router.push(`/games/${planet.id}`);
-            }, 500);
+            }, 1200); // Slightly longer to enjoy confetti
         } else {
             setUnlockingPlanet(null);
         }
@@ -222,10 +362,23 @@ export default function MissionControl() {
         ? Math.round((unlockedMainPlanets.length / mainPlanets.length) * 100)
         : 0; // Start at 0% until first game played
 
+    // Scroll reveal for sections
+    const [howItWorksRef, howItWorksVisible] = useScrollReveal<HTMLElement>();
+    const [educationRef, educationVisible] = useScrollReveal<HTMLElement>();
+    const [blogRef, blogVisible] = useScrollReveal<HTMLElement>();
+
     return (
         <div className="min-h-screen bg-space-deep overflow-hidden">
 
-            {/* CSS Animations */}
+            {/* 🎉 Confetti celebration on planet unlock */}
+            <Confetti
+                active={showConfetti}
+                onComplete={() => setShowConfetti(false)}
+                particleCount={100}
+                duration={2500}
+            />
+
+            {/* CSS Animations - Premium Cosmic Effects */}
             <style jsx global>{`
                 @keyframes float {
                     0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -243,6 +396,10 @@ export default function MissionControl() {
                 @keyframes orbit {
                     0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
                     100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+                }
+                @keyframes orbit-small {
+                    0% { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+                    100% { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
                 }
                 @keyframes glow-pulse {
                     0%, 100% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
@@ -265,83 +422,164 @@ export default function MissionControl() {
                     50% { transform: rotate(180deg) scale(1.2); }
                     100% { transform: rotate(360deg) scale(1); }
                 }
+                @keyframes nebula-drift {
+                    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+                    50% { transform: translate(30px, -20px) scale(1.1); opacity: 0.5; }
+                }
+                @keyframes cosmic-pulse {
+                    0%, 100% { transform: scale(1); filter: brightness(1); }
+                    50% { transform: scale(1.05); filter: brightness(1.2); }
+                }
+                @keyframes typewriter {
+                    from { width: 0; }
+                    to { width: 100%; }
+                }
+                @keyframes blink-caret {
+                    from, to { border-color: transparent; }
+                    50% { border-color: #00f0ff; }
+                }
+                @keyframes aurora {
+                    0%, 100% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                }
+                @keyframes card-glow {
+                    0%, 100% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 30px rgba(0, 240, 255, 0.05); }
+                    50% { box-shadow: 0 0 40px rgba(0, 240, 255, 0.4), inset 0 0 50px rgba(0, 240, 255, 0.1); }
+                }
+                @keyframes planet-hover {
+                    0%, 100% { transform: translateY(0) scale(1); }
+                    50% { transform: translateY(-10px) scale(1.02); }
+                }
                 .animate-float { animation: float 6s ease-in-out infinite; }
                 .animate-shooting-star { animation: shooting-star 3s linear infinite; }
                 .animate-pulse-ring { animation: pulse-ring 2s ease-out infinite; }
                 .animate-orbit { animation: orbit 20s linear infinite; }
+                .animate-orbit-small { animation: orbit-small 15s linear infinite; }
                 .animate-glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
                 .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
                 .animate-slide-in-left { animation: slide-in-left 0.6s ease-out forwards; }
                 .animate-scale-in { animation: scale-in 0.5s ease-out forwards; }
                 .animate-unlock-spin { animation: unlock-spin 0.5s ease-out; }
+                .animate-nebula { animation: nebula-drift 15s ease-in-out infinite; }
+                .animate-cosmic-pulse { animation: cosmic-pulse 3s ease-in-out infinite; }
+                .animate-aurora { animation: aurora 10s ease infinite; background-size: 200% 200%; }
+                .animate-card-glow { animation: card-glow 3s ease-in-out infinite; }
+                .animate-planet-hover { animation: planet-hover 4s ease-in-out infinite; }
                 .animation-delay-100 { animation-delay: 0.1s; }
                 .animation-delay-200 { animation-delay: 0.2s; }
                 .animation-delay-300 { animation-delay: 0.3s; }
                 .animation-delay-400 { animation-delay: 0.4s; }
+                .animation-delay-500 { animation-delay: 0.5s; }
+                .animation-delay-1000 { animation-delay: 1s; }
+                .text-gradient-cosmic {
+                    background: linear-gradient(135deg, #00f0ff 0%, #a855f7 50%, #ec4899 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
             `}</style>
 
             {/* Hero Section with Animated Starfield */}
-            <section className="relative h-[600px] overflow-hidden border-b border-neon-cyan/20">
+            <section className="relative h-[700px] overflow-hidden border-b border-neon-cyan/20">
                 {/* Canvas starfield */}
                 <canvas
                     ref={canvasRef}
                     className="absolute inset-0 w-full h-full"
                 />
 
-                {/* Floating decorative planets */}
-                <FloatingPlanet color="#3b82f6" size={80} x={10} y={20} duration={8} />
-                <FloatingPlanet color="#f97316" size={60} x={85} y={60} duration={10} />
-                <FloatingPlanet color="#06b6d4" size={40} x={70} y={15} duration={7} />
-                <FloatingPlanet color="#dc2626" size={50} x={20} y={70} duration={9} />
+                {/* Nebula background effects */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-10 left-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-nebula" />
+                    <div className="absolute bottom-20 right-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-nebula animation-delay-500" />
+                    <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-500/5 rounded-full blur-3xl animate-nebula animation-delay-1000" />
+                </div>
 
-                {/* Shooting stars */}
-                {[...Array(3)].map((_, i) => (
-                    <ShootingStar key={i} delay={i * 4 + 2} />
+                {/* Floating decorative planets with enhanced animation */}
+                <FloatingPlanet color="#3b82f6" size={100} x={8} y={15} duration={12} />
+                <FloatingPlanet color="#f97316" size={70} x={88} y={55} duration={14} />
+                <FloatingPlanet color="#06b6d4" size={50} x={75} y={10} duration={10} />
+                <FloatingPlanet color="#dc2626" size={60} x={15} y={65} duration={11} />
+                <FloatingPlanet color="#a855f7" size={40} x={80} y={80} duration={9} />
+
+                {/* More shooting stars */}
+                {[...Array(5)].map((_, i) => (
+                    <ShootingStar key={i} delay={i * 3 + 1} />
                 ))}
 
                 {/* Content */}
                 <div className={`relative z-10 h-full flex flex-col items-center justify-center px-4 text-center ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
-                    {/* Logo with glow effect */}
-                    <div className="relative mb-6">
-                        <h1 className="font-heading text-5xl md:text-7xl text-white">
-                            <span className="text-neon-cyan drop-shadow-[0_0_30px_rgba(0,240,255,0.5)]">Orbit</span>
-                            <span className="text-white">Quest</span>
+
+                    {/* Status Badge */}
+                    <div className="mb-6 px-5 py-2 bg-gradient-to-r from-purple-600/30 via-cyan-500/30 to-purple-600/30 rounded-full border border-purple-400/40 animate-aurora">
+                        <span className="text-sm font-ui text-purple-200 tracking-widest uppercase">🚀 Free Space Arcade Adventure</span>
+                    </div>
+
+                    {/* Logo with enhanced glow effect */}
+                    <div className="relative mb-8">
+                        <h1 className="font-heading text-6xl md:text-8xl text-white animate-cosmic-pulse">
+                            <span className="text-gradient-cosmic drop-shadow-[0_0_40px_rgba(0,240,255,0.6)]">Orbit</span>
+                            <span className="text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">Quest</span>
                         </h1>
-                        {/* Orbiting dot */}
+                        {/* Multiple orbiting particles */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                             <div className="animate-orbit">
-                                <div className="w-3 h-3 bg-yellow-400 rounded-full shadow-[0_0_10px_#fbbf24]" />
+                                <div className="w-4 h-4 bg-yellow-400 rounded-full shadow-[0_0_15px_#fbbf24,0_0_30px_#fbbf24]" />
+                            </div>
+                        </div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <div className="animate-orbit-small" style={{ animationDelay: '-5s' }}>
+                                <div className="w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_#22d3ee]" />
                             </div>
                         </div>
                     </div>
 
-                    <p className="text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto mb-8 leading-relaxed">
-                        Your probe is stranded at the edge of the solar system.
-                        Navigate through <span className="text-neon-cyan font-bold">8 planets</span> to find your way{' '}
-                        <span className="text-green-400 font-bold">home to Earth</span>.
-                    </p>
-
-                    {/* Stardust Balance with pulse effect */}
-                    <div className="relative inline-flex items-center gap-3 bg-space-tertiary/70 backdrop-blur-sm px-8 py-4 rounded-full border border-neon-cyan/40">
-                        <div className="absolute inset-0 rounded-full border border-neon-cyan/30 animate-pulse-ring" />
-                        <span className="text-yellow-400 text-3xl animate-bounce">⭐</span>
-                        <span className="text-3xl font-heading text-white">{progress.stardust.toLocaleString()}</span>
-                        <span className="text-text-dim text-sm uppercase tracking-wider">Stardust</span>
+                    {/* Dramatic storytelling text */}
+                    <div className="max-w-3xl mx-auto mb-10">
+                        <p className="text-2xl md:text-3xl text-white font-ui mb-4 leading-relaxed">
+                            Your probe is <span className="text-red-400 font-bold">stranded</span> at the edge of the solar system.
+                        </p>
+                        <p className="text-xl md:text-2xl text-text-secondary leading-relaxed">
+                            Navigate through <span className="text-neon-cyan font-bold text-2xl">10 incredible worlds</span>,
+                            each with <span className="text-neon-purple">unique arcade challenges</span>, to find your way
+                            <span className="text-green-400 font-bold"> home to Earth</span>.
+                        </p>
+                        <p className="text-lg text-text-dim mt-4 italic">
+                            &quot;With a bonus surprise waiting on the cosmic journey...&quot; 🌙
+                        </p>
                     </div>
 
-                    {/* CTA Button */}
+                    {/* Stardust Balance with premium effect */}
+                    <div className="relative inline-flex items-center gap-4 bg-gradient-to-r from-space-tertiary/80 via-purple-900/40 to-space-tertiary/80 backdrop-blur-md px-10 py-5 rounded-2xl border border-neon-cyan/50 animate-card-glow">
+                        <div className="absolute inset-0 rounded-2xl border border-neon-cyan/20 animate-pulse-ring" />
+                        <span className="text-yellow-400 text-4xl animate-float">⭐</span>
+                        <div className="flex flex-col items-start">
+                            <span className="text-4xl font-heading text-white">{progress.stardust.toLocaleString()}</span>
+                            <span className="text-text-dim text-xs uppercase tracking-widest">Stardust Collected</span>
+                        </div>
+                    </div>
+
+                    {/* CTA Button with premium effect */}
                     <Link
-                        href={currentPlanet ? `/games/${currentPlanet.id}` : '/games/neptune'}
-                        className="mt-8 group relative inline-flex items-center gap-2 px-10 py-4 bg-neon-cyan/20 hover:bg-neon-cyan/30 border-2 border-neon-cyan rounded-lg text-neon-cyan font-heading text-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]"
+                        href={currentPlanet ? `/games/${currentPlanet.id}` : '/games/pluto'}
+                        className="mt-10 group relative inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-neon-cyan/20 to-purple-600/20 hover:from-neon-cyan/30 hover:to-purple-600/30 border-2 border-neon-cyan rounded-xl text-neon-cyan font-heading text-2xl transition-all duration-500 hover:scale-110 hover:shadow-[0_0_50px_rgba(0,240,255,0.5)] overflow-hidden"
                     >
-                        <span>🚀</span>
-                        <span>Start Your Journey</span>
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        {/* Button shimmer effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                        <span className="text-3xl group-hover:animate-bounce">🚀</span>
+                        <span className="relative z-10">{currentPlanet ? 'Continue Journey' : 'Begin Your Epic Quest'}</span>
+                        <span className="group-hover:translate-x-2 transition-transform text-2xl">→</span>
                     </Link>
+
+                    {/* Quick stats */}
+                    <div className="mt-8 flex items-center gap-8 text-text-dim text-sm">
+                        <span className="flex items-center gap-2"><span className="text-neon-cyan">🎮</span> 10 Unique Games</span>
+                        <span className="flex items-center gap-2"><span className="text-yellow-400">⭐</span> Earn Stardust</span>
+                        <span className="flex items-center gap-2"><span className="text-green-400">🏠</span> Reach Earth</span>
+                    </div>
                 </div>
 
                 {/* Gradient fade at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-space-deep to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-space-deep via-space-deep/80 to-transparent" />
             </section>
 
             {/* Journey Progress Bar */}
@@ -378,116 +616,184 @@ export default function MissionControl() {
                 </div>
             </section>
 
-            {/* Continue Playing - MOVED ABOVE NEXT DESTINATION */}
+            {/* Continue Playing - Premium Card */}
             {currentPlanet && (
                 <section className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6 ${isLoaded ? 'animate-scale-in animation-delay-100' : 'opacity-0'}`}>
-                    <div className="rounded-xl border-2 border-neon-cyan/40 bg-gradient-to-br from-space-tertiary to-cyan-900/20 backdrop-blur-sm p-6 hover:border-neon-cyan/60 transition-colors duration-300">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-6">
-                                <div className="flex-shrink-0">
-                                    <PlanetOrb planetId={currentPlanet.id} size={80} />
+                    <div className="relative rounded-2xl border-2 border-neon-cyan/50 bg-gradient-to-br from-space-tertiary via-cyan-900/20 to-space-tertiary backdrop-blur-md p-8 overflow-hidden animate-card-glow group">
+                        {/* Animated background particles */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-nebula" />
+                            <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl animate-nebula animation-delay-500" />
+                        </div>
+
+                        {/* Live indicator bar */}
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-neon-cyan to-cyan-500 animate-aurora" />
+
+                        <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="flex items-center gap-8">
+                                {/* Planet with orbiting particles */}
+                                <div className="relative flex-shrink-0">
+                                    <div className="absolute inset-0 rounded-full animate-pulse-ring" style={{ width: 120, height: 120, left: -10, top: -10, background: `radial-gradient(circle, ${currentPlanet.glowColor}30, transparent 70%)` }} />
+                                    <div className="animate-planet-hover">
+                                        <PlanetOrb planetId={currentPlanet.id} size={100} />
+                                    </div>
+                                    {/* Tiny orbiting moon */}
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit-small">
+                                        <div className="w-3 h-3 bg-white/60 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <p className="text-neon-cyan text-sm uppercase tracking-widest mb-1 flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                                        Continue Playing
-                                    </p>
-                                    <p className="font-heading text-2xl md:text-3xl text-white">{currentPlanet.name}: {currentPlanet.gameName}</p>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_#4ade80]" />
+                                        <span className="text-neon-cyan text-sm uppercase tracking-widest font-bold">Now Playing</span>
+                                    </div>
+                                    <h3 className="font-heading text-3xl md:text-4xl text-white mb-2 group-hover:text-gradient-cosmic transition-all duration-500">
+                                        {currentPlanet.name}
+                                    </h3>
+                                    <p className="text-neon-cyan text-xl font-ui">{currentPlanet.gameName}</p>
                                     {progress.highScores[currentPlanet.id] && (
-                                        <p className="text-green-400 text-sm mt-1">
-                                            🏆 High Score: {progress.highScores[currentPlanet.id].toLocaleString()}
+                                        <p className="text-green-400 text-sm mt-2 flex items-center gap-2">
+                                            <span className="text-lg">🏆</span>
+                                            <span>Best Score: <span className="font-bold text-white">{progress.highScores[currentPlanet.id].toLocaleString()}</span></span>
                                         </p>
                                     )}
                                 </div>
                             </div>
                             <Link
                                 href={`/games/${currentPlanet.id}`}
-                                className="px-10 py-4 bg-neon-cyan/20 hover:bg-neon-cyan/40 border-2 border-neon-cyan rounded-lg text-neon-cyan font-heading text-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,240,255,0.4)]"
+                                className="group/btn relative px-12 py-5 bg-gradient-to-r from-neon-cyan/30 to-cyan-600/30 hover:from-neon-cyan/50 hover:to-cyan-600/50 border-2 border-neon-cyan rounded-xl text-neon-cyan font-heading text-2xl transition-all duration-500 hover:scale-110 hover:shadow-[0_0_50px_rgba(0,240,255,0.5)] overflow-hidden"
                             >
-                                🚀 PLAY NOW →
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+                                <span className="relative z-10 flex items-center gap-3">
+                                    <span className="text-2xl group-hover/btn:animate-bounce">🚀</span>
+                                    <span>PLAY NOW</span>
+                                    <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
+                                </span>
                             </Link>
                         </div>
                     </div>
                 </section>
             )}
 
-            {/* Next Destination - Animated Card */}
+            {/* Next Destination - Premium Animated Card */}
             {nextPlanet && (
                 <section className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 ${isLoaded ? 'animate-slide-in-left animation-delay-200' : 'opacity-0'}`}>
-                    <div className={`relative overflow-hidden rounded-2xl border-2 p-8 group transition-colors duration-300 ${nextPlanet.isHidden
-                            ? 'border-pink-500/60 bg-gradient-to-br from-purple-900/50 to-pink-900/30 hover:border-pink-400'
-                            : 'border-neon-purple/50 bg-gradient-to-br from-space-tertiary to-purple-900/30 hover:border-neon-purple'
+                    <div className={`relative overflow-hidden rounded-3xl border-2 p-10 group transition-all duration-500 ${nextPlanet.isHidden
+                        ? 'border-pink-500/60 bg-gradient-to-br from-purple-900/60 via-pink-900/30 to-purple-900/60 hover:border-pink-400 hover:shadow-[0_0_60px_rgba(236,72,153,0.3)]'
+                        : 'border-neon-purple/50 bg-gradient-to-br from-space-tertiary via-purple-900/30 to-space-tertiary hover:border-neon-purple hover:shadow-[0_0_60px_rgba(168,85,247,0.3)]'
                         }`}>
-                        {/* Animated background glow */}
-                        <div className={`absolute -top-20 -right-20 w-60 h-60 rounded-full blur-3xl transition-all duration-500 ${nextPlanet.isHidden ? 'bg-pink-500/20 group-hover:bg-pink-500/30' : 'bg-purple-500/10 group-hover:bg-purple-500/20'
-                            }`} />
 
-                        {/* Badge - different for hidden reveals */}
-                        <div className={`absolute top-4 right-4 px-4 py-1.5 rounded-full text-sm font-ui animate-pulse ${nextPlanet.isHidden
-                                ? 'bg-pink-500/40 text-pink-200'
-                                : 'bg-neon-purple/30 text-neon-purple'
-                            }`}>
-                            {nextPlanet.isHidden ? '✨ SURPRISE REVEAL!' : '🔒 NEXT DESTINATION'}
+                        {/* Holographic scan lines effect */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+                            <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(168,85,247,0.1)_2px,rgba(168,85,247,0.1)_4px)]" />
                         </div>
 
-                        <div className="relative grid md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <p className="text-text-dim uppercase tracking-widest mb-2 text-sm">
-                                    {nextPlanet.isHidden ? '🌙 Hidden Challenge' : `Stage ${nextPlanet.order}`}
-                                </p>
-                                <h2 className="font-heading text-5xl text-white mb-3">{nextPlanet.name}</h2>
-                                <p className={`text-2xl mb-4 font-ui ${nextPlanet.isHidden ? 'text-pink-400' : 'text-neon-purple'}`}>{nextPlanet.gameName}</p>
-                                <p className="text-text-secondary text-lg mb-6 leading-relaxed">{nextPlanet.description}</p>
+                        {/* Animated background particles */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className={`absolute -top-32 -right-32 w-80 h-80 rounded-full blur-3xl animate-nebula ${nextPlanet.isHidden ? 'bg-pink-500/20' : 'bg-purple-500/20'}`} />
+                            <div className={`absolute -bottom-20 -left-20 w-60 h-60 rounded-full blur-3xl animate-nebula animation-delay-500 ${nextPlanet.isHidden ? 'bg-purple-500/15' : 'bg-cyan-500/15'}`} />
+                        </div>
 
-                                <div className="flex flex-wrap items-center gap-4">
+                        {/* Animated top border */}
+                        <div className={`absolute top-0 left-0 right-0 h-1 ${nextPlanet.isHidden ? 'bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600' : 'bg-gradient-to-r from-purple-600 via-cyan-500 to-purple-600'} animate-aurora`} />
+
+                        {/* Badge - Premium design */}
+                        <div className={`absolute top-6 right-6 px-5 py-2 rounded-xl text-sm font-heading tracking-wider flex items-center gap-2 ${nextPlanet.isHidden
+                            ? 'bg-gradient-to-r from-pink-600/50 to-purple-600/50 text-pink-100 border border-pink-400/40'
+                            : 'bg-gradient-to-r from-purple-600/50 to-neon-purple/50 text-purple-100 border border-purple-400/40'
+                            }`}>
+                            <span className="animate-pulse">{nextPlanet.isHidden ? '✨' : '🔒'}</span>
+                            <span>{nextPlanet.isHidden ? 'SURPRISE REVEAL!' : 'NEXT DESTINATION'}</span>
+                        </div>
+
+                        <div className="relative grid md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <p className="text-text-dim uppercase tracking-[0.2em] mb-3 text-sm font-ui flex items-center gap-2">
+                                    {nextPlanet.isHidden ? (
+                                        <><span className="text-lg">🌙</span> Hidden Cosmic Challenge</>
+                                    ) : (
+                                        <>Stage <span className="text-neon-purple font-bold">{nextPlanet.order}</span> of 10</>
+                                    )}
+                                </p>
+                                <h2 className={`font-heading text-5xl md:text-6xl text-white mb-4 group-hover:text-gradient-cosmic transition-all duration-500`}>
+                                    {nextPlanet.name}
+                                </h2>
+                                <p className={`text-2xl md:text-3xl mb-5 font-ui ${nextPlanet.isHidden ? 'text-pink-400' : 'text-neon-purple'}`}>
+                                    {nextPlanet.gameName}
+                                </p>
+                                <p className="text-text-secondary text-lg mb-8 leading-relaxed max-w-lg">
+                                    {nextPlanet.description}
+                                </p>
+
+                                <div className="flex flex-wrap items-center gap-5">
                                     {progress.stardust >= nextPlanet.stardustCost ? (
                                         <button
                                             onClick={() => handleUnlock(nextPlanet)}
                                             disabled={unlockingPlanet === nextPlanet.id}
-                                            className={`px-8 py-3 text-lg font-bold rounded border-2 transition-all ${unlockingPlanet === nextPlanet.id
-                                                ? 'bg-purple-500/50 border-purple-400 text-white animate-unlock-spin'
-                                                : 'bg-neon-purple/20 hover:bg-neon-purple/40 border-neon-purple text-neon-purple hover:scale-105'
+                                            className={`group/unlock relative px-10 py-4 text-lg font-bold rounded-xl border-2 transition-all duration-500 overflow-hidden ${unlockingPlanet === nextPlanet.id
+                                                ? 'bg-purple-500/50 border-purple-400 text-white'
+                                                : 'bg-neon-purple/20 hover:bg-neon-purple/40 border-neon-purple text-neon-purple hover:scale-110 hover:shadow-[0_0_40px_rgba(168,85,247,0.4)]'
                                                 }`}
                                         >
-                                            {unlockingPlanet === nextPlanet.id ? '🔓 Unlocking...' : '🔓 Unlock & Play'}
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/unlock:translate-x-full transition-transform duration-700" />
+                                            <span className="relative z-10 flex items-center gap-2">
+                                                <span className={unlockingPlanet === nextPlanet.id ? 'animate-spin' : ''}>{unlockingPlanet === nextPlanet.id ? '⌛' : '🔓'}</span>
+                                                <span>{unlockingPlanet === nextPlanet.id ? 'Unlocking...' : 'Unlock & Play'}</span>
+                                            </span>
                                         </button>
                                     ) : (
-                                        <div className="flex items-center gap-4">
-                                            <button className="px-8 py-3 bg-white/10 text-white/50 rounded cursor-not-allowed border border-white/20">
+                                        <div className="flex items-center gap-5">
+                                            <button className="px-8 py-4 bg-white/5 text-white/40 rounded-xl cursor-not-allowed border border-white/10 font-heading">
                                                 🔒 Locked
                                             </button>
-                                            <div className="text-yellow-400">
-                                                <span className="text-lg font-bold">{(nextPlanet.stardustCost - progress.stardust).toLocaleString()}</span>
-                                                <span className="text-sm"> more ⭐ needed</span>
+                                            <div className="bg-yellow-500/10 border border-yellow-500/30 px-5 py-3 rounded-xl">
+                                                <span className="text-yellow-400 font-bold text-xl">{(nextPlanet.stardustCost - progress.stardust).toLocaleString()}</span>
+                                                <span className="text-yellow-400/70 text-sm ml-2">more ⭐ needed</span>
                                             </div>
                                         </div>
                                     )}
                                 </div>
 
-                                <p className="text-text-dim text-sm mt-4">
-                                    Unlock Cost: <span className="text-yellow-400 font-bold">{nextPlanet.stardustCost.toLocaleString()} ⭐</span>
-                                </p>
+                                <div className="mt-6 flex items-center gap-2 text-text-dim text-sm">
+                                    <span className="text-yellow-400">⭐</span>
+                                    <span>Unlock Cost: <span className="text-yellow-400 font-bold">{nextPlanet.stardustCost.toLocaleString()}</span></span>
+                                </div>
                             </div>
 
-                            {/* Realistic Planet Visual */}
+                            {/* Premium Planet Visual */}
                             <div className="flex justify-center">
                                 <div className="relative">
-                                    {/* Outer glow ring */}
+                                    {/* Multiple glow rings */}
                                     <div
-                                        className="absolute inset-0 rounded-full animate-pulse-ring"
+                                        className="absolute rounded-full animate-pulse-ring"
                                         style={{
-                                            background: `radial-gradient(circle, ${nextPlanet.glowColor}40, transparent 70%)`,
-                                            width: 220,
-                                            height: 220,
-                                            left: -15,
-                                            top: -15,
+                                            background: `radial-gradient(circle, ${nextPlanet.glowColor}30, transparent 60%)`,
+                                            width: 280,
+                                            height: 280,
+                                            left: -30,
+                                            top: -30,
                                         }}
                                     />
-                                    <PlanetOrb
-                                        planetId={nextPlanet.id}
-                                        size={190}
-                                        className={unlockingPlanet === nextPlanet.id ? 'animate-unlock-spin' : ''}
+                                    <div
+                                        className="absolute rounded-full animate-pulse-ring animation-delay-500"
+                                        style={{
+                                            background: `radial-gradient(circle, ${nextPlanet.glowColor}20, transparent 70%)`,
+                                            width: 320,
+                                            height: 320,
+                                            left: -50,
+                                            top: -50,
+                                        }}
                                     />
+                                    <div className={`animate-planet-hover ${unlockingPlanet === nextPlanet.id ? 'animate-unlock-spin' : ''}`}>
+                                        <PlanetOrb
+                                            planetId={nextPlanet.id}
+                                            size={nextPlanet.isHidden ? 160 : 220}
+                                        />
+                                    </div>
+                                    {/* Orbiting particles */}
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit" style={{ animationDuration: '12s' }}>
+                                        <div className="w-4 h-4 bg-purple-400 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.8)]" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -495,12 +801,6 @@ export default function MissionControl() {
                 </section>
             )}
 
-            {/* Ad Slot */}
-            <div className="max-w-7xl mx-auto px-4 py-6">
-                <div className="h-[90px] bg-space-tertiary/30 rounded-lg border border-white/5 flex items-center justify-center">
-                    <span className="text-text-dim text-sm opacity-50">Advertisement</span>
-                </div>
-            </div>
 
             {/* Journey Map */}
             <section className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isLoaded ? 'animate-fade-in-up animation-delay-400' : 'opacity-0'}`}>
@@ -515,48 +815,61 @@ export default function MissionControl() {
                     <div className="absolute hidden md:block top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-500 via-orange-500 to-green-500 opacity-40 -translate-y-1/2 rounded-full" />
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-3">
-                        {planets.map((planet, index) => {
+                        {planets.map((planet) => {
                             const unlocked = isUnlocked(planet.id);
                             const highScore = progress.highScores[planet.id] || 0;
                             const isNext = nextPlanet?.id === planet.id;
                             const isHome = planet.id === 'earth';
+                            const isMoon = planet.id === 'moon';
                             const canUnlockNow = isNext && progress.stardust >= planet.stardustCost;
 
                             // SURPRISE! Hidden planets show as mystery until unlocked
                             const showAsMystery = planet.isHidden && !unlocked;
 
+                            // Make Moon smaller to distinguish it as a "surprise" special world
+                            const orbSize = isMoon ? 44 : 56;
+                            const cardPadding = isMoon ? 'p-3' : 'p-4';
+
                             return (
                                 <div
                                     key={planet.id}
-                                    className={`relative flex flex-col items-center p-4 rounded-xl transition-all duration-300 hover:scale-105 ${showAsMystery
+                                    className={`relative flex flex-col items-center ${cardPadding} rounded-xl transition-all duration-300 hover:scale-105 ${showAsMystery
                                         ? 'bg-gradient-to-br from-purple-900/40 to-pink-900/20 border-2 border-dashed border-purple-500/40'
-                                        : unlocked
-                                            ? 'bg-space-tertiary/60 hover:bg-space-tertiary border border-green-500/30'
-                                            : isNext
-                                                ? 'bg-purple-900/40 border-2 border-neon-purple/60'
-                                                : 'bg-space-dark/50 opacity-60 hover:opacity-80'
+                                        : isMoon && unlocked
+                                            ? 'bg-gradient-to-br from-gray-800/60 to-purple-900/30 border border-pink-500/40 scale-[0.92]'
+                                            : unlocked
+                                                ? 'bg-space-tertiary/60 hover:bg-space-tertiary border border-green-500/30'
+                                                : isNext
+                                                    ? 'bg-purple-900/40 border-2 border-neon-purple/60 animate-card-glow'
+                                                    : 'bg-space-dark/50 opacity-60 hover:opacity-80'
                                         }`}
-                                    style={{ animationDelay: `${index * 0.1}s` }}
                                 >
-                                    {/* Status badge */}
-                                    <div className={`absolute -top-2 -left-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-lg ${showAsMystery
-                                        ? 'bg-purple-600 text-white shadow-purple-500/50 animate-pulse'
-                                        : unlocked
-                                            ? 'bg-green-500 text-white shadow-green-500/50'
-                                            : isNext
-                                                ? 'bg-purple-500 text-white shadow-purple-500/50 animate-bounce'
-                                                : 'bg-gray-700 text-gray-400'
+                                    {/* Status badge - Show planet order number */}
+                                    <div className={`absolute -top-2 -left-2 rounded-full flex items-center justify-center text-xs font-bold shadow-lg ${showAsMystery
+                                        ? 'w-7 h-7 bg-purple-600 text-white shadow-purple-500/50 animate-pulse'
+                                        : isMoon
+                                            ? 'w-6 h-6 bg-pink-500/80 text-white shadow-pink-500/50'
+                                            : unlocked
+                                                ? 'w-7 h-7 bg-green-500 text-white shadow-green-500/50'
+                                                : isNext
+                                                    ? 'w-7 h-7 bg-purple-500 text-white shadow-purple-500/50 animate-bounce'
+                                                    : 'w-7 h-7 bg-gray-700 text-gray-400'
                                         }`}>
-                                        {showAsMystery ? '?' : unlocked ? '✓' : index + 1}
+                                        {showAsMystery ? '?' : unlocked ? '✓' : isMoon ? '🌙' : planet.order + 1}
                                     </div>
 
                                     {/* Special badges */}
                                     {showAsMystery && (
-                                        <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-purple-500/30 text-purple-300 text-[10px] rounded-full font-bold animate-pulse">
-                                            ???
+                                        <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-gradient-to-r from-purple-600/50 to-pink-600/50 text-purple-200 text-[10px] rounded-full font-bold animate-pulse border border-purple-400/30">
+                                            HIDDEN
                                         </div>
                                     )}
-                                    {!showAsMystery && planet.isBonus && (
+                                    {!showAsMystery && isMoon && (
+                                        <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-pink-500/30 text-pink-300 text-[9px] rounded-full font-bold">
+                                            SURPRISE
+                                        </div>
+                                    )}
+                                    {!showAsMystery && planet.isBonus && !isMoon && (
                                         <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-yellow-500/30 text-yellow-400 text-[10px] rounded-full font-bold">
                                             BONUS
                                         </div>
@@ -566,41 +879,46 @@ export default function MissionControl() {
                                             🏠 HOME
                                         </div>
                                     )}
+                                    {!showAsMystery && planet.id === 'pluto' && (
+                                        <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-cyan-500/30 text-cyan-400 text-[10px] rounded-full font-bold">
+                                            FREE
+                                        </div>
+                                    )}
 
                                     {/* Planet orb - Mystery or Real */}
                                     {showAsMystery ? (
-                                        <div className="mb-3 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600/40 to-pink-600/40 flex items-center justify-center border-2 border-dashed border-purple-400/50">
-                                            <span className="text-2xl animate-pulse">?</span>
+                                        <div className={`mb-3 ${isMoon ? 'w-11 h-11' : 'w-14 h-14'} rounded-full bg-gradient-to-br from-purple-600/40 to-pink-600/40 flex items-center justify-center border-2 border-dashed border-purple-400/50`}>
+                                            <span className={`${isMoon ? 'text-xl' : 'text-2xl'} animate-pulse`}>?</span>
                                         </div>
                                     ) : (
-                                        <div className={`mb-3 transition-all duration-300 ${!unlocked ? 'grayscale opacity-60' : ''}`}>
+                                        <div className={`mb-3 transition-all duration-300 ${!unlocked ? 'grayscale opacity-60' : ''} ${unlocked ? 'animate-float' : ''}`} style={{ animationDelay: `${planet.order * 0.2}s` }}>
                                             <PlanetOrb
                                                 planetId={planet.id}
-                                                size={56}
+                                                size={orbSize}
                                                 animated={unlocked}
                                             />
                                         </div>
                                     )}
 
-                                    <p className={`font-heading text-sm ${showAsMystery ? 'text-purple-300' : unlocked ? 'text-white' : 'text-gray-500'}`}>
+                                    <p className={`font-heading ${isMoon ? 'text-xs' : 'text-sm'} ${showAsMystery ? 'text-purple-300' : isMoon && unlocked ? 'text-pink-300' : unlocked ? 'text-white' : 'text-gray-500'}`}>
                                         {showAsMystery ? '???' : planet.name}
                                     </p>
 
-                                    <p className="text-text-dim text-xs truncate w-full text-center mt-1">
+                                    <p className={`text-text-dim ${isMoon ? 'text-[10px]' : 'text-xs'} truncate w-full text-center mt-1`}>
                                         {showAsMystery ? 'Surprise!' : planet.gameName}
                                     </p>
 
                                     {unlocked ? (
                                         <Link
                                             href={`/games/${planet.id}`}
-                                            className="mt-3 px-4 py-1.5 bg-neon-cyan/20 hover:bg-neon-cyan/40 text-neon-cyan text-xs rounded-full transition-all duration-300 hover:scale-110"
+                                            className={`mt-3 ${isMoon ? 'px-3 py-1' : 'px-4 py-1.5'} bg-neon-cyan/20 hover:bg-neon-cyan/40 text-neon-cyan text-xs rounded-full transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(0,240,255,0.4)]`}
                                         >
                                             PLAY
                                         </Link>
                                     ) : canUnlockNow ? (
                                         <button
                                             onClick={() => handleUnlock(planet)}
-                                            className="mt-3 px-3 py-1.5 bg-neon-purple/30 hover:bg-neon-purple/50 text-neon-purple text-xs rounded-full transition-all duration-300 hover:scale-110"
+                                            className={`mt-3 ${isMoon ? 'px-2 py-1' : 'px-3 py-1.5'} bg-neon-purple/30 hover:bg-neon-purple/50 text-neon-purple text-xs rounded-full transition-all duration-300 hover:scale-110`}
                                         >
                                             🔓 UNLOCK
                                         </button>
@@ -622,8 +940,86 @@ export default function MissionControl() {
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section className="bg-gradient-to-b from-space-secondary/30 to-space-deep border-y border-white/5 py-20">
+            {/* 🏆 MASTER CHALLENGE BANNER - Black Hole Escape */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <Link
+                    href="/games/blackhole"
+                    className="group relative block rounded-2xl overflow-hidden border-2 border-purple-500/40 hover:border-purple-400/80 transition-all duration-500 hover:shadow-[0_0_60px_rgba(168,85,247,0.3)]"
+                >
+                    {/* Animated gradient background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-950 via-black to-orange-950 opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-orange-600/10 animate-aurora" />
+
+                    {/* Animated stars */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        {[...Array(15)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                                style={{
+                                    left: `${5 + Math.random() * 90}%`,
+                                    top: `${10 + Math.random() * 80}%`,
+                                    animationDelay: `${Math.random() * 2}s`,
+                                    opacity: 0.3 + Math.random() * 0.4
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Black hole visual - left side */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 h-40 md:w-56 md:h-56">
+                        <div className="absolute inset-0 rounded-full bg-black shadow-[0_0_60px_20px_rgba(168,85,247,0.4)] animate-pulse" />
+                        <div className="absolute inset-4 rounded-full border-2 border-orange-500/20 animate-spin" style={{ animationDuration: '15s' }} />
+                        <div className="absolute inset-8 rounded-full border border-pink-500/30 animate-spin" style={{ animationDuration: '10s', animationDirection: 'reverse' }} />
+                        <div className="absolute inset-12 rounded-full border border-purple-400/20 animate-spin" style={{ animationDuration: '20s' }} />
+                    </div>
+
+                    {/* Content */}
+                    <div className="relative py-8 px-8 pl-24 md:pl-36 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="text-center md:text-left">
+                            <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
+                                <span className="px-3 py-1 bg-gradient-to-r from-purple-500/30 to-orange-500/30 text-orange-400 text-sm rounded-full font-bold border border-orange-500/30 animate-pulse">
+                                    🏆 MASTER CHALLENGE
+                                </span>
+                            </div>
+                            <h3 className="font-heading text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 mb-1">
+                                Black Hole Escape: Event Horizon
+                            </h3>
+                            <p className="text-purple-300 text-sm md:text-base">
+                                Complete this challenge to <span className="text-yellow-400 font-bold">unlock ALL planets instantly!</span>
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="hidden sm:flex flex-col items-center text-center px-4 border-l border-purple-500/30">
+                                <span className="text-2xl mb-1">⏱️</span>
+                                <span className="text-purple-300 text-xs">Time Dilation</span>
+                            </div>
+                            <div className="hidden sm:flex flex-col items-center text-center px-4 border-l border-purple-500/30">
+                                <span className="text-2xl mb-1">🌀</span>
+                                <span className="text-pink-300 text-xs">Gravity Anchors</span>
+                            </div>
+                            <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-orange-600 hover:from-purple-500 hover:to-orange-500 text-white font-bold rounded-xl transition-all group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] flex items-center gap-2">
+                                <span>🕳️</span>
+                                <span>Enter the Void</span>
+                                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Glowing edge */}
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 opacity-60" />
+                </Link>
+            </section>
+
+            {/* ☀️ FINAL BOSS CHALLENGE - Solar Showdown */}
+            <SunBossChallengeSection />
+
+            {/* How It Works - Scroll Reveal */}
+
+            <section
+                ref={howItWorksRef}
+                className={`bg-gradient-to-b from-space-secondary/30 to-space-deep border-y border-white/5 py-20 transition-all duration-1000 ${howItWorksVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-heading text-4xl text-white text-center mb-16">How It Works</h2>
 
@@ -650,8 +1046,11 @@ export default function MissionControl() {
                 </div>
             </section>
 
-            {/* Educational Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            {/* Educational Section - Scroll Reveal */}
+            <section
+                ref={educationRef}
+                className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 transition-all duration-1000 delay-100 ${educationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            >
                 <div className="grid md:grid-cols-2 gap-8">
                     <div className="planet-card hover:border-neon-cyan/50 transition-colors duration-300">
                         <h3 className="font-heading text-2xl text-neon-cyan mb-4">🧠 Learn While You Play</h3>
@@ -694,24 +1093,86 @@ export default function MissionControl() {
                 </div>
             </section>
 
-            {/* Ad Slot */}
-            <div className="max-w-7xl mx-auto px-4 pb-12">
-                <div className="h-[250px] bg-space-tertiary/30 rounded-lg border border-white/5 flex items-center justify-center">
-                    <span className="text-text-dim text-sm opacity-50">Advertisement</span>
-                </div>
-            </div>
+            {/* Blog Section - Scroll Reveal */}
+            <section
+                ref={blogRef}
+                className={`py-16 bg-gradient-to-b from-space-dark to-space-deep transition-all duration-1000 ${blogVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            >
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <h2 className="font-heading text-3xl md:text-4xl text-neon-cyan mb-4">
+                            📚 Space Learning Blog
+                        </h2>
+                        <p className="text-text-secondary max-w-2xl mx-auto">
+                            Dive deeper into the wonders of our universe with educational articles
+                            about planets, space phenomena, and cosmic mysteries.
+                        </p>
+                    </div>
 
-            {/* Fun Facts */}
-            <section className="bg-space-dark border-t border-white/5 py-12">
-                <div className="max-w-7xl mx-auto px-4 text-center">
-                    <p className="text-neon-cyan uppercase tracking-widest text-sm mb-4">✨ Did You Know?</p>
-                    <p className="text-text-secondary text-xl italic max-w-3xl mx-auto leading-relaxed">
-                        &quot;If you could stand on Neptune, the winds would blow you away at 2,000 km/h —
-                        faster than the speed of sound on Earth. That&apos;s why we&apos;re playing the game from
-                        the safety of our probe!&quot;
-                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <Link href="/blog/why-is-neptune-blue" className="group">
+                            <article className="planet-card h-full hover:border-neon-cyan/60 transition-all duration-300 hover:scale-[1.02] hover:bg-blue-900/10">
+                                <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">🔵</span>
+                                <h3 className="font-heading text-lg text-white group-hover:text-neon-cyan transition-colors mb-2">
+                                    Why Is Neptune Blue?
+                                </h3>
+                                <p className="text-text-secondary text-sm">
+                                    Discover the science behind the ice giant&apos;s stunning azure color.
+                                </p>
+                            </article>
+                        </Link>
+
+                        <Link href="/blog/jupiter-great-red-spot" className="group">
+                            <article className="planet-card h-full hover:border-neon-orange/60 transition-all duration-300 hover:scale-[1.02] hover:bg-orange-900/10">
+                                <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">🌪️</span>
+                                <h3 className="font-heading text-lg text-white group-hover:text-neon-cyan transition-colors mb-2">
+                                    Jupiter&apos;s Great Red Spot
+                                </h3>
+                                <p className="text-text-secondary text-sm">
+                                    A storm bigger than Earth that has raged for over 400 years.
+                                </p>
+                            </article>
+                        </Link>
+
+                        <Link href="/blog/venus-hottest-planet" className="group">
+                            <article className="planet-card h-full hover:border-red-500/60 transition-all duration-300 hover:scale-[1.02] hover:bg-red-900/10">
+                                <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">🔥</span>
+                                <h3 className="font-heading text-lg text-white group-hover:text-neon-cyan transition-colors mb-2">
+                                    Why Is Venus Hotter Than Mercury?
+                                </h3>
+                                <p className="text-text-secondary text-sm">
+                                    Learn about the runaway greenhouse effect and its implications.
+                                </p>
+                            </article>
+                        </Link>
+                    </div>
+
+                    <div className="text-center">
+                        <Link
+                            href="/blog"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-neon-cyan/10 hover:bg-neon-cyan/20 border border-neon-cyan/50 rounded-lg text-neon-cyan transition-all duration-300 hover:scale-105"
+                        >
+                            <span>📖</span>
+                            <span>View All Articles</span>
+                            <span>→</span>
+                        </Link>
+                    </div>
                 </div>
             </section>
+
+
+            {/* Achievements Section */}
+            <section className="max-w-4xl mx-auto px-4 py-12">
+                <div className="text-center mb-8">
+                    <h2 className="font-heading text-2xl text-white mb-2">🏆 Your Achievements</h2>
+                    <p className="text-text-dim text-sm">Unlock badges as you explore the solar system</p>
+                </div>
+                <AchievementsDisplay />
+            </section>
+
+
+            {/* Rotating Fun Facts */}
+            <RotatingFunFacts />
 
         </div>
     );

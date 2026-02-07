@@ -1,6 +1,15 @@
 import { MetadataRoute } from 'next';
 import { PLANETS } from '@/lib/gameTypes';
 
+// Blog post slugs
+const BLOG_POSTS = [
+    'why-is-neptune-blue',
+    'jupiter-great-red-spot',
+    'saturn-rings-composition',
+    'mars-olympus-mons',
+    'venus-hottest-planet',
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://orbitquest.coredrivn.com';
     const currentDate = new Date().toISOString();
@@ -12,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
             lastModified: currentDate,
             changeFrequency: 'weekly',
             priority: 1.0,
+        },
+        {
+            url: `${baseUrl}/blog`,
+            lastModified: currentDate,
+            changeFrequency: 'weekly',
+            priority: 0.9,
         },
         {
             url: `${baseUrl}/about`,
@@ -47,5 +62,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.9,
     }));
 
-    return [...staticPages, ...gamePages];
+    // Blog pages
+    const blogPages: MetadataRoute.Sitemap = BLOG_POSTS.map((slug) => ({
+        url: `${baseUrl}/blog/${slug}`,
+        lastModified: currentDate,
+        changeFrequency: 'monthly' as const,
+        priority: 0.8,
+    }));
+
+    return [...staticPages, ...gamePages, ...blogPages];
 }

@@ -11,6 +11,7 @@ const DEFAULT_PROGRESS: PlayerProgress = {
     highScores: {},
     lastPlayed: null,
     hasPlayedFirstGame: false,
+    gamesPlayedAtLeastOnce: [], // Track games played for boss challenge unlock
 };
 
 /**
@@ -31,6 +32,10 @@ export function loadProgress(): PlayerProgress {
             if (parsed.unlockedPlanets.includes('neptune') && !parsed.hasPlayedFirstGame) {
                 parsed.hasPlayedFirstGame = true;
             }
+            // Migrate old saves without gamesPlayedAtLeastOnce
+            if (!parsed.gamesPlayedAtLeastOnce) {
+                parsed.gamesPlayedAtLeastOnce = [];
+            }
             return parsed;
         }
     } catch (error) {
@@ -39,6 +44,7 @@ export function loadProgress(): PlayerProgress {
 
     return DEFAULT_PROGRESS;
 }
+
 
 /**
  * Save player progress to localStorage
@@ -144,6 +150,29 @@ export function getStardustBalance(): number {
  */
 export function hasStartedPlaying(): boolean {
     return loadProgress().hasPlayedFirstGame || false;
+}
+
+/**
+ * Mark a game as played at least once (for boss challenge unlock)
+ */
+export function markGamePlayed(planetId: string): PlayerProgress {
+    const progress = loadProgress();
+    if (!progress.gamesPlayedAtLeastOnce) {
+        progress.gamesPlayedAtLeastOnce = [];
+    }
+    if (!progress.gamesPlayedAtLeastOnce.includes(planetId)) {
+        progress.gamesPlayedAtLeastOnce.push(planetId);
+        saveProgress(progress);
+    }
+    return progress;
+}
+
+/**
+ * Get list of games played at least once
+ */
+export function getGamesPlayedAtLeastOnce(): string[] {
+    const progress = loadProgress();
+    return progress.gamesPlayedAtLeastOnce || [];
 }
 
 /**

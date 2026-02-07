@@ -86,33 +86,24 @@ export default function TermsPage() {
                             <h2 className="font-heading text-xl text-neon-purple mb-4">6. Educational Content</h2>
                             <p>
                                 The educational content provided about planets and space is sourced from publicly
-                                available information from NASA, ESA, and other reputable sources. While we strive
+                                available information from organizations such as NASA and ESA. While we strive
                                 for accuracy, this content is provided for entertainment and general educational
-                                purposes only and should not be used for academic or professional purposes without
-                                verification.
+                                purposes only and should not be relied upon for academic or professional purposes
+                                without independent verification from authoritative sources.
                             </p>
                         </section>
 
                         <section>
                             <h2 className="font-heading text-xl text-neon-purple mb-4">7. Limitation of Liability</h2>
                             <p>
-                                To the fullest extent permitted by law, OrbitQuest and its operators shall not be
+                                To the fullest extent permitted by applicable law, OrbitQuest and its operators shall not be
                                 liable for any indirect, incidental, special, consequential, or punitive damages
                                 arising from your use of the website or games.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">8. Governing Law</h2>
-                            <p>
-                                These Terms shall be governed and construed in accordance with the laws of India,
-                                without regard to its conflict of law provisions. Any disputes arising under these
-                                terms shall be subject to the exclusive jurisdiction of the courts in India.
-                            </p>
-                        </section>
-
-                        <section>
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">9. Changes to Terms</h2>
+                            <h2 className="font-heading text-xl text-neon-purple mb-4">8. Changes to Terms</h2>
                             <p>
                                 We reserve the right to modify these Terms of Use at any time. Changes will be
                                 effective immediately upon posting to this page. Your continued use of the website
@@ -121,7 +112,7 @@ export default function TermsPage() {
                         </section>
 
                         <section>
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">10. Contact Us</h2>
+                            <h2 className="font-heading text-xl text-neon-purple mb-4">9. Contact Us</h2>
                             <p>
                                 If you have any questions about these Terms of Use, please contact us at:{' '}
                                 <a href="mailto:solutions@coredrivn.com" className="text-neon-cyan hover:underline">

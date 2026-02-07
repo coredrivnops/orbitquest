@@ -1,22 +1,40 @@
-// Pluto Game Logic - "Planet or Not?" 
-// A Tinder/Reigns-style swipe classification game
+// Pluto Game Logic - "ORBIT DEFENDER"
+// A retro twin-stick shooter where Pluto defends against Kuiper Belt invaders
 
-export interface Card {
-    id: string;
-    name: string;
-    description: string;
-    isPlanet: boolean;
-    isSpecial?: boolean;
-    specialReaction?: string;
+export interface Projectile {
     x: number;
     y: number;
-    rotation: number;
-    targetX: number;
-    opacity: number;
-    scale: number;
-    imageType: 'planet' | 'dwarf' | 'moon' | 'asteroid' | 'comet' | 'star' | 'other';
+    vx: number;
+    vy: number;
+    radius: number;
     color: string;
-    funFact: string;
+    trail: { x: number; y: number; alpha: number }[];
+}
+
+export interface Enemy {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+    type: 'rock' | 'ice' | 'comet' | 'asteroid';
+    health: number;
+    rotation: number;
+    rotationSpeed: number;
+    points: number;
+    color: string;
+}
+
+export interface Moon {
+    id: string;
+    name: string;
+    angle: number;
+    orbitRadius: number;
+    radius: number;
+    color: string;
+    alive: boolean;
+    respawnTimer: number;
+    pulsePhase: number;
 }
 
 export interface Particle {
@@ -28,47 +46,41 @@ export interface Particle {
     color: string;
     life: number;
     maxLife: number;
-    emoji?: string;
+    type: 'explosion' | 'spark' | 'star' | 'trail';
 }
 
-// All the celestial objects to classify
-const CELESTIAL_OBJECTS = [
-    // ACTUAL PLANETS
-    { id: 'mercury', name: 'Mercury', description: 'Closest to the Sun', isPlanet: true, imageType: 'planet', color: '#b5b5b5', funFact: 'Mercury is the smallest planet and has no moons!' },
-    { id: 'venus', name: 'Venus', description: 'Hottest planet', isPlanet: true, imageType: 'planet', color: '#e6c87a', funFact: 'Venus spins backwards compared to other planets!' },
-    { id: 'earth', name: 'Earth', description: 'Our home', isPlanet: true, imageType: 'planet', color: '#4a90d9', funFact: 'Earth is the only planet not named after a god!' },
-    { id: 'mars', name: 'Mars', description: 'The Red Planet', isPlanet: true, imageType: 'planet', color: '#c1440e', funFact: 'Mars has the tallest volcano in the solar system - Olympus Mons!' },
-    { id: 'jupiter', name: 'Jupiter', description: 'Largest planet', isPlanet: true, imageType: 'planet', color: '#d4a574', funFact: 'Jupiter has 95 known moons!' },
-    { id: 'saturn', name: 'Saturn', description: 'Ringed beauty', isPlanet: true, imageType: 'planet', color: '#f4d59e', funFact: 'Saturn could float in water if there was a bathtub big enough!' },
-    { id: 'uranus', name: 'Uranus', description: 'Sideways spinner', isPlanet: true, imageType: 'planet', color: '#a5d4e8', funFact: 'Uranus rotates on its side at 98 degrees!' },
-    { id: 'neptune', name: 'Neptune', description: 'Windiest world', isPlanet: true, imageType: 'planet', color: '#4b70dd', funFact: 'Neptune has winds up to 2,100 km/h!' },
+export interface PowerUp {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    type: 'rapidfire' | 'spread' | 'shield' | 'freeze' | 'nuke' | 'heart';
+    radius: number;
+    pulsePhase: number;
+}
 
-    // DWARF PLANETS (NOT planets!)
-    { id: 'pluto', name: 'Pluto', description: 'The controversial one', isPlanet: false, isSpecial: true, imageType: 'dwarf', color: '#c4a882', funFact: 'Pluto was a "planet" for 76 years before being reclassified in 2006!', specialReaction: 'HEY! I used to be a planet! This is discrimination!' },
-    { id: 'ceres', name: 'Ceres', description: 'Largest in asteroid belt', isPlanet: false, imageType: 'dwarf', color: '#9a9a9a', funFact: 'Ceres was discovered in 1801 and was also once called a planet!' },
-    { id: 'eris', name: 'Eris', description: 'Bigger than Pluto', isPlanet: false, imageType: 'dwarf', color: '#f0ebe0', funFact: 'Eris caused the great planet debate - it\'s actually bigger than Pluto!' },
-    { id: 'makemake', name: 'Makemake', description: 'Kuiper Belt dwarf', isPlanet: false, imageType: 'dwarf', color: '#d4a574', funFact: 'Makemake is named after a Rapa Nui god of fertility!' },
-    { id: 'haumea', name: 'Haumea', description: 'Egg-shaped world', isPlanet: false, imageType: 'dwarf', color: '#e0e0e0', funFact: 'Haumea spins so fast it\'s shaped like an egg!' },
+interface TriviaQuestion {
+    question: string;
+    answers: string[];
+    correct: number;
+    fact: string;
+}
 
-    // MOONS (NOT planets!)
-    { id: 'moon', name: 'The Moon', description: 'Earth\'s companion', isPlanet: false, imageType: 'moon', color: '#c4c4c4', funFact: 'The Moon is slowly drifting away from Earth at 3.8cm per year!' },
-    { id: 'titan', name: 'Titan', description: 'Saturn\'s largest moon', isPlanet: false, imageType: 'moon', color: '#d4a060', funFact: 'Titan has lakes of liquid methane and a thick atmosphere!' },
-    { id: 'europa', name: 'Europa', description: 'Jupiter\'s icy moon', isPlanet: false, imageType: 'moon', color: '#e8e0d0', funFact: 'Europa likely has a liquid water ocean under its ice!' },
-    { id: 'ganymede', name: 'Ganymede', description: 'Largest moon', isPlanet: false, imageType: 'moon', color: '#b0a090', funFact: 'Ganymede is bigger than Mercury!' },
-    { id: 'charon', name: 'Charon', description: 'Pluto\'s big moon', isPlanet: false, imageType: 'moon', color: '#9a9090', funFact: 'Charon is half the size of Pluto - they orbit each other!' },
+const MOON_DATA = [
+    { id: 'charon', name: 'Charon', orbitRadius: 90, radius: 18, color: '#b8a090' },
+    { id: 'nix', name: 'Nix', orbitRadius: 110, radius: 10, color: '#d0d0d0' },
+    { id: 'hydra', name: 'Hydra', orbitRadius: 130, radius: 11, color: '#c8c8e0' },
+    { id: 'kerberos', name: 'Kerberos', orbitRadius: 150, radius: 7, color: '#a8a8a8' },
+    { id: 'styx', name: 'Styx', orbitRadius: 170, radius: 6, color: '#989898' },
+];
 
-    // ASTEROIDS & COMETS (NOT planets!)
-    { id: 'halley', name: 'Halley\'s Comet', description: 'Famous visitor', isPlanet: false, imageType: 'comet', color: '#88ccff', funFact: 'Halley\'s Comet visits Earth every 75-79 years!' },
-    { id: 'vesta', name: 'Vesta', description: 'Giant asteroid', isPlanet: false, imageType: 'asteroid', color: '#8a8a8a', funFact: 'Vesta is so bright you can see it with the naked eye!' },
-    { id: 'bennu', name: 'Bennu', description: 'Near-Earth asteroid', isPlanet: false, imageType: 'asteroid', color: '#666666', funFact: 'NASA collected samples from Bennu in 2023!' },
-
-    // STARS (NOT planets!)
-    { id: 'sun', name: 'The Sun', description: 'Our star', isPlanet: false, imageType: 'star', color: '#ffdd44', funFact: 'The Sun contains 99.86% of all mass in our solar system!' },
-    { id: 'proxima', name: 'Proxima Centauri', description: 'Nearest star', isPlanet: false, imageType: 'star', color: '#ff6644', funFact: 'Proxima Centauri is 4.24 light-years away!' },
-
-    // TRICK QUESTIONS
-    { id: 'iss', name: 'Int\'l Space Station', description: 'Human-made satellite', isPlanet: false, imageType: 'other', color: '#cccccc', funFact: 'The ISS orbits Earth 16 times per day!' },
-    { id: 'blackhole', name: 'Black Hole', description: 'Space-time eater', isPlanet: false, imageType: 'other', color: '#111111', funFact: 'Black holes can warp space and time!' },
+const TRIVIA: TriviaQuestion[] = [
+    { question: "What is Pluto's heart-shaped feature called?", answers: ["Pluto's Love", "Tombaugh Regio", "Heart Valley", "Icy Plain"], correct: 1, fact: "Tombaugh Regio is named after Clyde Tombaugh, who discovered Pluto in 1930!" },
+    { question: "How many moons does Pluto have?", answers: ["1", "3", "5", "7"], correct: 2, fact: "Pluto has 5 moons: Charon, Nix, Hydra, Kerberos, and Styx!" },
+    { question: "When was Pluto demoted from planet status?", answers: ["2000", "2006", "2010", "2015"], correct: 1, fact: "The IAU reclassified Pluto as a 'dwarf planet' in August 2006." },
+    { question: "What spacecraft visited Pluto in 2015?", answers: ["Voyager", "Cassini", "New Horizons", "Juno"], correct: 2, fact: "New Horizons flew by Pluto after a 9.5-year journey!" },
+    { question: "How long is a year on Pluto?", answers: ["165 years", "200 years", "248 years", "300 years"], correct: 2, fact: "Pluto takes 248 Earth years to orbit the Sun once!" },
+    { question: "What gives Pluto its reddish color?", answers: ["Rust", "Tholins", "Iron", "Blood"], correct: 1, fact: "Tholins are complex organic molecules created by UV light hitting nitrogen and methane!" },
 ];
 
 export class PlutoGameLogic {
@@ -77,39 +89,59 @@ export class PlutoGameLogic {
     centerX: number;
     centerY: number;
 
-    // Cards
-    currentCard: Card | null;
-    nextCards: Card[];
-    usedCardIds: Set<string>;
+    // Pluto
+    plutoRadius: number;
+    plutoRotation: number;
+    aimAngle: number;
 
-    // Swipe state
-    isDragging: boolean;
-    dragStartX: number;
-    dragStartY: number;
-    cardStartX: number;
+    // Shooting
+    projectiles: Projectile[];
+    shootCooldown: number;
+    maxShootCooldown: number;
+    spreadShot: boolean;
+    spreadShotTimer: number;
+
+    // Moons (shields)
+    moons: Moon[];
+    moonOrbitSpeed: number;
+
+    // Enemies
+    enemies: Enemy[];
+    waveNumber: number;
+    enemiesPerWave: number;
+    enemiesSpawned: number;
+    waveComplete: boolean;
+    betweenWaves: boolean;
+    waveTimer: number;
+    spawnTimer: number;
+
+    // Power-ups
+    powerUps: PowerUp[];
+    freezeActive: boolean;
+    freezeTimer: number;
+    heartShield: boolean;
+
+    // Effects
+    particles: Particle[];
+    screenShake: number;
 
     // Game state
     score: number;
     stardustCollected: number;
-    credibility: number; // Health
-    streak: number;
-    maxStreak: number;
     isGameOver: boolean;
-    cardsAnswered: number;
-    correctAnswers: number;
+    gameTime: number;
+    combo: number;
+    comboTimer: number;
 
-    // Animation
-    particles: Particle[];
-    showingResult: boolean;
-    resultText: string;
-    resultColor: string;
-    resultTimer: number;
-    showFunFact: boolean;
-    currentFunFact: string;
+    // Trivia
+    showTrivia: boolean;
+    currentTrivia: TriviaQuestion | null;
+    triviaAnswered: boolean;
 
-    // Background
+    // Visual
     backgroundStars: { x: number; y: number; size: number; twinkle: number }[];
     pulsePhase: number;
+    gridOffset: number;
 
     // Session
     sessionStardust: number;
@@ -120,40 +152,53 @@ export class PlutoGameLogic {
         this.height = height;
         this.centerX = width / 2;
         this.centerY = height / 2;
-        this.maxSessionStardust = 60;
+        this.plutoRadius = 35;
+        this.maxSessionStardust = 80;
 
-        this.currentCard = null;
-        this.nextCards = [];
-        this.usedCardIds = new Set();
-        this.isDragging = false;
-        this.dragStartX = 0;
-        this.dragStartY = 0;
-        this.cardStartX = 0;
+        // Initialize all properties
+        this.plutoRotation = 0;
+        this.aimAngle = 0;
+        this.projectiles = [];
+        this.shootCooldown = 0;
+        this.maxShootCooldown = 12;
+        this.spreadShot = false;
+        this.spreadShotTimer = 0;
+        this.moons = [];
+        this.moonOrbitSpeed = 0.02;
+        this.enemies = [];
+        this.waveNumber = 0;
+        this.enemiesPerWave = 5;
+        this.enemiesSpawned = 0;
+        this.waveComplete = false;
+        this.betweenWaves = true;
+        this.waveTimer = 0;
+        this.spawnTimer = 0;
+        this.powerUps = [];
+        this.freezeActive = false;
+        this.freezeTimer = 0;
+        this.heartShield = false;
+        this.particles = [];
+        this.screenShake = 0;
         this.score = 0;
         this.stardustCollected = 0;
         this.sessionStardust = 0;
-        this.credibility = 100;
-        this.streak = 0;
-        this.maxStreak = 0;
         this.isGameOver = false;
-        this.cardsAnswered = 0;
-        this.correctAnswers = 0;
-        this.particles = [];
-        this.showingResult = false;
-        this.resultText = '';
-        this.resultColor = '';
-        this.resultTimer = 0;
-        this.showFunFact = false;
-        this.currentFunFact = '';
+        this.gameTime = 0;
+        this.combo = 1;
+        this.comboTimer = 0;
+        this.showTrivia = false;
+        this.currentTrivia = null;
+        this.triviaAnswered = false;
         this.backgroundStars = [];
         this.pulsePhase = 0;
+        this.gridOffset = 0;
 
         this.initializeStars();
         this.reset();
     }
 
     initializeStars() {
-        for (let i = 0; i < 150; i++) {
+        for (let i = 0; i < 100; i++) {
             this.backgroundStars.push({
                 x: Math.random() * this.width,
                 y: Math.random() * this.height,
@@ -164,272 +209,609 @@ export class PlutoGameLogic {
     }
 
     reset() {
-        this.usedCardIds = new Set();
-        this.nextCards = this.shuffleCards();
-        this.currentCard = null;
-        this.dealNextCard();
+        this.plutoRotation = 0;
+        this.aimAngle = 0;
+        this.projectiles = [];
+        this.shootCooldown = 0;
+        this.maxShootCooldown = 12;
+        this.spreadShot = false;
+        this.spreadShotTimer = 0;
+
+        // Initialize moons
+        this.moons = MOON_DATA.map((data, index) => ({
+            ...data,
+            angle: (Math.PI * 2 * index) / MOON_DATA.length,
+            alive: true,
+            respawnTimer: 0,
+            pulsePhase: Math.random() * Math.PI * 2,
+        }));
+
+        this.enemies = [];
+        this.waveNumber = 0;
+        this.enemiesPerWave = 5;
+        this.enemiesSpawned = 0;
+        this.waveComplete = false;
+        this.betweenWaves = true;
+        this.waveTimer = 120; // 2 seconds before first wave
+        this.spawnTimer = 0;
+
+        this.powerUps = [];
+        this.freezeActive = false;
+        this.freezeTimer = 0;
+        this.heartShield = false;
+
+        this.particles = [];
+        this.screenShake = 0;
 
         this.score = 0;
         this.stardustCollected = 0;
         this.sessionStardust = 0;
-        this.credibility = 100;
-        this.streak = 0;
-        this.maxStreak = 0;
         this.isGameOver = false;
-        this.cardsAnswered = 0;
-        this.correctAnswers = 0;
-        this.particles = [];
-        this.showingResult = false;
-        this.showFunFact = false;
+        this.gameTime = 0;
+        this.combo = 1;
+        this.comboTimer = 0;
+
+        this.showTrivia = false;
+        this.currentTrivia = null;
+        this.triviaAnswered = false;
     }
 
-    shuffleCards(): Card[] {
-        const shuffled = [...CELESTIAL_OBJECTS]
-            .sort(() => Math.random() - 0.5)
-            .map(obj => ({
-                ...obj,
-                x: this.centerX,
-                y: this.centerY - 50,
-                rotation: 0,
-                targetX: this.centerX,
-                opacity: 1,
-                scale: 1,
-            })) as Card[];
-        return shuffled;
-    }
+    handleInput(mouseX: number, mouseY: number, shooting: boolean) {
+        // Calculate aim angle
+        const dx = mouseX - this.centerX;
+        const dy = mouseY - this.centerY;
+        this.aimAngle = Math.atan2(dy, dx);
 
-    dealNextCard() {
-        if (this.nextCards.length === 0) {
-            // Reshuffle if we run out
-            this.nextCards = this.shuffleCards();
-        }
-
-        this.currentCard = this.nextCards.shift()!;
-        if (this.currentCard) {
-            this.currentCard.x = this.centerX;
-            this.currentCard.y = this.centerY - 50;
-            this.currentCard.rotation = 0;
-            this.currentCard.opacity = 1;
-            this.currentCard.scale = 0.5;
+        // Shooting
+        if (shooting && this.shootCooldown <= 0 && !this.showTrivia && !this.isGameOver) {
+            this.shoot();
         }
     }
 
-    handleMouseDown(x: number, y: number) {
-        if (this.showingResult || !this.currentCard || this.isGameOver) return;
+    shoot() {
+        const speed = 12;
+        const spreadAngles = this.spreadShot ? [-0.2, 0, 0.2] : [0];
 
-        // Check if clicking on card
-        const cardWidth = 280;
-        const cardHeight = 380;
-        const cardLeft = this.currentCard.x - cardWidth / 2;
-        const cardTop = this.currentCard.y - cardHeight / 2;
+        spreadAngles.forEach(offset => {
+            const angle = this.aimAngle + offset;
+            this.projectiles.push({
+                x: this.centerX + Math.cos(angle) * (this.plutoRadius + 10),
+                y: this.centerY + Math.sin(angle) * (this.plutoRadius + 10),
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                radius: 5,
+                color: '#ff69b4',
+                trail: [],
+            });
+        });
 
-        if (x >= cardLeft && x <= cardLeft + cardWidth &&
-            y >= cardTop && y <= cardTop + cardHeight) {
-            this.isDragging = true;
-            this.dragStartX = x;
-            this.dragStartY = y;
-            this.cardStartX = this.currentCard.x;
+        this.shootCooldown = this.maxShootCooldown;
+
+        // Muzzle flash particles
+        for (let i = 0; i < 5; i++) {
+            this.particles.push({
+                x: this.centerX + Math.cos(this.aimAngle) * (this.plutoRadius + 15),
+                y: this.centerY + Math.sin(this.aimAngle) * (this.plutoRadius + 15),
+                vx: Math.cos(this.aimAngle + (Math.random() - 0.5)) * 3,
+                vy: Math.sin(this.aimAngle + (Math.random() - 0.5)) * 3,
+                size: 3 + Math.random() * 3,
+                color: '#ff69b4',
+                life: 15,
+                maxLife: 15,
+                type: 'spark',
+            });
         }
     }
 
-    handleMouseMove(x: number, y: number) {
-        if (!this.isDragging || !this.currentCard) return;
+    answerTrivia(index: number) {
+        if (!this.currentTrivia || this.triviaAnswered) return;
 
-        const deltaX = x - this.dragStartX;
-        this.currentCard.x = this.cardStartX + deltaX;
+        this.triviaAnswered = true;
 
-        // Rotate based on drag distance
-        this.currentCard.rotation = deltaX * 0.0015;
-
-        // Calculate target position for visual feedback
-        this.currentCard.targetX = x;
-    }
-
-    handleMouseUp() {
-        if (!this.isDragging || !this.currentCard) return;
-
-        const deltaX = this.currentCard.x - this.centerX;
-        const threshold = 100;
-
-        if (Math.abs(deltaX) > threshold) {
-            // Swipe registered!
-            const swipedRight = deltaX > 0; // Right = PLANET
-            this.processAnswer(swipedRight);
-        } else {
-            // Reset card position
-            this.currentCard.x = this.centerX;
-            this.currentCard.rotation = 0;
-        }
-
-        this.isDragging = false;
-    }
-
-    processAnswer(answeredPlanet: boolean) {
-        if (!this.currentCard) return;
-
-        const isCorrect = answeredPlanet === this.currentCard.isPlanet;
-        const isPluto = this.currentCard.isSpecial && this.currentCard.id === 'pluto';
-
-        this.cardsAnswered++;
-
-        // Animate card flying off
-        const flyDirection = answeredPlanet ? 1 : -1;
-        this.currentCard.targetX = this.centerX + flyDirection * 600;
-
-        if (isPluto) {
-            // SPECIAL PLUTO HANDLING - it's always a trick!
-            this.showResult('😤 "I USED TO BE A PLANET!"', '#ff69b4');
-            this.createPlutoReaction();
-            // Give partial credit for Pluto - it's complicated!
-            this.score += 50;
-            this.streak++;
-            const stars = 2;
+        if (index === this.currentTrivia.correct) {
+            // Correct - bonus stardust and restore a moon
+            const bonus = 5;
             if (this.sessionStardust < this.maxSessionStardust) {
-                this.stardustCollected += stars;
-                this.sessionStardust += stars;
-            }
-            this.currentFunFact = this.currentCard.specialReaction || this.currentCard.funFact;
-        } else if (isCorrect) {
-            this.correctAnswers++;
-            this.streak++;
-            this.maxStreak = Math.max(this.maxStreak, this.streak);
-
-            // Score based on streak
-            const streakBonus = Math.min(this.streak, 10);
-            this.score += 100 * streakBonus;
-
-            // Stardust
-            const stars = 1 + Math.floor(this.streak / 3);
-            if (this.sessionStardust < this.maxSessionStardust) {
-                const earned = Math.min(stars, this.maxSessionStardust - this.sessionStardust);
+                const earned = Math.min(bonus, this.maxSessionStardust - this.sessionStardust);
                 this.stardustCollected += earned;
                 this.sessionStardust += earned;
             }
+            this.score += 500;
 
-            this.showResult(this.streak > 1 ? `✓ CORRECT! x${this.streak} STREAK` : '✓ CORRECT!', '#00ff88');
-            this.createCelebration(answeredPlanet);
-            this.currentFunFact = this.currentCard.funFact;
-        } else {
-            this.streak = 0;
-            this.credibility -= 15;
-
-            const correctAnswer = this.currentCard.isPlanet ? 'IS a planet!' : 'is NOT a planet!';
-            this.showResult(`✗ WRONG! ${this.currentCard.name} ${correctAnswer}`, '#ff4444');
-            this.createFailure();
-            this.currentFunFact = this.currentCard.funFact;
-
-            if (this.credibility <= 0) {
-                this.isGameOver = true;
+            // Restore a dead moon
+            const deadMoon = this.moons.find(m => !m.alive);
+            if (deadMoon) {
+                deadMoon.alive = true;
+                deadMoon.respawnTimer = 0;
             }
+
+            this.createExplosion(this.centerX, this.centerY, '#00ff88', 30);
         }
 
-        this.showFunFact = true;
+        setTimeout(() => {
+            this.showTrivia = false;
+            this.currentTrivia = null;
+            this.triviaAnswered = false;
+            this.startNextWave();
+        }, 2500);
     }
 
-    showResult(text: string, color: string) {
-        this.showingResult = true;
-        this.resultText = text;
-        this.resultColor = color;
-        this.resultTimer = 90; // 1.5 seconds at 60fps
+    startNextWave() {
+        this.waveNumber++;
+        this.enemiesPerWave = 5 + this.waveNumber * 2;
+        this.enemiesSpawned = 0;
+        this.waveComplete = false;
+        this.betweenWaves = false;
+        this.spawnTimer = 0;
     }
 
-    createCelebration(swipedRight: boolean) {
-        const emojis = ['⭐', '✨', '🌟', '💫'];
-        const startX = swipedRight ? this.width * 0.75 : this.width * 0.25;
+    spawnEnemy() {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.max(this.width, this.height) * 0.6;
+        const x = this.centerX + Math.cos(angle) * distance;
+        const y = this.centerY + Math.sin(angle) * distance;
 
-        for (let i = 0; i < 20; i++) {
-            this.particles.push({
-                x: startX + (Math.random() - 0.5) * 100,
-                y: this.centerY + (Math.random() - 0.5) * 100,
-                vx: (Math.random() - 0.5) * 8,
-                vy: -Math.random() * 6 - 2,
-                size: 20 + Math.random() * 20,
-                color: '#ffd700',
-                life: 60,
-                maxLife: 60,
-                emoji: emojis[Math.floor(Math.random() * emojis.length)],
-            });
+        // Speed toward center with some randomness
+        const speed = 1.5 + this.waveNumber * 0.2 + Math.random() * 0.5;
+        const targetAngle = Math.atan2(this.centerY - y, this.centerX - x);
+        const spread = (Math.random() - 0.5) * 0.3;
+
+        const types: ('rock' | 'ice' | 'comet' | 'asteroid')[] = ['rock', 'ice', 'comet', 'asteroid'];
+        const type = types[Math.floor(Math.random() * types.length)];
+
+        const typeData = {
+            rock: { radius: 20 + Math.random() * 15, health: 1, color: '#666666', points: 100 },
+            ice: { radius: 15 + Math.random() * 10, health: 1, color: '#88ddff', points: 150 },
+            comet: { radius: 18 + Math.random() * 12, health: 1, color: '#ffcc44', points: 200 },
+            asteroid: { radius: 30 + Math.random() * 20, health: 2, color: '#885533', points: 300 },
+        };
+
+        const data = typeData[type];
+
+        this.enemies.push({
+            x, y,
+            vx: Math.cos(targetAngle + spread) * speed,
+            vy: Math.sin(targetAngle + spread) * speed,
+            radius: data.radius,
+            type,
+            health: data.health,
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.1,
+            points: data.points,
+            color: data.color,
+        });
+
+        this.enemiesSpawned++;
+    }
+
+    spawnPowerUp(x: number, y: number) {
+        if (Math.random() > 0.15) return; // 15% chance
+
+        const types: ('rapidfire' | 'spread' | 'shield' | 'freeze' | 'nuke' | 'heart')[] =
+            ['rapidfire', 'spread', 'shield', 'freeze', 'nuke', 'heart'];
+        const type = types[Math.floor(Math.random() * types.length)];
+
+        this.powerUps.push({
+            x, y,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            type,
+            radius: 15,
+            pulsePhase: 0,
+        });
+    }
+
+    collectPowerUp(powerUp: PowerUp) {
+        switch (powerUp.type) {
+            case 'rapidfire':
+                this.maxShootCooldown = 6;
+                setTimeout(() => { this.maxShootCooldown = 12; }, 8000);
+                break;
+            case 'spread':
+                this.spreadShot = true;
+                this.spreadShotTimer = 600; // 10 seconds
+                break;
+            case 'shield':
+                const deadMoon = this.moons.find(m => !m.alive);
+                if (deadMoon) {
+                    deadMoon.alive = true;
+                    deadMoon.respawnTimer = 0;
+                }
+                break;
+            case 'freeze':
+                this.freezeActive = true;
+                this.freezeTimer = 300; // 5 seconds
+                break;
+            case 'nuke':
+                // Destroy all enemies on screen
+                this.enemies.forEach(e => {
+                    this.createExplosion(e.x, e.y, e.color, 15);
+                    this.score += e.points;
+                });
+                this.enemies = [];
+                this.screenShake = 20;
+                break;
+            case 'heart':
+                this.heartShield = true;
+                break;
         }
-    }
 
-    createPlutoReaction() {
-        const emojis = ['💔', '😤', '😢', '🥺', '❤️'];
-        for (let i = 0; i < 25; i++) {
-            this.particles.push({
-                x: this.centerX + (Math.random() - 0.5) * 200,
-                y: this.centerY + (Math.random() - 0.5) * 100,
-                vx: (Math.random() - 0.5) * 6,
-                vy: -Math.random() * 4 - 1,
-                size: 25 + Math.random() * 20,
-                color: '#ff69b4',
-                life: 80,
-                maxLife: 80,
-                emoji: emojis[Math.floor(Math.random() * emojis.length)],
-            });
-        }
-    }
-
-    createFailure() {
-        for (let i = 0; i < 15; i++) {
-            this.particles.push({
-                x: this.centerX + (Math.random() - 0.5) * 100,
-                y: this.centerY + (Math.random() - 0.5) * 100,
-                vx: (Math.random() - 0.5) * 5,
-                vy: Math.random() * 3 + 1,
-                size: 15 + Math.random() * 10,
-                color: '#ff4444',
-                life: 40,
-                maxLife: 40,
-                emoji: '❌',
-            });
-        }
+        this.createExplosion(powerUp.x, powerUp.y, '#ffffff', 20);
     }
 
     update() {
-        if (this.isGameOver) return;
+        if (this.showTrivia || this.isGameOver) return;
 
-        this.pulsePhase += 0.02;
+        this.gameTime++;
+        this.pulsePhase += 0.03;
+        this.gridOffset = (this.gridOffset + 0.5) % 50;
+        this.plutoRotation += 0.01;
 
-        // Update current card animation
-        if (this.currentCard) {
-            // Scale animation (card appearing)
-            this.currentCard.scale += (1 - this.currentCard.scale) * 0.15;
+        // Decrease screen shake
+        if (this.screenShake > 0) this.screenShake *= 0.9;
 
-            // If showing result, animate card off screen
-            if (this.showingResult && this.currentCard.targetX !== this.centerX) {
-                this.currentCard.x += (this.currentCard.targetX - this.currentCard.x) * 0.2;
-                this.currentCard.opacity -= 0.05;
+        // Cooldowns
+        if (this.shootCooldown > 0) this.shootCooldown--;
+        if (this.spreadShotTimer > 0) {
+            this.spreadShotTimer--;
+            if (this.spreadShotTimer <= 0) this.spreadShot = false;
+        }
+        if (this.freezeTimer > 0) {
+            this.freezeTimer--;
+            if (this.freezeTimer <= 0) this.freezeActive = false;
+        }
+
+        // Combo timer
+        if (this.comboTimer > 0) {
+            this.comboTimer--;
+            if (this.comboTimer <= 0) this.combo = 1;
+        }
+
+        // Wave management
+        if (this.betweenWaves) {
+            this.waveTimer--;
+            if (this.waveTimer <= 0) {
+                this.startNextWave();
+            }
+        } else {
+            // Spawn enemies
+            this.spawnTimer--;
+            if (this.spawnTimer <= 0 && this.enemiesSpawned < this.enemiesPerWave) {
+                this.spawnEnemy();
+                this.spawnTimer = Math.max(30, 60 - this.waveNumber * 5);
+            }
+
+            // Check wave complete
+            if (this.enemiesSpawned >= this.enemiesPerWave && this.enemies.length === 0) {
+                this.waveComplete = true;
+                this.betweenWaves = true;
+                this.waveTimer = 120;
+
+                // Trigger trivia every 2 waves
+                if (this.waveNumber % 2 === 0) {
+                    this.triggerTrivia();
+                }
             }
         }
 
-        // Update result timer
-        if (this.showingResult) {
-            this.resultTimer--;
-            if (this.resultTimer <= 0) {
-                this.showingResult = false;
-                this.showFunFact = false;
-                this.dealNextCard();
+        // Update moons (orbit around Pluto)
+        this.moons.forEach(moon => {
+            moon.angle += this.moonOrbitSpeed;
+            moon.pulsePhase += 0.05;
+            if (!moon.alive) {
+                moon.respawnTimer--;
+                if (moon.respawnTimer <= 0 && Math.random() < 0.001) {
+                    moon.alive = true;
+                }
             }
-        }
+        });
+
+        // Update projectiles
+        this.projectiles = this.projectiles.filter(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Trail
+            p.trail.push({ x: p.x, y: p.y, alpha: 1 });
+            if (p.trail.length > 10) p.trail.shift();
+            p.trail.forEach(t => t.alpha *= 0.8);
+
+            // Check collision with enemies
+            for (let i = this.enemies.length - 1; i >= 0; i--) {
+                const enemy = this.enemies[i];
+                const dx = p.x - enemy.x;
+                const dy = p.y - enemy.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < p.radius + enemy.radius) {
+                    enemy.health--;
+                    this.createExplosion(p.x, p.y, p.color, 8);
+
+                    if (enemy.health <= 0) {
+                        // Enemy destroyed!
+                        this.createExplosion(enemy.x, enemy.y, enemy.color, 20);
+                        const points = enemy.points * this.combo;
+                        this.score += points;
+
+                        // Stardust
+                        const stars = Math.ceil(this.combo);
+                        if (this.sessionStardust < this.maxSessionStardust) {
+                            const earned = Math.min(stars, this.maxSessionStardust - this.sessionStardust);
+                            this.stardustCollected += earned;
+                            this.sessionStardust += earned;
+                        }
+
+                        // Combo
+                        this.combo = Math.min(5, this.combo + 0.25);
+                        this.comboTimer = 120;
+
+                        // Power-up chance
+                        this.spawnPowerUp(enemy.x, enemy.y);
+
+                        this.enemies.splice(i, 1);
+                        this.screenShake = 5;
+                    }
+                    return false; // Remove projectile
+                }
+            }
+
+            // Remove if off screen
+            return p.x > -50 && p.x < this.width + 50 && p.y > -50 && p.y < this.height + 50;
+        });
+
+        // Update enemies
+        const freezeMultiplier = this.freezeActive ? 0.2 : 1;
+        this.enemies.forEach(enemy => {
+            enemy.x += enemy.vx * freezeMultiplier;
+            enemy.y += enemy.vy * freezeMultiplier;
+            enemy.rotation += enemy.rotationSpeed * freezeMultiplier;
+
+            // Check collision with moons
+            this.moons.forEach(moon => {
+                if (!moon.alive) return;
+                const moonX = this.centerX + Math.cos(moon.angle) * moon.orbitRadius;
+                const moonY = this.centerY + Math.sin(moon.angle) * moon.orbitRadius;
+                const dx = enemy.x - moonX;
+                const dy = enemy.y - moonY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < enemy.radius + moon.radius) {
+                    // Moon hit! Destroy enemy, disable moon temporarily
+                    moon.alive = false;
+                    moon.respawnTimer = 600; // 10 seconds
+                    this.createExplosion(enemy.x, enemy.y, moon.color, 25);
+                    this.createExplosion(moonX, moonY, '#ff4444', 15);
+
+                    // Remove enemy
+                    const idx = this.enemies.indexOf(enemy);
+                    if (idx > -1) this.enemies.splice(idx, 1);
+
+                    this.screenShake = 10;
+                }
+            });
+
+            // Check collision with Pluto
+            const dx = enemy.x - this.centerX;
+            const dy = enemy.y - this.centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < enemy.radius + this.plutoRadius) {
+                if (this.heartShield) {
+                    // Heart shield protects once
+                    this.heartShield = false;
+                    this.createExplosion(enemy.x, enemy.y, '#ff69b4', 30);
+                    const idx = this.enemies.indexOf(enemy);
+                    if (idx > -1) this.enemies.splice(idx, 1);
+                    this.screenShake = 15;
+                } else {
+                    // Game over!
+                    this.isGameOver = true;
+                    this.createExplosion(this.centerX, this.centerY, '#ff4444', 50);
+                    this.screenShake = 30;
+                }
+            }
+        });
+
+        // Update power-ups
+        this.powerUps = this.powerUps.filter(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.98;
+            p.vy *= 0.98;
+            p.pulsePhase += 0.1;
+
+            // Check collection (near Pluto)
+            const dx = p.x - this.centerX;
+            const dy = p.y - this.centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < this.plutoRadius + 30) {
+                this.collectPowerUp(p);
+                return false;
+            }
+
+            // Remove if off screen
+            return p.x > -50 && p.x < this.width + 50 && p.y > -50 && p.y < this.height + 50;
+        });
 
         // Update particles
         this.particles = this.particles.filter(p => {
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.15; // Gravity
+            p.vx *= 0.96;
+            p.vy *= 0.96;
             p.life--;
             return p.life > 0;
         });
     }
 
+    triggerTrivia() {
+        this.currentTrivia = TRIVIA[Math.floor(Math.random() * TRIVIA.length)];
+        this.showTrivia = true;
+        this.triviaAnswered = false;
+    }
+
+    createExplosion(x: number, y: number, color: string, count: number) {
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+            const speed = 2 + Math.random() * 4;
+            this.particles.push({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: 2 + Math.random() * 4,
+                color,
+                life: 30 + Math.random() * 20,
+                maxLife: 50,
+                type: 'explosion',
+            });
+        }
+    }
+
     draw(ctx: CanvasRenderingContext2D) {
-        // Background
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, this.height);
-        bgGrad.addColorStop(0, '#0a0014');
-        bgGrad.addColorStop(0.5, '#150528');
-        bgGrad.addColorStop(1, '#0d001a');
+        // Apply screen shake
+        ctx.save();
+        if (this.screenShake > 0.5) {
+            ctx.translate(
+                (Math.random() - 0.5) * this.screenShake,
+                (Math.random() - 0.5) * this.screenShake
+            );
+        }
+
+        // Background - deep space with grid
+        this.drawBackground(ctx);
+
+        // Draw danger zones (edges glow when enemies coming)
+        this.drawDangerZones(ctx);
+
+        // Draw projectile trails
+        this.projectiles.forEach(p => {
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            p.trail.forEach((t, i) => {
+                ctx.globalAlpha = t.alpha * 0.5;
+                if (i === 0) ctx.moveTo(t.x, t.y);
+                else ctx.lineTo(t.x, t.y);
+            });
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        });
+
+        // Draw projectiles
+        this.projectiles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+
+        // Draw power-ups
+        this.powerUps.forEach(p => {
+            this.drawPowerUp(ctx, p);
+        });
+
+        // Draw enemies
+        this.enemies.forEach(e => {
+            this.drawEnemy(ctx, e);
+        });
+
+        // Draw moon orbit paths (faint)
+        ctx.strokeStyle = 'rgba(168, 139, 250, 0.1)';
+        ctx.lineWidth = 1;
+        this.moons.forEach(moon => {
+            ctx.beginPath();
+            ctx.arc(this.centerX, this.centerY, moon.orbitRadius, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+
+        // Draw moons
+        this.moons.forEach(moon => {
+            if (moon.alive) {
+                const x = this.centerX + Math.cos(moon.angle) * moon.orbitRadius;
+                const y = this.centerY + Math.sin(moon.angle) * moon.orbitRadius;
+
+                // Glow
+                ctx.shadowColor = moon.color;
+                ctx.shadowBlur = 15;
+
+                const grad = ctx.createRadialGradient(x - moon.radius * 0.3, y - moon.radius * 0.3, 0, x, y, moon.radius);
+                grad.addColorStop(0, moon.color);
+                grad.addColorStop(1, this.darkenColor(moon.color));
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, moon.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+            }
+        });
+
+        // Draw Pluto
+        this.drawPluto(ctx);
+
+        // Draw aiming line
+        if (!this.isGameOver && !this.showTrivia) {
+            ctx.strokeStyle = 'rgba(255, 105, 180, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(this.centerX, this.centerY);
+            ctx.lineTo(
+                this.centerX + Math.cos(this.aimAngle) * 200,
+                this.centerY + Math.sin(this.aimAngle) * 200
+            );
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        // Draw particles
+        this.particles.forEach(p => {
+            ctx.globalAlpha = p.life / p.maxLife;
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+
+        ctx.restore();
+
+        // UI (not affected by screen shake)
+        this.drawUI(ctx);
+    }
+
+    drawBackground(ctx: CanvasRenderingContext2D) {
+        // Deep space gradient
+        const bgGrad = ctx.createRadialGradient(this.centerX, this.centerY, 0, this.centerX, this.centerY, this.width);
+        bgGrad.addColorStop(0, '#1a0a2a');
+        bgGrad.addColorStop(0.5, '#0d0518');
+        bgGrad.addColorStop(1, '#050208');
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, this.width, this.height);
+
+        // Grid lines (retro feel)
+        ctx.strokeStyle = 'rgba(168, 139, 250, 0.1)';
+        ctx.lineWidth = 1;
+        for (let x = this.gridOffset; x < this.width; x += 50) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, this.height);
+            ctx.stroke();
+        }
+        for (let y = this.gridOffset; y < this.height; y += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(this.width, y);
+            ctx.stroke();
+        }
 
         // Stars
         this.backgroundStars.forEach(star => {
@@ -439,271 +821,252 @@ export class PlutoGameLogic {
             ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             ctx.fill();
         });
+    }
 
-        // Swipe zones (left = NOT PLANET, right = PLANET)
-        this.drawSwipeZones(ctx);
-
-        // Draw card
-        if (this.currentCard && (!this.showingResult || this.currentCard.opacity > 0.1)) {
-            this.drawCard(ctx, this.currentCard);
-        }
-
-        // Draw particles
-        this.particles.forEach(p => {
-            ctx.globalAlpha = p.life / p.maxLife;
-            if (p.emoji) {
-                ctx.font = `${p.size}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.fillText(p.emoji, p.x, p.y);
-            } else {
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
-                ctx.fill();
+    drawDangerZones(ctx: CanvasRenderingContext2D) {
+        // Glow at edges where enemies are coming from
+        this.enemies.forEach(e => {
+            // Only for enemies near edges
+            const margin = 100;
+            if (e.x < margin || e.x > this.width - margin || e.y < margin || e.y > this.height - margin) {
+                const gradient = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 100);
+                gradient.addColorStop(0, 'rgba(255, 0, 0, 0.3)');
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(e.x - 100, e.y - 100, 200, 200);
             }
         });
-        ctx.globalAlpha = 1;
-
-        // Result text
-        if (this.showingResult) {
-            this.drawResult(ctx);
-        }
-
-        // UI
-        this.drawUI(ctx);
     }
 
-    drawSwipeZones(ctx: CanvasRenderingContext2D) {
-        // Left zone - NOT A PLANET
-        const leftAlpha = this.currentCard ? Math.max(0, (this.centerX - this.currentCard.x) / 200) * 0.6 : 0;
-        if (leftAlpha > 0) {
-            ctx.fillStyle = `rgba(255, 68, 68, ${leftAlpha})`;
-            ctx.fillRect(0, 0, this.width / 3, this.height);
-        }
-
-        // Right zone - PLANET
-        const rightAlpha = this.currentCard ? Math.max(0, (this.currentCard.x - this.centerX) / 200) * 0.6 : 0;
-        if (rightAlpha > 0) {
-            ctx.fillStyle = `rgba(0, 255, 136, ${rightAlpha})`;
-            ctx.fillRect(this.width * 2 / 3, 0, this.width / 3, this.height);
-        }
-
-        // Zone labels
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'center';
-
-        // Left label
-        ctx.fillStyle = `rgba(255, 100, 100, ${0.3 + leftAlpha})`;
-        ctx.fillText('❌ NOT A', 100, this.height / 2 - 20);
-        ctx.fillText('PLANET', 100, this.height / 2 + 20);
-
-        // Right label
-        ctx.fillStyle = `rgba(100, 255, 136, ${0.3 + rightAlpha})`;
-        ctx.fillText('✓ IS A', this.width - 100, this.height / 2 - 20);
-        ctx.fillText('PLANET', this.width - 100, this.height / 2 + 20);
-
-        // Arrows
-        ctx.font = '40px Arial';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.fillText('←', 100, this.height / 2 + 80);
-        ctx.fillText('→', this.width - 100, this.height / 2 + 80);
-    }
-
-    drawCard(ctx: CanvasRenderingContext2D, card: Card) {
+    drawPluto(ctx: CanvasRenderingContext2D) {
         ctx.save();
-        ctx.translate(card.x, card.y);
-        ctx.rotate(card.rotation);
-        ctx.scale(card.scale, card.scale);
-        ctx.globalAlpha = card.opacity;
+        ctx.translate(this.centerX, this.centerY);
+        ctx.rotate(this.plutoRotation);
 
-        const w = 280;
-        const h = 380;
-
-        // Card shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.fillRect(-w / 2 + 10, -h / 2 + 10, w, h);
-
-        // Card background
-        const cardGrad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-        cardGrad.addColorStop(0, '#2a1a3a');
-        cardGrad.addColorStop(1, '#1a0a2a');
-        ctx.fillStyle = cardGrad;
-        ctx.fillRect(-w / 2, -h / 2, w, h);
-
-        // Card border
-        ctx.strokeStyle = card.isSpecial ? '#ff69b4' : '#a78bfa';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(-w / 2, -h / 2, w, h);
-
-        // Celestial object visualization
-        const orbRadius = 70;
-        const orbY = -60;
-
-        // Glow
-        const glow = ctx.createRadialGradient(0, orbY, 0, 0, orbY, orbRadius * 1.5);
-        glow.addColorStop(0, card.color + '80');
+        // Outer glow (pulsing)
+        const glowSize = this.plutoRadius + 15 + Math.sin(this.pulsePhase) * 5;
+        const glow = ctx.createRadialGradient(0, 0, this.plutoRadius, 0, 0, glowSize);
+        glow.addColorStop(0, 'rgba(255, 105, 180, 0.6)');
         glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(0, orbY, orbRadius * 1.5, 0, Math.PI * 2);
+        ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
         ctx.fill();
 
-        // Object itself
-        const objGrad = ctx.createRadialGradient(-orbRadius * 0.3, orbY - orbRadius * 0.3, 0, 0, orbY, orbRadius);
-        objGrad.addColorStop(0, this.lightenColor(card.color));
-        objGrad.addColorStop(1, this.darkenColor(card.color));
-        ctx.fillStyle = objGrad;
-        ctx.beginPath();
-        ctx.arc(0, orbY, orbRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Special indicator for Pluto
-        if (card.isSpecial) {
-            ctx.fillStyle = '#ff69b4';
-            ctx.font = '30px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('❤️', orbRadius * 0.3, orbY + orbRadius * 0.2);
+        // Heart shield indicator
+        if (this.heartShield) {
+            ctx.strokeStyle = '#ff69b4';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.arc(0, 0, this.plutoRadius + 25, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
         }
 
-        // Type badge
-        ctx.fillStyle = this.getTypeBadgeColor(card.imageType);
-        ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(card.imageType.toUpperCase(), 0, orbY + orbRadius + 25);
+        // Main body
+        const bodyGrad = ctx.createRadialGradient(-10, -10, 0, 0, 0, this.plutoRadius);
+        bodyGrad.addColorStop(0, '#e8dcc8');
+        bodyGrad.addColorStop(0.5, '#a89070');
+        bodyGrad.addColorStop(1, '#6a5040');
+        ctx.fillStyle = bodyGrad;
+        ctx.shadowColor = '#ff69b4';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.plutoRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
 
-        // Name
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 32px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(card.name, 0, 80);
-
-        // Description
-        ctx.fillStyle = '#a78bfa';
-        ctx.font = '18px Arial';
-        ctx.fillText(card.description, 0, 115);
-
-        // Question prompt
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 20px Arial';
-        ctx.fillText('Is this a PLANET?', 0, 160);
+        // Heart feature
+        ctx.fillStyle = 'rgba(255, 220, 200, 0.8)';
+        const hs = this.plutoRadius * 0.35;
+        ctx.beginPath();
+        ctx.moveTo(5, hs * 0.2);
+        ctx.bezierCurveTo(5 + hs * 0.4, -hs * 0.3, 5 + hs * 0.8, hs * 0.1, 5, hs * 0.7);
+        ctx.bezierCurveTo(5 - hs * 0.8, hs * 0.1, 5 - hs * 0.4, -hs * 0.3, 5, hs * 0.2);
+        ctx.fill();
 
         ctx.restore();
     }
 
-    drawResult(ctx: CanvasRenderingContext2D) {
-        // Dim background
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(0, 0, this.width, this.height);
+    drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+        ctx.save();
+        ctx.translate(enemy.x, enemy.y);
+        ctx.rotate(enemy.rotation);
 
-        // Result text
-        ctx.fillStyle = this.resultColor;
-        ctx.font = 'bold 36px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.resultText, this.centerX, this.height / 2 - 50);
-
-        // Fun fact
-        if (this.showFunFact && this.currentFunFact) {
-            ctx.fillStyle = '#fff';
-            ctx.font = '18px Arial';
-
-            // Word wrap the fun fact
-            const words = this.currentFunFact.split(' ');
-            let line = '';
-            let y = this.height / 2 + 20;
-            const maxWidth = 500;
-
-            for (const word of words) {
-                const testLine = line + word + ' ';
-                if (ctx.measureText(testLine).width > maxWidth && line) {
-                    ctx.fillText(line.trim(), this.centerX, y);
-                    line = word + ' ';
-                    y += 25;
-                } else {
-                    line = testLine;
-                }
-            }
-            ctx.fillText(line.trim(), this.centerX, y);
+        // Freeze effect
+        if (this.freezeActive) {
+            ctx.fillStyle = 'rgba(136, 221, 255, 0.3)';
+            ctx.beginPath();
+            ctx.arc(0, 0, enemy.radius + 10, 0, Math.PI * 2);
+            ctx.fill();
         }
+
+        // Enemy body
+        ctx.fillStyle = enemy.color;
+        ctx.shadowColor = enemy.color;
+        ctx.shadowBlur = 10;
+
+        if (enemy.type === 'comet') {
+            // Comet with tail
+            ctx.beginPath();
+            ctx.arc(0, 0, enemy.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tail
+            ctx.fillStyle = `${enemy.color}66`;
+            ctx.beginPath();
+            ctx.moveTo(enemy.radius, 0);
+            ctx.lineTo(enemy.radius * 2.5, -enemy.radius * 0.8);
+            ctx.lineTo(enemy.radius * 2.5, enemy.radius * 0.8);
+            ctx.closePath();
+            ctx.fill();
+        } else if (enemy.type === 'asteroid') {
+            // Rough asteroid shape
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI * 2 * i) / 8;
+                const r = enemy.radius * (0.8 + Math.random() * 0.4);
+                if (i === 0) ctx.moveTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                else ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+            }
+            ctx.closePath();
+            ctx.fill();
+        } else {
+            // Round rock/ice
+            ctx.beginPath();
+            ctx.arc(0, 0, enemy.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (enemy.type === 'ice') {
+                // Ice highlight
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath();
+                ctx.arc(-enemy.radius * 0.3, -enemy.radius * 0.3, enemy.radius * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    }
+
+    drawPowerUp(ctx: CanvasRenderingContext2D, powerUp: PowerUp) {
+        const pulse = Math.sin(powerUp.pulsePhase) * 0.2 + 1;
+        const r = powerUp.radius * pulse;
+
+        ctx.save();
+        ctx.translate(powerUp.x, powerUp.y);
+
+        // Glow
+        const colors: Record<string, string> = {
+            rapidfire: '#ff4444',
+            spread: '#ff9900',
+            shield: '#00ff88',
+            freeze: '#88ddff',
+            nuke: '#ff00ff',
+            heart: '#ff69b4',
+        };
+        const color = colors[powerUp.type];
+
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 20;
+
+        // Hexagon shape
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+            if (i === 0) ctx.moveTo(Math.cos(angle) * r, Math.sin(angle) * r);
+            else ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        // Icon
+        ctx.fillStyle = '#fff';
+        ctx.font = `${r}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const icons: Record<string, string> = {
+            rapidfire: '⚡',
+            spread: '🔥',
+            shield: '🛡️',
+            freeze: '❄️',
+            nuke: '💥',
+            heart: '❤️',
+        };
+        ctx.fillText(icons[powerUp.type], 0, 2);
+
+        ctx.shadowBlur = 0;
+        ctx.restore();
     }
 
     drawUI(ctx: CanvasRenderingContext2D) {
-        // Credibility bar (top)
-        const barWidth = 300;
-        const barHeight = 20;
-        const barX = (this.width - barWidth) / 2;
-        const barY = 20;
-
-        // Background
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(barX, barY, barWidth, barHeight);
-
-        // Fill
-        const credGrad = ctx.createLinearGradient(barX, barY, barX + barWidth, barY);
-        credGrad.addColorStop(0, '#ff69b4');
-        credGrad.addColorStop(1, '#a78bfa');
-        ctx.fillStyle = credGrad;
-        ctx.fillRect(barX, barY, barWidth * (this.credibility / 100), barHeight);
-
-        // Border
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(barX, barY, barWidth, barHeight);
-
-        // Label
+        // Wave indicator
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold 14px Arial';
+        ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(`CREDIBILITY: ${Math.round(this.credibility)}%`, this.centerX, barY + 15);
+        ctx.fillText(`WAVE ${this.waveNumber}`, this.centerX, 40);
+
+        if (this.betweenWaves && !this.showTrivia && this.waveNumber > 0) {
+            ctx.fillStyle = '#00ff88';
+            ctx.font = '18px Arial';
+            ctx.fillText('WAVE COMPLETE!', this.centerX, 70);
+        }
 
         // Score (top left)
         ctx.textAlign = 'left';
-        ctx.font = 'bold 24px Arial';
+        ctx.font = 'bold 28px Arial';
         ctx.fillStyle = '#ffd700';
         ctx.fillText(`⭐ ${this.stardustCollected}`, 20, 40);
 
         ctx.fillStyle = '#fff';
-        ctx.font = '16px Arial';
-        ctx.fillText(`Score: ${this.score.toLocaleString()}`, 20, 65);
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText(`Score: ${this.score.toLocaleString()}`, 20, 70);
 
-        // Streak (top right)
-        ctx.textAlign = 'right';
-        if (this.streak > 1) {
-            ctx.fillStyle = '#00ff88';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText(`🔥 ${this.streak} STREAK`, this.width - 20, 40);
+        // Combo (if active)
+        if (this.combo > 1) {
+            ctx.fillStyle = '#ff69b4';
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText(`x${this.combo.toFixed(1)} COMBO`, 20, 95);
         }
 
-        ctx.fillStyle = '#a78bfa';
-        ctx.font = '14px Arial';
-        ctx.fillText(`${this.correctAnswers}/${this.cardsAnswered} correct`, this.width - 20, 65);
+        // Power-up status
+        ctx.textAlign = 'right';
+        let statusY = 40;
+        if (this.spreadShot) {
+            ctx.fillStyle = '#ff9900';
+            ctx.font = '14px Arial';
+            ctx.fillText(`🔥 SPREAD: ${Math.ceil(this.spreadShotTimer / 60)}s`, this.width - 20, statusY);
+            statusY += 20;
+        }
+        if (this.freezeActive) {
+            ctx.fillStyle = '#88ddff';
+            ctx.font = '14px Arial';
+            ctx.fillText(`❄️ FREEZE: ${Math.ceil(this.freezeTimer / 60)}s`, this.width - 20, statusY);
+            statusY += 20;
+        }
+        if (this.heartShield) {
+            ctx.fillStyle = '#ff69b4';
+            ctx.font = '14px Arial';
+            ctx.fillText('❤️ SHIELD ACTIVE', this.width - 20, statusY);
+            statusY += 20;
+        }
 
-        // Instructions (bottom)
-        if (this.cardsAnswered < 3 && !this.showingResult) {
-            ctx.textAlign = 'center';
+        // Moon status (bottom)
+        const aliveMoons = this.moons.filter(m => m.alive).length;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = aliveMoons > 2 ? '#00ff88' : aliveMoons > 0 ? '#ffaa00' : '#ff4444';
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText(`MOON SHIELDS: ${aliveMoons}/5`, this.centerX, this.height - 20);
+
+        // Instructions (first few seconds)
+        if (this.gameTime < 180 && !this.isGameOver) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
             ctx.font = '16px Arial';
-            ctx.fillText('Drag the card LEFT or RIGHT to classify!', this.centerX, this.height - 30);
+            ctx.fillText('Move mouse to aim • Click to shoot • Protect Pluto!', this.centerX, this.height - 50);
         }
-    }
-
-    getTypeBadgeColor(type: string): string {
-        const colors: Record<string, string> = {
-            planet: '#00ff88',
-            dwarf: '#ff69b4',
-            moon: '#88ccff',
-            asteroid: '#888888',
-            comet: '#ffcc00',
-            star: '#ffdd44',
-            other: '#aaaaaa',
-        };
-        return colors[type] || '#ffffff';
-    }
-
-    lightenColor(hex: string): string {
-        const r = Math.min(255, parseInt(hex.slice(1, 3), 16) * 1.3);
-        const g = Math.min(255, parseInt(hex.slice(3, 5), 16) * 1.3);
-        const b = Math.min(255, parseInt(hex.slice(5, 7), 16) * 1.3);
-        return `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
     }
 
     darkenColor(hex: string): string {

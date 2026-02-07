@@ -5,18 +5,26 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GameCanvas from '@/components/GameCanvas';
 import { PlutoGameLogic } from '@/games/pluto/PlutoGameLogic';
-import { addStardust, updateHighScore } from '@/lib/localStorage';
+import { addStardust, updateHighScore, markGamePlayed } from '@/lib/localStorage';
 import Link from 'next/link';
 
 export default function PlutoGamePage() {
     const gameLogicRef = useRef<PlutoGameLogic | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [score, setScore] = useState(0);
-    const [credibility, setCredibility] = useState(100);
-    const [streak, setStreak] = useState(0);
+    const [wave, setWave] = useState(0);
+    const [moonShields, setMoonShields] = useState(5);
     const [isGameOver, setIsGameOver] = useState(false);
     const [earnedStardust, setEarnedStardust] = useState(0);
-    const [stats, setStats] = useState({ correct: 0, total: 0 });
+
+    // Trivia state
+    const [showTrivia, setShowTrivia] = useState(false);
+    const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
+    const [triviaAnswered, setTriviaAnswered] = useState(false);
+    const [triviaCorrect, setTriviaCorrect] = useState(false);
+
+    // Mouse state
+    const isShootingRef = useRef(false);
 
     useEffect(() => {
         gameLogicRef.current = new PlutoGameLogic(1280, 720);
@@ -34,44 +42,51 @@ export default function PlutoGamePage() {
         }
         game.draw(ctx);
 
-        if (frameCount % 10 === 0) {
+        if (frameCount % 6 === 0) {
             setScore(game.score);
-            setCredibility(game.credibility);
-            setStreak(game.streak);
-            setStats({ correct: game.correctAnswers, total: game.cardsAnswered });
+            setWave(game.waveNumber);
+            setMoonShields(game.moons.filter(m => m.alive).length);
+
+            // Check for trivia trigger
+            if (game.showTrivia && !showTrivia && game.currentTrivia) {
+                setShowTrivia(true);
+                setTriviaQuestion(game.currentTrivia);
+                setTriviaAnswered(false);
+            }
 
             if (game.isGameOver && !isGameOver) {
-                handleGameOver(game.score, game.stardustCollected, game.correctAnswers, game.cardsAnswered);
+                handleGameOver(game.score, game.stardustCollected, game.waveNumber);
             }
         }
     };
 
-    const handleGameOver = (finalScore: number, stardust: number, correct: number, total: number) => {
+    const handleGameOver = (finalScore: number, stardust: number, waveReached: number) => {
         setIsGameOver(true);
         setEarnedStardust(stardust);
-        setStats({ correct, total });
+        setWave(waveReached);
 
         addStardust(stardust);
         updateHighScore('pluto', finalScore);
+        markGamePlayed('pluto');
 
         window.dispatchEvent(new CustomEvent('stardust-earned', {
             detail: { amount: stardust }
         }));
     };
 
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleTriviaAnswer = (index: number) => {
         const game = gameLogicRef.current;
-        if (!game || !isPlaying) return;
+        if (!game || triviaAnswered) return;
 
-        const canvas = e.currentTarget as HTMLCanvasElement;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = game.width / rect.width;
-        const scaleY = game.height / rect.height;
+        game.answerTrivia(index);
+        setTriviaAnswered(true);
+        setTriviaCorrect(index === triviaQuestion?.correct);
 
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-
-        game.handleMouseDown(x, y);
+        setTimeout(() => {
+            setShowTrivia(false);
+            setTriviaQuestion(null);
+            setTriviaAnswered(false);
+        }, 2500);
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
@@ -86,29 +101,16 @@ export default function PlutoGamePage() {
         const x = (e.clientX - rect.left) * scaleX;
         const y = (e.clientY - rect.top) * scaleY;
 
-        game.handleMouseMove(x, y);
+        game.handleInput(x, y, isShootingRef.current);
+    };
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        isShootingRef.current = true;
+        handleMouseMove(e);
     };
 
     const handleMouseUp = () => {
-        const game = gameLogicRef.current;
-        if (!game) return;
-        game.handleMouseUp();
-    };
-
-    const handleTouchStart = (e: React.TouchEvent) => {
-        if (e.touches.length === 0) return;
-        const game = gameLogicRef.current;
-        if (!game || !isPlaying) return;
-
-        const canvas = e.currentTarget as HTMLCanvasElement;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = game.width / rect.width;
-        const scaleY = game.height / rect.height;
-
-        const x = (e.touches[0].clientX - rect.left) * scaleX;
-        const y = (e.touches[0].clientY - rect.top) * scaleY;
-
-        game.handleMouseDown(x, y);
+        isShootingRef.current = false;
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
@@ -124,13 +126,7 @@ export default function PlutoGamePage() {
         const x = (e.touches[0].clientX - rect.left) * scaleX;
         const y = (e.touches[0].clientY - rect.top) * scaleY;
 
-        game.handleMouseMove(x, y);
-    };
-
-    const handleTouchEnd = () => {
-        const game = gameLogicRef.current;
-        if (!game) return;
-        game.handleMouseUp();
+        game.handleInput(x, y, true);
     };
 
     const startGame = () => {
@@ -139,11 +135,11 @@ export default function PlutoGamePage() {
         }
         setIsPlaying(true);
         setIsGameOver(false);
+        setShowTrivia(false);
         setScore(0);
-        setCredibility(100);
-        setStreak(0);
+        setWave(0);
+        setMoonShields(5);
         setEarnedStardust(0);
-        setStats({ correct: 0, total: 0 });
     };
 
     return (
@@ -157,31 +153,30 @@ export default function PlutoGamePage() {
                     <div className="mb-6 flex justify-between items-end">
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <h1 className="font-heading text-3xl text-purple-400">Pluto: Planet or Not?</h1>
+                                <h1 className="font-heading text-3xl text-pink-400">Pluto: Orbit Defender</h1>
                                 <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full font-bold">FREE!</span>
                             </div>
                             <p className="text-text-secondary font-ui">
-                                Swipe to classify celestial objects! Can you tell planets from non-planets?
+                                Defend Pluto from Kuiper Belt invaders! Your moons are your shields.
                             </p>
                         </div>
                         <div className="text-right">
-                            {streak > 1 && (
-                                <p className="text-green-400 font-bold">🔥 {streak} Streak!</p>
-                            )}
-                            <p className="text-text-dim text-sm">{stats.correct}/{stats.total} correct</p>
+                            <p className="text-text-dim text-sm uppercase tracking-wider">Wave {wave}</p>
+                            <p className={`font-heading text-xl ${moonShields > 2 ? 'text-green-400' : moonShields > 0 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                🌙 {moonShields}/5 Shields
+                            </p>
                         </div>
                     </div>
 
                     {/* Game Container */}
                     <div
-                        className="game-canvas-container relative cursor-grab active:cursor-grabbing touch-none"
-                        onMouseDown={handleMouseDown}
+                        className="game-canvas-container relative cursor-crosshair touch-none select-none"
                         onMouseMove={handleMouseMove}
+                        onMouseDown={handleMouseDown}
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
-                        onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
+                        onTouchStart={handleTouchMove}
                     >
                         <GameCanvas
                             onGameLoop={handleGameLoop}
@@ -192,86 +187,127 @@ export default function PlutoGamePage() {
                         {/* Start Overlay */}
                         {!isPlaying && !isGameOver && (
                             <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-8 text-center z-10">
-                                <div className="relative mb-6">
-                                    <div className="text-8xl">🪐</div>
-                                    <div className="absolute -top-2 -right-8 text-4xl rotate-12">❓</div>
+                                {/* Retro arcade title */}
+                                <div className="relative mb-4">
+                                    <h2 className="font-heading text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 tracking-wider animate-pulse">
+                                        ORBIT DEFENDER
+                                    </h2>
+                                    <div className="absolute -inset-4 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-cyan-500/20 blur-xl -z-10" />
                                 </div>
 
-                                <h2 className="font-heading text-5xl text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 mb-3">
-                                    PLANET OR NOT?
-                                </h2>
-                                <p className="text-purple-300 text-xl mb-2">The Classification Challenge</p>
-                                <p className="text-yellow-400 text-sm mb-8 max-w-md">
-                                    🎉 FREE because Pluto knows the pain of being reclassified!
-                                </p>
+                                <p className="text-pink-300 text-xl mb-2">A Retro Arcade Experience</p>
+                                <p className="text-yellow-400 text-sm mb-8">🎉 FREE - Because Pluto deserves some love!</p>
 
-                                <div className="max-w-2xl mb-8 space-y-4">
-                                    <div className="grid grid-cols-2 gap-6 text-sm">
-                                        <div className="p-5 bg-gradient-to-br from-red-900/40 to-red-800/20 rounded-xl border border-red-500/30">
-                                            <div className="text-4xl mb-2">👈</div>
-                                            <p className="text-red-400 font-bold text-lg">SWIPE LEFT</p>
-                                            <p className="text-text-dim mt-1">NOT a Planet</p>
-                                            <p className="text-xs text-text-dim mt-2">(Moons, asteroids, dwarf planets, stars...)</p>
+                                {/* Controls */}
+                                <div className="max-w-2xl mb-8">
+                                    <div className="grid grid-cols-3 gap-4 text-sm mb-6">
+                                        <div className="p-4 bg-gradient-to-br from-pink-900/40 to-purple-900/30 rounded-xl border border-pink-500/30">
+                                            <div className="text-3xl mb-2">🎯</div>
+                                            <p className="text-pink-400 font-bold">AIM</p>
+                                            <p className="text-text-dim text-xs mt-1">Move your mouse</p>
                                         </div>
-                                        <div className="p-5 bg-gradient-to-br from-green-900/40 to-green-800/20 rounded-xl border border-green-500/30">
-                                            <div className="text-4xl mb-2">👉</div>
-                                            <p className="text-green-400 font-bold text-lg">SWIPE RIGHT</p>
-                                            <p className="text-text-dim mt-1">IS a Planet</p>
-                                            <p className="text-xs text-text-dim mt-2">(Mercury, Venus, Earth, Mars...)</p>
+                                        <div className="p-4 bg-gradient-to-br from-pink-900/40 to-purple-900/30 rounded-xl border border-pink-500/30">
+                                            <div className="text-3xl mb-2">🔫</div>
+                                            <p className="text-cyan-400 font-bold">SHOOT</p>
+                                            <p className="text-text-dim text-xs mt-1">Click & hold</p>
+                                        </div>
+                                        <div className="p-4 bg-gradient-to-br from-pink-900/40 to-purple-900/30 rounded-xl border border-pink-500/30">
+                                            <div className="text-3xl mb-2">🛡️</div>
+                                            <p className="text-green-400 font-bold">SURVIVE</p>
+                                            <p className="text-text-dim text-xs mt-1">Moons protect you!</p>
                                         </div>
                                     </div>
 
-                                    <div className="bg-pink-900/30 p-4 rounded-lg border border-pink-500/20">
-                                        <p className="text-pink-300 text-sm">
-                                            <span className="font-bold">⚠️ Warning:</span> When Pluto appears...
-                                            well, that&apos;s complicated! 😅
-                                        </p>
+                                    {/* Power-ups preview */}
+                                    <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-500/20 mb-6">
+                                        <p className="text-purple-300 text-sm font-bold mb-2">⬡ POWER-UPS</p>
+                                        <div className="flex justify-center gap-4 text-xl">
+                                            <span title="Rapid Fire">⚡</span>
+                                            <span title="Spread Shot">🔥</span>
+                                            <span title="Shield Restore">🛡️</span>
+                                            <span title="Freeze">❄️</span>
+                                            <span title="Nuke">💥</span>
+                                            <span title="Heart Shield">❤️</span>
+                                        </div>
                                     </div>
 
-                                    <div className="flex justify-center gap-8 text-sm text-text-dim">
-                                        <div>✓ Build streaks for bonus points</div>
-                                        <div>✓ Learn fun facts about space</div>
-                                        <div>✓ 25+ celestial objects</div>
-                                    </div>
+                                    <p className="text-text-secondary italic text-sm">
+                                        &quot;They may have demoted me, but they can&apos;t stop me from defending my orbit!&quot;
+                                    </p>
                                 </div>
 
                                 <button
                                     onClick={startGame}
                                     className="group relative px-12 py-5 text-xl font-heading rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 animate-gradient-x"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 animate-gradient-x"></div>
                                     <div className="absolute inset-0.5 bg-space-deep rounded-xl"></div>
-                                    <span className="relative text-white flex items-center gap-2">
-                                        <span>🎴</span>
-                                        <span>Start Classifying!</span>
-                                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                    <span className="relative text-white flex items-center gap-3">
+                                        <span className="text-2xl">🚀</span>
+                                        <span>DEFEND PLUTO</span>
+                                        <span className="group-hover:translate-x-2 transition-transform">→</span>
                                     </span>
                                 </button>
+
+                                <p className="text-text-dim text-xs mt-6">Press START or click anywhere to begin</p>
+                            </div>
+                        )}
+
+                        {/* Trivia Overlay */}
+                        {showTrivia && triviaQuestion && (
+                            <div className="absolute inset-0 bg-purple-950/95 flex flex-col items-center justify-center p-8 text-center z-20 backdrop-blur-sm">
+                                <div className="text-4xl mb-4">🧠</div>
+                                <h3 className="font-heading text-2xl text-pink-400 mb-2">WAVE COMPLETE!</h3>
+                                <p className="text-text-dim mb-4">Answer correctly to restore a moon shield!</p>
+                                <p className="text-white text-xl mb-6 max-w-lg">{triviaQuestion.question}</p>
+
+                                {!triviaAnswered ? (
+                                    <div className="grid grid-cols-2 gap-3 max-w-lg w-full">
+                                        {triviaQuestion.answers.map((answer: string, idx: number) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleTriviaAnswer(idx)}
+                                                className="p-4 bg-purple-800/50 hover:bg-purple-700/60 border border-purple-400/30 rounded-xl text-white transition-all hover:scale-105 hover:border-pink-400/50"
+                                            >
+                                                {answer}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="max-w-lg">
+                                        <p className={`text-3xl font-bold mb-4 ${triviaCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                                            {triviaCorrect ? '✅ CORRECT! +5⭐ & Moon Restored!' : '❌ WRONG!'}
+                                        </p>
+                                        <p className="text-purple-200 text-sm bg-purple-900/50 p-4 rounded-lg">
+                                            💡 {triviaQuestion.fact}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         )}
 
                         {/* Game Over */}
                         {isGameOver && (
                             <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-8 text-center z-10 backdrop-blur-sm">
-                                <div className="text-5xl mb-4">📊</div>
-                                <h2 className="font-heading text-4xl text-red-400 mb-2">
-                                    Credibility Lost!
+                                <div className="text-6xl mb-4 animate-pulse">💥</div>
+                                <h2 className="font-heading text-5xl text-red-400 mb-2">
+                                    GAME OVER
                                 </h2>
-                                <p className="text-purple-300 mb-6 italic">
-                                    The IAU has revoked your classification license...
+                                <p className="text-pink-300 mb-6 italic text-lg">
+                                    Pluto has been hit! The Kuiper Belt claims another...
                                 </p>
 
                                 <div className="grid grid-cols-3 gap-6 mb-8 text-center">
-                                    <div className="bg-space-tertiary/50 p-4 rounded-lg">
-                                        <p className="text-3xl font-bold text-white">{stats.correct}/{stats.total}</p>
-                                        <p className="text-text-dim text-sm">Correct</p>
+                                    <div className="bg-space-tertiary/50 p-5 rounded-xl border border-pink-500/30">
+                                        <p className="text-4xl font-bold text-white">{wave}</p>
+                                        <p className="text-text-dim text-sm">Waves</p>
                                     </div>
-                                    <div className="bg-space-tertiary/50 p-4 rounded-lg">
-                                        <p className="text-3xl font-bold text-yellow-400">{earnedStardust}⭐</p>
+                                    <div className="bg-space-tertiary/50 p-5 rounded-xl border border-yellow-500/30">
+                                        <p className="text-4xl font-bold text-yellow-400">{earnedStardust}⭐</p>
                                         <p className="text-text-dim text-sm">Stardust</p>
                                     </div>
-                                    <div className="bg-space-tertiary/50 p-4 rounded-lg">
-                                        <p className="text-3xl font-bold text-green-400">{score.toLocaleString()}</p>
+                                    <div className="bg-space-tertiary/50 p-5 rounded-xl border border-cyan-500/30">
+                                        <p className="text-4xl font-bold text-cyan-400">{score.toLocaleString()}</p>
                                         <p className="text-text-dim text-sm">Score</p>
                                     </div>
                                 </div>
@@ -279,99 +315,122 @@ export default function PlutoGamePage() {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={startGame}
-                                        className="px-8 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-lg font-bold transition-all hover:scale-105"
+                                        className="px-8 py-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl font-bold text-lg transition-all hover:scale-105"
                                     >
-                                        🔄 Try Again
+                                        🔄 PLAY AGAIN
                                     </button>
-                                    <Link href="/" className="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors">
+                                    <Link href="/" className="px-8 py-4 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors">
                                         Return to Hub
                                     </Link>
                                 </div>
                             </div>
                         )}
                     </div>
-
-                    {/* Ad Slot */}
-                    <div className="my-8 h-[90px] bg-space-tertiary/30 rounded-lg border border-white/5 flex items-center justify-center">
-                        <span className="text-text-dim text-sm opacity-50">Advertisement</span>
-                    </div>
-
                     {/* Educational Content */}
                     <section className="mt-8 space-y-12">
 
-                        <article className="planet-card bg-gradient-to-br from-purple-900/30 to-pink-900/20">
-                            <h2 className="font-heading text-3xl text-purple-400 mb-6">
-                                What Makes a Planet a Planet?
+                        <article className="planet-card bg-gradient-to-br from-pink-900/30 to-purple-900/20">
+                            <h2 className="font-heading text-3xl text-pink-400 mb-6">
+                                Pluto: The Dwarf Planet That Stole Our Hearts
                             </h2>
                             <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
                                 <p className="text-lg">
-                                    In 2006, the International Astronomical Union (IAU) created a formal definition
-                                    for what qualifies as a planet. This decision famously reclassified Pluto and
-                                    sparked debates that continue to this day!
+                                    For 76 years, Pluto was the ninth planet in our solar system. Discovered in 1930
+                                    by Clyde Tombaugh, it captured the imagination of generations. That all changed
+                                    in 2006 when the International Astronomical Union reclassified Pluto as a
+                                    &quot;dwarf planet&quot; — but that hasn&apos;t diminished our love for this distant world!
                                 </p>
 
                                 <div className="bg-purple-900/30 p-6 rounded-lg border-l-4 border-pink-500 my-8">
-                                    <p className="font-ui text-pink-400 font-bold mb-4">📜 THE THREE RULES</p>
-                                    <ol className="space-y-3 text-white">
-                                        <li><strong>1. Orbits the Sun</strong> - Must go around our star, not another planet</li>
-                                        <li><strong>2. Has enough mass for gravity to make it round</strong> - No potato shapes!</li>
-                                        <li><strong>3. Has &quot;cleared&quot; its orbital neighborhood</strong> - It&apos;s the dominant object in its orbit</li>
-                                    </ol>
-                                    <p className="text-pink-300 mt-4 italic">
-                                        Pluto fails Rule #3 - it shares its orbital zone with other Kuiper Belt objects!
+                                    <p className="font-ui text-pink-400 font-bold mb-2">🎮 GAME CONNECTION</p>
+                                    <p>
+                                        In Orbit Defender, you protect Pluto from the Kuiper Belt objects that
+                                        share its orbital neighborhood — the very reason it was &quot;demoted&quot;!
+                                        Your 5 moon shields (Charon, Nix, Hydra, Kerberos, and Styx) help you
+                                        survive the onslaught. It&apos;s Pluto&apos;s revenge against the cosmos!
                                     </p>
                                 </div>
 
-                                <h3 className="font-heading text-xl text-purple-400 mt-8 mb-4">Why This Game?</h3>
+                                <h3 className="font-heading text-xl text-pink-400 mt-8 mb-4">Why Pluto Matters</h3>
                                 <p>
-                                    &quot;Planet or Not?&quot; teaches you to classify celestial objects using the same
-                                    criteria that astronomers use. As you swipe through cards, you&apos;ll learn
-                                    the difference between planets, dwarf planets, moons, asteroids, and more
-                                    - all while having fun!
+                                    Despite its reclassification, Pluto remains scientifically fascinating.
+                                    NASA&apos;s New Horizons mission in 2015 revealed a world far more complex
+                                    than anyone imagined — with ice mountains, nitrogen glaciers, and most
+                                    famously, the heart-shaped Tombaugh Regio that charmed the world.
                                 </p>
                             </div>
                         </article>
 
-                        {/* Quick Classification Guide */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="planet-card border-green-500/30">
-                                <h3 className="font-heading text-xl text-green-400 mb-4">✓ PLANETS (Swipe Right!)</h3>
-                                <ul className="space-y-2 text-text-secondary">
-                                    <li><span className="text-white font-bold">Mercury</span> - Smallest, closest to Sun</li>
-                                    <li><span className="text-white font-bold">Venus</span> - Hottest, spins backwards</li>
-                                    <li><span className="text-white font-bold">Earth</span> - Our home!</li>
-                                    <li><span className="text-white font-bold">Mars</span> - The Red Planet</li>
-                                    <li><span className="text-white font-bold">Jupiter</span> - Largest planet</li>
-                                    <li><span className="text-white font-bold">Saturn</span> - Beautiful rings</li>
-                                    <li><span className="text-white font-bold">Uranus</span> - Tilted sideways</li>
-                                    <li><span className="text-white font-bold">Neptune</span> - Fastest winds</li>
+                        {/* Quick Facts */}
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl text-pink-400 mb-4">📊 Pluto Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Diameter</span>
+                                        <span className="text-pink-400">2,377 km</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Discovery</span>
+                                        <span className="text-pink-400">1930</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Moons</span>
+                                        <span className="text-pink-400">5 known</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Orbit Period</span>
+                                        <span className="text-pink-400">248 years</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Status</span>
+                                        <span className="text-yellow-400">Dwarf Planet ❤️</span>
+                                    </li>
                                 </ul>
-                                <p className="text-green-400 text-sm mt-4 italic">Just 8 planets in our solar system!</p>
                             </div>
 
-                            <div className="planet-card border-red-500/30">
-                                <h3 className="font-heading text-xl text-red-400 mb-4">✗ NOT PLANETS (Swipe Left!)</h3>
-                                <ul className="space-y-2 text-text-secondary">
-                                    <li><span className="text-white font-bold">Dwarf Planets</span> - Pluto, Ceres, Eris...</li>
-                                    <li><span className="text-white font-bold">Moons</span> - Orbit planets, not the Sun</li>
-                                    <li><span className="text-white font-bold">Asteroids</span> - Rocky debris</li>
-                                    <li><span className="text-white font-bold">Comets</span> - Icy with tails</li>
-                                    <li><span className="text-white font-bold">Stars</span> - Including our Sun!</li>
-                                    <li><span className="text-white font-bold">Satellites</span> - Human-made objects</li>
-                                </ul>
-                                <p className="text-pink-400 text-sm mt-4 italic">
-                                    When Pluto appears... it&apos;s technically NOT a planet, but we understand if you struggle! 💔
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl text-purple-400 mb-4">🌙 The Moon Shields</h3>
+                                <div className="space-y-2 text-sm text-text-secondary">
+                                    <div className="flex justify-between">
+                                        <span className="font-bold text-white">Charon</span>
+                                        <span className="text-purple-400">Half Pluto&apos;s size!</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-bold text-white">Nix</span>
+                                        <span className="text-purple-400">~50 km wide</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-bold text-white">Hydra</span>
+                                        <span className="text-purple-400">~55 km wide</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-bold text-white">Kerberos</span>
+                                        <span className="text-purple-400">~12 km wide</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-bold text-white">Styx</span>
+                                        <span className="text-purple-400">~10 km wide</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="planet-card bg-gradient-to-br from-green-900/20 to-space-tertiary">
+                                <h3 className="font-heading text-xl text-green-400 mb-4">🎉 Why It&apos;s FREE</h3>
+                                <p className="text-text-dim italic text-sm mb-4">
+                                    &quot;If they won&apos;t count me as a planet, I won&apos;t count as an unlock cost!&quot;
+                                </p>
+                                <p className="text-text-secondary text-sm">
+                                    Pluto&apos;s game is free as a tribute to the underdog of our solar system.
+                                    Start here, master the basics, then journey through the planets to reach Earth!
+                                </p>
+                                <p className="text-green-400 font-bold text-sm mt-4">
+                                    Earn stardust here to unlock Neptune! 🚀
                                 </p>
                             </div>
                         </div>
 
                     </section>
-
-                    {/* Ad Slot */}
-                    <div className="my-8 h-[250px] bg-space-tertiary/30 rounded-lg border border-white/5 flex items-center justify-center">
-                        <span className="text-text-dim text-sm opacity-50">Advertisement</span>
-                    </div>
-
                 </div>
             </main>
 
@@ -390,3 +449,4 @@ export default function PlutoGamePage() {
         </>
     );
 }
+

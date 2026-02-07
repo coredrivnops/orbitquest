@@ -20,10 +20,11 @@ export default function PlanetCard({ planet, index }: PlanetCardProps) {
         setHighScore(progress.highScores[planet.id] || null);
     }, [planet.id]);
 
-    const difficultyColors = {
+    const difficultyColors: Record<string, string> = {
         easy: 'text-green-400',
         medium: 'text-yellow-400',
         hard: 'text-red-400',
+        legendary: 'text-amber-400',
     };
 
     return (

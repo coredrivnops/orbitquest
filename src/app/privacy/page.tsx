@@ -54,15 +54,22 @@ export default function PrivacyPage() {
                                     </a>.
                                 </li>
                                 <li>
-                                    Third-party vendors, including Google, use cookies to serve ads based on a user&apos;s
-                                    prior visits to this website or other websites.
+                                    You can also opt out of third-party vendor cookies by visiting{' '}
+                                    <a
+                                        href="https://www.aboutads.info/choices/"
+                                        className="text-neon-cyan hover:underline"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        aboutads.info
+                                    </a>.
                                 </li>
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">3. Data Collection</h2>
-                            <p>We may collect the following non-personally identifiable information:</p>
+                            <h2 className="font-heading text-xl text-neon-purple mb-4">3. Data We Collect</h2>
+                            <p>We may collect the following non-personally identifiable information through standard web analytics:</p>
                             <ul className="list-disc list-inside mt-4 space-y-2">
                                 <li>Browser type and version</li>
                                 <li>Operating system</li>
@@ -71,7 +78,7 @@ export default function PrivacyPage() {
                                 <li>Anonymous usage statistics</li>
                             </ul>
                             <p className="mt-4">
-                                <strong>We do NOT collect:</strong> Names, email addresses, physical addresses,
+                                <strong>We do NOT directly collect:</strong> Names, email addresses, physical addresses,
                                 phone numbers, or any other personally identifiable information unless you voluntarily
                                 provide it through our contact form.
                             </p>
@@ -83,46 +90,63 @@ export default function PrivacyPage() {
                                 OrbitQuest uses browser localStorage to save your game progress, including:
                             </p>
                             <ul className="list-disc list-inside mt-4 space-y-2">
-                                <li>Stardust balance</li>
+                                <li>Stardust balance (in-game currency)</li>
                                 <li>Unlocked planets</li>
                                 <li>High scores</li>
                             </ul>
                             <p className="mt-4">
                                 This data is stored only on your device and is never transmitted to our servers.
+                                You can clear this data at any time by clearing your browser&apos;s local storage.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">5. GDPR Compliance (European Visitors)</h2>
-                            <p>If you are located in the European Economic Area (EEA), you have the following rights:</p>
+                            <h2 className="font-heading text-xl text-neon-purple mb-4">5. Your Rights</h2>
+                            <p>
+                                Depending on your location, you may have certain rights regarding your personal data, including:
+                            </p>
                             <ul className="list-disc list-inside mt-4 space-y-2">
-                                <li><strong>Right to Access:</strong> Request copies of your personal data.</li>
-                                <li><strong>Right to Rectification:</strong> Request correction of inaccurate data.</li>
+                                <li><strong>Right to Access:</strong> Request information about your data.</li>
                                 <li><strong>Right to Erasure:</strong> Request deletion of your personal data.</li>
-                                <li><strong>Right to Restrict Processing:</strong> Request limitation of data processing.</li>
-                                <li><strong>Right to Object:</strong> Object to our processing of your personal data.</li>
+                                <li><strong>Right to Object:</strong> Object to certain data processing.</li>
+                                <li><strong>Right to Opt-Out:</strong> Opt out of personalized advertising via the links above.</li>
                             </ul>
                             <p className="mt-4">
-                                To exercise any of these rights, please contact us at solutions@coredrivn.com.
+                                To exercise any of these rights, please contact us at{' '}
+                                <a href="mailto:solutions@coredrivn.com" className="text-neon-cyan hover:underline">
+                                    solutions@coredrivn.com
+                                </a>.
                             </p>
                         </section>
 
                         <section>
                             <h2 className="font-heading text-xl text-neon-purple mb-4">6. Children&apos;s Privacy</h2>
                             <p>
-                                OrbitQuest is designed to be family-friendly. We do not knowingly collect personal
-                                information from children under 13. If you believe we have collected such information,
-                                please contact us immediately.
+                                OrbitQuest is designed to be family-friendly and is intended for general audiences.
+                                We do not knowingly collect personal information from children under 13.
+                                If you believe we have inadvertently collected such information, please contact us
+                                immediately and we will take steps to delete it.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">7. Jurisdiction</h2>
+                            <h2 className="font-heading text-xl text-neon-purple mb-4">7. Third-Party Services</h2>
                             <p>
-                                This website is operated from India. By using this site, you consent to the
-                                processing of your information as described in this policy under the applicable
-                                laws of India.
+                                We use the following third-party services that may collect data:
                             </p>
+                            <ul className="list-disc list-inside mt-4 space-y-2">
+                                <li>
+                                    <strong>Google AdSense:</strong> For displaying advertisements.{' '}
+                                    <a
+                                        href="https://policies.google.com/privacy"
+                                        className="text-neon-cyan hover:underline"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Google Privacy Policy
+                                    </a>
+                                </li>
+                            </ul>
                         </section>
 
                         <section>

@@ -492,6 +492,164 @@ export function PlanetOrb({ planetId, size, className = '', animated = true }: P
                 </div>
             );
 
+        case 'blackhole':
+            // Mysterious black hole with accretion disk and gravitational lensing effect
+            return (
+                <div className={`relative ${animClass} ${className}`} style={{ width: size * 1.4, height: size * 1.4, marginLeft: -size * 0.2, marginRight: -size * 0.2 }}>
+                    {/* Accretion disk (back) */}
+                    <div
+                        className="absolute"
+                        style={{
+                            width: size * 1.3,
+                            height: size * 0.3,
+                            top: '45%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%) rotateX(75deg)',
+                            background: `linear-gradient(
+                                90deg,
+                                rgba(168, 85, 247, 0.1) 0%,
+                                rgba(236, 72, 153, 0.4) 20%,
+                                rgba(251, 191, 36, 0.6) 35%,
+                                rgba(249, 115, 22, 0.8) 50%,
+                                rgba(251, 191, 36, 0.6) 65%,
+                                rgba(236, 72, 153, 0.4) 80%,
+                                rgba(168, 85, 247, 0.1) 100%
+                            )`,
+                            borderRadius: '50%',
+                            filter: 'blur(2px)',
+                            zIndex: 0,
+                        }}
+                    />
+                    {/* Event Horizon (the actual black hole) */}
+                    <div
+                        className="absolute rounded-full"
+                        style={{
+                            width: size * 0.5,
+                            height: size * 0.5,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: 'radial-gradient(circle, #000 60%, #1a0020 80%, #2d0040 100%)',
+                            boxShadow: `0 0 ${size / 2}px rgba(0, 0, 0, 0.9), 0 0 ${size}px rgba(168, 85, 247, 0.3)`,
+                            zIndex: 2,
+                        }}
+                    />
+                    {/* Photon sphere / light bending effect */}
+                    <div
+                        className="absolute rounded-full"
+                        style={{
+                            width: size * 0.65,
+                            height: size * 0.65,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            border: '2px solid rgba(168, 85, 247, 0.5)',
+                            boxShadow: '0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.2)',
+                            zIndex: 1,
+                        }}
+                    />
+                    {/* Accretion disk (front) */}
+                    <div
+                        className="absolute"
+                        style={{
+                            width: size * 1.3,
+                            height: size * 0.15,
+                            top: '58%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%) rotateX(75deg)',
+                            background: `linear-gradient(
+                                90deg,
+                                transparent 0%,
+                                rgba(249, 115, 22, 0.6) 25%,
+                                rgba(251, 191, 36, 0.8) 50%,
+                                transparent 75%
+                            )`,
+                            borderRadius: '50%',
+                            filter: 'blur(1px)',
+                            zIndex: 3,
+                        }}
+                    />
+                </div>
+            );
+
+        case 'sun':
+            // Brilliant sun with solar flares and corona
+            return (
+                <div className={`relative ${animClass} ${className}`} style={{ width: size * 1.3, height: size * 1.3, marginLeft: -size * 0.15, marginRight: -size * 0.15 }}>
+                    {/* Corona / outer glow */}
+                    <div
+                        className="absolute rounded-full animate-pulse"
+                        style={{
+                            width: size * 1.25,
+                            height: size * 1.25,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: 'radial-gradient(circle, rgba(251, 191, 36, 0.4) 40%, rgba(249, 115, 22, 0.2) 60%, transparent 80%)',
+                            zIndex: 0,
+                        }}
+                    />
+                    {/* Main sun body */}
+                    <div
+                        className="absolute rounded-full"
+                        style={{
+                            width: size * 0.8,
+                            height: size * 0.8,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: `radial-gradient(circle at 35% 35%, #fef3c7, #fbbf24 40%, #f97316 70%, #dc2626 100%)`,
+                            boxShadow: `0 0 ${size / 2}px rgba(251, 191, 36, 0.8), 0 0 ${size}px rgba(249, 115, 22, 0.4)`,
+                            zIndex: 2,
+                        }}
+                    />
+                    {/* Solar granulation (surface texture) */}
+                    <div
+                        className="absolute rounded-full overflow-hidden"
+                        style={{
+                            width: size * 0.7,
+                            height: size * 0.7,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 3,
+                            opacity: 0.3,
+                        }}
+                    >
+                        <div className="absolute" style={{ width: '20%', height: '15%', top: '30%', left: '25%', background: 'rgba(255, 200, 100, 0.6)', borderRadius: '50%' }} />
+                        <div className="absolute" style={{ width: '15%', height: '20%', top: '50%', left: '55%', background: 'rgba(255, 180, 80, 0.5)', borderRadius: '50%' }} />
+                        <div className="absolute" style={{ width: '18%', height: '12%', top: '20%', left: '50%', background: 'rgba(255, 220, 120, 0.5)', borderRadius: '50%' }} />
+                    </div>
+                    {/* Sunspot */}
+                    <div
+                        className="absolute rounded-full"
+                        style={{
+                            width: size * 0.1,
+                            height: size * 0.08,
+                            top: '45%',
+                            left: '40%',
+                            background: 'radial-gradient(circle, rgba(100, 50, 0, 0.7) 40%, transparent 80%)',
+                            zIndex: 4,
+                        }}
+                    />
+                    {/* Solar flare (animated) */}
+                    <div
+                        className="absolute"
+                        style={{
+                            width: size * 0.2,
+                            height: size * 0.35,
+                            top: '10%',
+                            left: '65%',
+                            background: 'linear-gradient(180deg, rgba(251, 191, 36, 0.8) 0%, rgba(249, 115, 22, 0.4) 50%, transparent 100%)',
+                            borderRadius: '50% 50% 50% 50%',
+                            transform: 'rotate(25deg)',
+                            zIndex: 1,
+                            animation: 'pulse 2s ease-in-out infinite',
+                        }}
+                    />
+                </div>
+            );
+
         default:
             // Fallback generic planet
             return (
@@ -507,3 +665,4 @@ export function PlanetOrb({ planetId, size, className = '', animated = true }: P
             );
     }
 }
+

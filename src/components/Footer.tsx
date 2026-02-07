@@ -31,13 +31,13 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/games/earth" className="text-text-secondary hover:text-neon-cyan transition-colors text-sm">
-                                    Orbital Defense
+                                <Link href="/blog" className="text-text-secondary hover:text-neon-cyan transition-colors text-sm">
+                                    Space Blog
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/games/mars" className="text-text-secondary hover:text-neon-cyan transition-colors text-sm">
-                                    Rover Rally
+                                <Link href="/about" className="text-text-secondary hover:text-neon-cyan transition-colors text-sm">
+                                    About Us
                                 </Link>
                             </li>
                         </ul>
@@ -49,11 +49,6 @@ export default function Footer() {
                             Legal
                         </h4>
                         <ul className="space-y-2">
-                            <li>
-                                <Link href="/about" className="text-text-secondary hover:text-neon-cyan transition-colors text-sm">
-                                    About Us
-                                </Link>
-                            </li>
                             <li>
                                 <Link href="/privacy" className="text-text-secondary hover:text-neon-cyan transition-colors text-sm">
                                     Privacy Policy

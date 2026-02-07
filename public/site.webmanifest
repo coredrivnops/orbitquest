@@ -1,0 +1,22 @@
+{
+    "name": "OrbitQuest",
+    "short_name": "OrbitQuest",
+    "description": "Free Solar System Arcade Games - Learn Space Science!",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#050510",
+    "theme_color": "#00f0ff",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

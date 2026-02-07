@@ -35,7 +35,7 @@ export default function ContactPage() {
                                             solutions@coredrivn.com
                                         </a>
                                         <p className="text-text-dim text-sm mt-2">
-                                            We typically respond within 24-48 hours.
+                                            We aim to respond within 24-48 hours.
                                         </p>
                                     </div>
                                 </div>
@@ -47,7 +47,7 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-ui text-lg text-neon-purple mb-2">Bug Reports</h3>
                                         <p className="text-text-secondary">
-                                            Found a glitch in the Matrix... er, solar system? Let us know!
+                                            Found a glitch in the solar system? Let us know!
                                             Please include:
                                         </p>
                                         <ul className="text-text-dim text-sm mt-2 space-y-1">
@@ -95,8 +95,8 @@ export default function ContactPage() {
                                         Why can&apos;t I access some planets?
                                     </p>
                                     <p className="text-text-secondary text-sm">
-                                        Outer planets require Stardust to unlock. Play Earth and Mars games
-                                        to earn Stardust, then unlock new worlds!
+                                        Some planets require Stardust to unlock. Play games to earn
+                                        Stardust, then use it to unlock new worlds!
                                     </p>
                                 </div>
 
@@ -115,7 +115,7 @@ export default function ContactPage() {
                                         Can I play on mobile?
                                     </p>
                                     <p className="text-text-secondary text-sm">
-                                        Absolutely! OrbitQuest is fully responsive and works on phones
+                                        Yes! OrbitQuest is designed to be responsive and works on phones
                                         and tablets. Just open it in your mobile browser.
                                     </p>
                                 </div>

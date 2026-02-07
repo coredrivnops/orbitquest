@@ -151,6 +151,32 @@ export default function NeptuneTunnelGame() {
             }
         };
 
+        const handleGameOver = () => {
+            document.exitPointerLock();
+            const state = stateRef.current;
+            const earnedStardust = Math.floor(state.score / 10);
+
+            // Save progress
+            const progress = loadProgress();
+            progress.stardust += earnedStardust;
+            if (!progress.highScores['neptune'] || state.score > progress.highScores['neptune']) {
+                progress.highScores['neptune'] = state.score;
+            }
+            saveProgress(progress);
+
+            // Dispatch event for other components
+            window.dispatchEvent(new CustomEvent('stardust-earned', {
+                detail: { amount: earnedStardust }
+            }));
+
+            setGameState(prev => ({
+                ...prev,
+                isPlaying: false,
+                gameOver: true,
+                stardust: earnedStardust
+            }));
+        };
+
         // --- Game Loop ---
         let frameId: number;
         const animate = () => {

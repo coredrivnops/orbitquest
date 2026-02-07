@@ -1,0 +1,55 @@
+{
+    "name": "OrbitQuest - Space Arcade Games",
+    "short_name": "OrbitQuest",
+    "description": "Explore the solar system through arcade-style mini-games. Learn about planets while having fun!",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a1a",
+    "theme_color": "#00f0ff",
+    "orientation": "portrait-primary",
+    "categories": [
+        "games",
+        "education",
+        "entertainment"
+    ],
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Start Playing",
+            "short_name": "Play",
+            "description": "Jump straight into the game",
+            "url": "/games/pluto",
+            "icons": [
+                {
+                    "src": "/favicon.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Space Blog",
+            "short_name": "Blog",
+            "description": "Read educational space articles",
+            "url": "/blog",
+            "icons": [
+                {
+                    "src": "/favicon.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

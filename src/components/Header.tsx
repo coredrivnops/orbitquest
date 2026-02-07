@@ -25,6 +25,12 @@ export default function Header() {
                             Solar System
                         </Link>
                         <Link
+                            href="/blog"
+                            className="font-ui text-text-secondary hover:text-neon-cyan transition-colors"
+                        >
+                            Blog
+                        </Link>
+                        <Link
                             href="/about"
                             className="font-ui text-text-secondary hover:text-neon-cyan transition-colors"
                         >

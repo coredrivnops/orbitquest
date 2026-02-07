@@ -27,10 +27,9 @@ export default function AboutPage() {
                                 or just looking for an entertaining way to learn.
                             </p>
                             <p className="text-text-secondary">
-                                Each game is carefully designed to reflect real scientific phenomena. When you dodge
-                                debris in Orbital Defense, you&apos;re learning about the Kessler Syndrome. When you
-                                navigate Mars in Rover Rally, you&apos;re experiencing the challenges of low-gravity
-                                terrain. Every game is a lesson wrapped in fun.
+                                Each game is designed to incorporate real scientific concepts. From Neptune&apos;s
+                                supersonic winds to Jupiter&apos;s massive storms, every game mechanic draws inspiration
+                                from actual planetary phenomena. Every game is a lesson wrapped in fun.
                             </p>
                         </section>
 
@@ -41,14 +40,14 @@ export default function AboutPage() {
                                 <li className="flex items-start gap-3">
                                     <span className="text-neon-cyan text-xl">✓</span>
                                     <span>
-                                        <strong className="text-text-primary">Science-Based Games:</strong> Every mechanic
-                                        is inspired by real planetary science and space phenomena.
+                                        <strong className="text-text-primary">Science-Inspired Games:</strong> Every mechanic
+                                        draws inspiration from real planetary science and space phenomena.
                                     </span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="text-neon-cyan text-xl">✓</span>
                                     <span>
-                                        <strong className="text-text-primary">No Clutter:</strong> Clean, beautiful interface
+                                        <strong className="text-text-primary">Clean Design:</strong> Beautiful, clutter-free interface
                                         designed for focus and immersion.
                                     </span>
                                 </li>
@@ -74,21 +73,21 @@ export default function AboutPage() {
                             <h2 className="font-heading text-xl text-neon-purple mb-4">🎮 What We Offer</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="bg-space-deep/50 rounded-lg p-4">
-                                    <p className="font-ui text-neon-cyan mb-2">8 Unique Games</p>
+                                    <p className="font-ui text-neon-cyan mb-2">10 Unique Games</p>
                                     <p className="text-text-secondary text-sm">
-                                        One game per planet, each with unique mechanics
+                                        One game per celestial body, each with unique mechanics
                                     </p>
                                 </div>
                                 <div className="bg-space-deep/50 rounded-lg p-4">
                                     <p className="font-ui text-neon-cyan mb-2">Educational Content</p>
                                     <p className="text-text-secondary text-sm">
-                                        500+ words of NASA/ESA-sourced facts per game
+                                        Science facts sourced from NASA, ESA, and other resources
                                     </p>
                                 </div>
                                 <div className="bg-space-deep/50 rounded-lg p-4">
                                     <p className="font-ui text-neon-cyan mb-2">Stardust Rewards</p>
                                     <p className="text-text-secondary text-sm">
-                                        Earn currency by playing, unlock new worlds
+                                        Earn in-game currency by playing, unlock new worlds
                                     </p>
                                 </div>
                                 <div className="bg-space-deep/50 rounded-lg p-4">
@@ -104,9 +103,9 @@ export default function AboutPage() {
                         <section className="planet-card">
                             <h2 className="font-heading text-xl text-neon-purple mb-4">💫 Free & Accessible</h2>
                             <p className="text-text-secondary mb-4">
-                                OrbitQuest is completely free to play. We support our development through
-                                non-intrusive advertisements via Google AdSense. We believe education should
-                                be accessible to everyone, regardless of budget.
+                                OrbitQuest is completely free to play. We support ongoing development through
+                                non-intrusive advertisements via Google AdSense. We believe educational entertainment
+                                should be accessible to everyone.
                             </p>
                             <p className="text-text-secondary">
                                 Your progress is saved locally on your device, so your Stardust and unlocks
@@ -117,16 +116,20 @@ export default function AboutPage() {
 
                         {/* Our Sources */}
                         <section className="planet-card">
-                            <h2 className="font-heading text-xl text-neon-purple mb-4">📚 Our Sources</h2>
+                            <h2 className="font-heading text-xl text-neon-purple mb-4">📚 Educational Sources</h2>
                             <p className="text-text-secondary mb-4">
-                                We take accuracy seriously. All educational content is sourced from:
+                                We strive for accuracy in our educational content. Information is gathered from
+                                publicly available resources including:
                             </p>
                             <ul className="space-y-2 text-text-secondary">
                                 <li>• NASA (National Aeronautics and Space Administration)</li>
                                 <li>• ESA (European Space Agency)</li>
-                                <li>• Peer-reviewed scientific publications</li>
-                                <li>• Established astronomy resources</li>
+                                <li>• Established astronomy and planetary science resources</li>
                             </ul>
+                            <p className="text-text-dim text-sm mt-4">
+                                Note: Content is provided for entertainment and general educational purposes.
+                                Please verify with authoritative sources for academic use.
+                            </p>
                         </section>
 
                         {/* Contact */}

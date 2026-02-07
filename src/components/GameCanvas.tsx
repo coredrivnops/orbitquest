@@ -6,6 +6,8 @@ interface GameCanvasProps {
     onGameLoop: (ctx: CanvasRenderingContext2D, frameCount: number) => void;
     onMount?: (canvas: HTMLCanvasElement) => void;
     onCleanup?: () => void;
+    onMouseMove?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+    onClick?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
     width?: number;
     height?: number;
     className?: string;
@@ -15,6 +17,8 @@ export default function GameCanvas({
     onGameLoop,
     onMount,
     onCleanup,
+    onMouseMove,
+    onClick,
     width = 1280,
     height = 720,
     className = ''
@@ -70,7 +74,9 @@ export default function GameCanvas({
             <canvas
                 ref={canvasRef}
                 className="w-full h-full object-contain block"
-                style={{ imageRendering: 'pixelated' }} // Optional: for pixel art style if needed
+                style={{ imageRendering: 'pixelated' }}
+                onMouseMove={onMouseMove}
+                onClick={onClick}
             />
         </div>
     );
