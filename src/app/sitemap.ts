@@ -11,7 +11,7 @@ const BLOG_POSTS = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://orbitquest.coredrivn.com';
+    const baseUrl = 'https://orbitquest.games';
     const currentDate = new Date().toISOString();
 
     // Static pages

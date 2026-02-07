@@ -22,7 +22,7 @@ const rajdhani = Rajdhani({
     display: 'swap',
 })
 
-const siteUrl = 'https://orbitquest.coredrivn.com';
+const siteUrl = 'https://orbitquest.games';
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
