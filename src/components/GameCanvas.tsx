@@ -55,11 +55,6 @@ export default function GameCanvas({
                 // iOS / No API -> CSS fallback
                 setFullscreenState(true);
             }
-
-            // Lock orientation if possible
-            if ('orientation' in screen && 'lock' in (screen.orientation as any)) {
-                (screen.orientation as any).lock('landscape').catch(() => { });
-            }
         } else {
             // Exit Fullscreen
             if (document.fullscreenElement) {
@@ -91,15 +86,7 @@ export default function GameCanvas({
         };
     }, []);
 
-    // Dismiss state for rotation prompt
-    const [isDismissed, setIsDismissed] = useState(false);
 
-    // Reset dismissed state when entering fullscreen
-    useEffect(() => {
-        if (isFullscreen) {
-            setIsDismissed(false);
-        }
-    }, [isFullscreen]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -235,37 +222,6 @@ export default function GameCanvas({
                     </svg>
                 )}
             </button>
-
-            {/* Rotate Device Prompt (Mobile Fullscreen Portrait) */}
-            <div
-                onClick={() => setIsDismissed(true)}
-                className={`absolute inset-0 z-[10001] bg-black/95 flex flex-col items-center justify-center p-8 text-center transition-all duration-300 ${isFullscreen && !isDismissed ? 'hidden portrait:flex opacity-100 pointer-events-auto' : 'hidden opacity-0 pointer-events-none'}`}
-            >
-                {/* Close Button */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); setIsDismissed(true); }}
-                    className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-
-                <div className="w-16 h-16 mb-6 animate-pulse text-yellow-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
-                        <path d="M21 16.5A2.5 2.5 0 0 1 18.5 19H5.5A2.5 2.5 0 0 1 3 16.5v-9A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9Z" />
-                        <path d="M12 5V3m0 18v-2" />
-                    </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Landscape Recommended</h3>
-                <p className="text-gray-300 mb-6">Rotate for the best experience.</p>
-                <button
-                    className="px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-white text-sm font-medium transition-colors"
-                >
-                    Dismiss
-                </button>
-            </div>
         </div>
     );
 }
