@@ -171,7 +171,64 @@ body {
   }
 }
 
-/* Forced Fullscreen Override (JS toggled) */
+/* Mobile Landscape Optimization */
+@media screen and (max-width: 1024px) and (orientation: landscape) {
+
+  /* 1. Hide non-game elements using !important to override everything */
+  header,
+  footer,
+  nav,
+  section,
+  article,
+  .planet-card,
+  .stardust-counter,
+  .breadcrumbs {
+    display: none !important;
+  }
+
+  /* 2. Lock body scroll */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden !important;
+    background-color: #050510 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 3. Force Game Container to Fullscreen */
+  .game-canvas-container {
+    position: fixed !important;
+    inset: 0 !important;
+    /* top:0, right:0, bottom:0, left:0 */
+    width: 100vw !important;
+    height: 100dvh !important;
+    /* Use dynamic viewport height for mobile browsers */
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    z-index: 99999 !important;
+    background: #000 !important;
+    aspect-ratio: unset !important;
+  }
+
+  /* 4. Ensure Canvas Scales/Fits correctly */
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    /* Maintain aspect ratio (letterboxing if needed) */
+  }
+
+  /* 5. Hide the 'Rotate Device' prompt since we are IN landscape */
+  /* Targeting the text specifically or the logic inside GameCanvas already handles it via 'portrait:flex' */
+  /* But let's be safe and ensure no random overlays block view */
+}
+
+/* Forced Fullscreen Override (JS toggled - still useful for Desktop/Portrait forcing) */
 .force-fullscreen {
   position: fixed !important;
   inset: 0 !important;
@@ -179,7 +236,6 @@ body {
   height: 100vh !important;
   z-index: 9999 !important;
   background: #050510 !important;
-  /* bg-primary */
   max-width: none !important;
   margin: 0 !important;
   border-radius: 0 !important;

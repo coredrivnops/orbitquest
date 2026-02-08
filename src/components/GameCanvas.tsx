@@ -30,8 +30,8 @@ export default function GameCanvas({
 
     const toggleFullscreen = () => {
         // Target the parent wrapper (which contains both Canvas and UI Overlays)
-        // In all pages, GameCanvas is wrapped in <div className="relative w-full max-w-4xl mx-auto">
-        const container = canvasRef.current?.closest('.relative') as HTMLElement || canvasRef.current?.parentElement;
+        // We specifically look for the .game-canvas-container class which frames the game area in page.tsx
+        const container = canvasRef.current?.closest('.game-canvas-container') as HTMLElement;
 
         if (!container) return;
 
@@ -72,7 +72,7 @@ export default function GameCanvas({
     // Listen for native fullscreen changes
     useEffect(() => {
         const handleChange = () => {
-            const container = canvasRef.current?.closest('.relative') as HTMLElement || canvasRef.current?.parentElement;
+            const container = canvasRef.current?.closest('.game-canvas-container') as HTMLElement;
             if (document.fullscreenElement) {
                 setIsFullscreen(true);
             } else {
@@ -104,7 +104,7 @@ export default function GameCanvas({
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            const container = canvasRef.current?.closest('.relative') as HTMLElement || canvasRef.current?.parentElement;
+            const container = canvasRef.current?.closest('.game-canvas-container') as HTMLElement;
             if (container) container.classList.remove('force-fullscreen');
         };
     }, []);
@@ -153,7 +153,7 @@ export default function GameCanvas({
 
     return (
         <div
-            className={`game-canvas-container ${className}`}
+            className={`relative w-full h-full ${className}`}
         >
             <canvas
                 ref={canvasRef}
