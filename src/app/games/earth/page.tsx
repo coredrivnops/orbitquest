@@ -255,7 +255,10 @@ export default function EarthGamePage() {
                                             </div>
                                             <div className="bg-black/40 rounded-lg p-3 border border-yellow-500/30">
                                                 <div className="text-2xl mb-1">🎯</div>
-                                                <div className="text-yellow-300 font-bold text-sm">Mouse Move</div>
+                                                <div className="text-yellow-300 font-bold text-sm">
+                                                    <span className="hidden md:inline">Mouse</span>
+                                                    <span className="md:hidden">Drag</span>
+                                                </div>
                                                 <div className="text-text-dim text-xs">Control your satellite</div>
                                             </div>
                                             <div className="bg-black/40 rounded-lg p-3 border border-green-500/30">

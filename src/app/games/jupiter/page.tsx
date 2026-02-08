@@ -244,7 +244,10 @@ export default function JupiterGamePage() {
                                         <div className="grid grid-cols-2 gap-6 text-center">
                                             <div className="bg-orange-800/30 p-4 rounded-lg">
                                                 <p className="text-4xl mb-2">👆</p>
-                                                <p className="text-white font-bold">CLICK / HOLD</p>
+                                                <p className="text-white font-bold">
+                                                    <span className="hidden md:inline">CLICK / HOLD</span>
+                                                    <span className="md:hidden">TAP / HOLD</span>
+                                                </p>
                                                 <p className="text-orange-300 text-sm">Rise up!</p>
                                             </div>
                                             <div className="bg-amber-800/30 p-4 rounded-lg">

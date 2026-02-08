@@ -263,7 +263,10 @@ export default function MercuryGamePage() {
                                     {/* Controls - SIMPLIFIED! */}
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className="px-6 py-3 bg-yellow-500/20 rounded-lg text-center border border-yellow-500/30">
-                                            <span className="text-yellow-400 font-bold text-xl">HOLD SPACE</span>
+                                            <span className="text-yellow-400 font-bold text-xl">
+                                                <span className="hidden md:inline">HOLD SPACE</span>
+                                                <span className="md:hidden">TAP</span>
+                                            </span>
                                             <p className="text-xs text-yellow-300">Speed Boost!</p>
                                         </div>
                                         <div className="text-text-dim text-xs text-left max-w-xs">

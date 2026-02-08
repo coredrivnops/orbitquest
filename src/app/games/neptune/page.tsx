@@ -278,7 +278,7 @@ export default function NeptuneGamePage() {
                                         <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-400/20">
                                             <p className="text-yellow-400 font-bold mb-2">🎮 HOW TO PLAY</p>
                                             <p className="text-text-secondary">
-                                                Move mouse <span className="text-cyan-400 font-bold">UP/DOWN</span> to navigate •
+                                                Move mouse or drag <span className="text-cyan-400 font-bold">UP/DOWN</span> to navigate •
                                                 Ride <span className="text-green-400 font-bold">green wind currents</span> for speed •
                                                 Avoid <span className="text-red-400 font-bold">red headwinds</span> and ice! •
                                                 Collect <span className="text-white font-bold">diamonds</span> for stardust!

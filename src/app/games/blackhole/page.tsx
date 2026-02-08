@@ -311,7 +311,10 @@ export default function BlackHoleGamePage() {
                                         <div className="grid grid-cols-4 gap-4 text-sm mb-6">
                                             <div className="p-4 bg-gradient-to-br from-purple-900/50 to-pink-900/30 rounded-xl border border-purple-500/30">
                                                 <div className="text-4xl mb-2">🖱️</div>
-                                                <p className="text-purple-400 font-bold">MOUSE</p>
+                                                <p className="text-purple-400 font-bold">
+                                                    <span className="hidden md:inline">MOUSE</span>
+                                                    <span className="md:hidden">DRAG</span>
+                                                </p>
                                                 <p className="text-text-dim text-xs mt-1">Controls your ship</p>
                                             </div>
                                             <div className="p-4 bg-gradient-to-br from-purple-900/50 to-pink-900/30 rounded-xl border border-purple-500/30">

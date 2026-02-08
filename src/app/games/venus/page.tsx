@@ -247,7 +247,10 @@ export default function VenusGamePage() {
                                     <div className="flex items-center gap-4 mb-6">
                                         <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg">
                                             <span className="text-2xl">🖱️</span>
-                                            <span className="text-white text-sm">Move mouse left/right to dodge</span>
+                                            <span className="text-white text-sm">
+                                                <span className="hidden md:inline">Move mouse left/right to dodge</span>
+                                                <span className="md:hidden">Drag left/right to dodge</span>
+                                            </span>
                                         </div>
                                     </div>
 

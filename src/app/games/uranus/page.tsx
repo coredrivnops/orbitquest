@@ -180,7 +180,10 @@ export default function UranusGamePage() {
                                             <div className="p-4 rounded-lg" style={{ background: 'rgba(34, 211, 238, 0.2)' }}>
                                                 <p className="text-2xl mb-1">☀️</p>
                                                 <p className="font-bold" style={{ color: '#22d3ee' }}>SUMMER</p>
-                                                <p className="text-sm text-text-dim">Move your mouse freely!</p>
+                                                <p className="text-sm text-text-dim">
+                                                    <span className="hidden md:inline">Move mouse freely!</span>
+                                                    <span className="md:hidden">Drag finger!</span>
+                                                </p>
                                             </div>
                                             <div className="p-4 rounded-lg" style={{ background: 'rgba(59, 130, 246, 0.2)' }}>
                                                 <p className="text-2xl mb-1">❄️</p>

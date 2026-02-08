@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter, Orbitron, Rajdhani } from 'next/font/google'
 import './globals.css'
+import Footer from '@/components/Footer';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 // Font configurations
 const inter = Inter({
@@ -157,6 +159,7 @@ export default function RootLayout({
                 <meta name="apple-mobile-web-app-title" content="OrbitQuest" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="msapplication-TileColor" content="#00f0ff" />
+                <GoogleAnalytics gaId="G-2LS6MLDXLV" />
                 <meta name="theme-color" content="#0a0a1a" />
 
                 {/* PWA Manifest */}

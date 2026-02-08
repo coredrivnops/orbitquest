@@ -234,7 +234,9 @@ export default function MarsGamePage() {
                                                     <p className="text-text-dim text-xs">Move Right</p>
                                                 </div>
                                             </div>
-                                            <p className="text-text-dim text-sm mt-4">Or move your mouse/finger to control!</p>
+                                            <p className="text-text-dim text-sm mt-4">
+                                                Or move your <span className="hidden md:inline">mouse</span><span className="md:hidden">finger</span> to control!
+                                            </p>
                                         </div>
 
                                         <div className="grid grid-cols-4 gap-2 text-center text-xs mb-4">

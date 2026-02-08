@@ -206,6 +206,38 @@ export default function MoonGamePage() {
                                 height={720}
                             />
 
+                            {/* Mobile Controls */}
+                            {isPlaying && !isCrashed && !isLanded && (
+                                <>
+                                    <div className="absolute bottom-8 left-8 flex gap-4 z-20 md:hidden">
+                                        <button
+                                            onTouchStart={(e) => { e.preventDefault(); gameLogicRef.current?.handleInput('left-start'); }}
+                                            onTouchEnd={(e) => { e.preventDefault(); gameLogicRef.current?.handleInput('left-stop'); }}
+                                            className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl select-none active:bg-white/40 backdrop-blur-sm border border-white/30"
+                                        >
+                                            ⬅️
+                                        </button>
+                                        <button
+                                            onTouchStart={(e) => { e.preventDefault(); gameLogicRef.current?.handleInput('right-start'); }}
+                                            onTouchEnd={(e) => { e.preventDefault(); gameLogicRef.current?.handleInput('right-stop'); }}
+                                            className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl select-none active:bg-white/40 backdrop-blur-sm border border-white/30"
+                                        >
+                                            ➡️
+                                        </button>
+                                    </div>
+
+                                    <div className="absolute bottom-8 right-8 z-20 md:hidden">
+                                        <button
+                                            onTouchStart={(e) => { e.preventDefault(); gameLogicRef.current?.handleInput('thrust-start'); }}
+                                            onTouchEnd={(e) => { e.preventDefault(); gameLogicRef.current?.handleInput('thrust-stop'); }}
+                                            className="w-20 h-20 bg-red-500/30 rounded-full flex items-center justify-center text-4xl select-none active:bg-red-500/50 border-2 border-red-400 backdrop-blur-sm"
+                                        >
+                                            🔥
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
                             {/* Start Overlay */}
                             {!isPlaying && !isCrashed && (
                                 <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-4 text-center z-10 overflow-hidden">

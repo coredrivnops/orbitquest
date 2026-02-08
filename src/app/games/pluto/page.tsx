@@ -204,12 +204,18 @@ export default function PlutoGamePage() {
                                         <div className="p-4 bg-gradient-to-br from-pink-900/40 to-purple-900/30 rounded-xl border border-pink-500/30">
                                             <div className="text-3xl mb-2">🎯</div>
                                             <p className="text-pink-400 font-bold">AIM</p>
-                                            <p className="text-text-dim text-xs mt-1">Move your mouse</p>
+                                            <p className="text-text-dim text-xs mt-1">
+                                                <span className="hidden md:inline">Move mouse</span>
+                                                <span className="md:hidden">Drag finger</span>
+                                            </p>
                                         </div>
                                         <div className="p-4 bg-gradient-to-br from-pink-900/40 to-purple-900/30 rounded-xl border border-pink-500/30">
                                             <div className="text-3xl mb-2">🔫</div>
                                             <p className="text-cyan-400 font-bold">SHOOT</p>
-                                            <p className="text-text-dim text-xs mt-1">Click & hold</p>
+                                            <p className="text-text-dim text-xs mt-1">
+                                                <span className="hidden md:inline">Click & hold</span>
+                                                <span className="md:hidden">Tap & hold</span>
+                                            </p>
                                         </div>
                                         <div className="p-4 bg-gradient-to-br from-pink-900/40 to-purple-900/30 rounded-xl border border-pink-500/30">
                                             <div className="text-3xl mb-2">🛡️</div>

@@ -217,6 +217,11 @@ export default function SunGamePage() {
         setEarnedStardust(0);
     };
 
+    const handleTouch = (key: string, pressed: boolean) => {
+        if (pressed) keysRef.current.add(key);
+        else keysRef.current.delete(key);
+    };
+
     // Loading state
     if (isLoading) {
         return (
@@ -356,6 +361,54 @@ export default function SunGamePage() {
                             width={1280}
                             height={720}
                         />
+
+                        {/* Mobile Controls for Sun */}
+                        {isPlaying && !isGameOver && !isVictory && (
+                            <>
+                                <div className="absolute bottom-6 left-6 z-20 md:hidden grid grid-cols-3 gap-1">
+                                    <div />
+                                    <button
+                                        onTouchStart={(e) => { e.preventDefault(); handleTouch('w', true); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); handleTouch('w', false); }}
+                                        className="w-14 h-14 bg-white/20 rounded-lg flex items-center justify-center text-2xl select-none active:bg-white/40 backdrop-blur-sm border border-white/30"
+                                    >
+                                        ⬆️
+                                    </button>
+                                    <div />
+                                    <button
+                                        onTouchStart={(e) => { e.preventDefault(); handleTouch('a', true); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); handleTouch('a', false); }}
+                                        className="w-14 h-14 bg-white/20 rounded-lg flex items-center justify-center text-2xl select-none active:bg-white/40 backdrop-blur-sm border border-white/30"
+                                    >
+                                        ⬅️
+                                    </button>
+                                    <button
+                                        onTouchStart={(e) => { e.preventDefault(); handleTouch('s', true); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); handleTouch('s', false); }}
+                                        className="w-14 h-14 bg-white/20 rounded-lg flex items-center justify-center text-2xl select-none active:bg-white/40 backdrop-blur-sm border border-white/30"
+                                    >
+                                        ⬇️
+                                    </button>
+                                    <button
+                                        onTouchStart={(e) => { e.preventDefault(); handleTouch('d', true); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); handleTouch('d', false); }}
+                                        className="w-14 h-14 bg-white/20 rounded-lg flex items-center justify-center text-2xl select-none active:bg-white/40 backdrop-blur-sm border border-white/30"
+                                    >
+                                        ➡️
+                                    </button>
+                                </div>
+
+                                <div className="absolute bottom-8 right-8 z-20 md:hidden">
+                                    <button
+                                        onTouchStart={(e) => { e.preventDefault(); handleTouch(' ', true); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); handleTouch(' ', false); }}
+                                        className="w-20 h-20 bg-orange-500/30 rounded-full flex items-center justify-center text-4xl select-none active:bg-orange-500/50 border-2 border-orange-400 backdrop-blur-sm"
+                                    >
+                                        🔥
+                                    </button>
+                                </div>
+                            </>
+                        )}
 
                         {/* HUD Overlay */}
                         {isPlaying && !isGameOver && !isVictory && !showTrivia && (

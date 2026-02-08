@@ -77,6 +77,58 @@ export default function GameCanvas({
                 style={{ imageRendering: 'pixelated' }}
                 onMouseMove={onMouseMove}
                 onClick={onClick}
+                onTouchStart={(e) => {
+                    if (onClick || onMouseMove) {
+                        e.preventDefault(); // Prevent scrolling
+                        const touch = e.touches[0];
+
+                        // If we have an onClick handler, trigger it (for tap-to-jump mechanics)
+                        if (onClick) {
+                            const syntheticEvent = {
+                                clientX: touch.clientX,
+                                clientY: touch.clientY,
+                                currentTarget: e.currentTarget,
+                                preventDefault: () => { },
+                                stopPropagation: () => { },
+                            } as unknown as React.MouseEvent<HTMLCanvasElement>;
+                            onClick(syntheticEvent);
+                        }
+
+                        // Also trigger onMouseMove for initial position set
+                        if (onMouseMove) {
+                            const syntheticEvent = {
+                                clientX: touch.clientX,
+                                clientY: touch.clientY,
+                                currentTarget: e.currentTarget,
+                                preventDefault: () => { },
+                                stopPropagation: () => { },
+                            } as unknown as React.MouseEvent<HTMLCanvasElement>;
+                            onMouseMove(syntheticEvent);
+                        }
+                    }
+                }}
+                onTouchMove={(e) => {
+                    if (onMouseMove) {
+                        e.preventDefault(); // Prevent scrolling
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const touch = e.touches[0];
+
+                        // Create a synthetic MouseEvent
+                        const syntheticEvent = {
+                            clientX: touch.clientX,
+                            clientY: touch.clientY,
+                            currentTarget: e.currentTarget,
+                            preventDefault: () => { },
+                            stopPropagation: () => { },
+                            // Add other properties if needed
+                        } as unknown as React.MouseEvent<HTMLCanvasElement>;
+
+                        onMouseMove(syntheticEvent);
+                    }
+                }}
+                onTouchEnd={(e) => {
+                    e.preventDefault();
+                }}
             />
         </div>
     );

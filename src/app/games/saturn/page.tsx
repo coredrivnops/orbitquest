@@ -234,7 +234,9 @@ export default function SaturnGamePage() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="p-4 rounded-lg" style={{ background: 'rgba(251, 191, 36, 0.15)' }}>
                                                 <p className="text-2xl mb-1">🖱️ / ⌨️</p>
-                                                <p className="font-bold text-yellow-400">CLICK or SPACE</p>
+                                                <p className="font-bold text-yellow-400">
+                                                    <span className="md:hidden">TAP or </span>CLICK<span className="hidden md:inline"> or SPACE</span>
+                                                </p>
                                                 <p className="text-sm text-text-dim">to jump</p>
                                             </div>
                                             <div className="p-4 rounded-lg" style={{ background: 'rgba(251, 191, 36, 0.15)' }}>
