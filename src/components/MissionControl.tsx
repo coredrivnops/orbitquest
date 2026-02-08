@@ -140,8 +140,8 @@ function SunBossChallengeSection() {
                             <span className="text-orange-300 text-xs">10 Waves</span>
                         </div>
                         <button className={`px-6 py-3 font-bold rounded-xl transition-all flex items-center gap-2 ${isUnlocked
-                                ? 'bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(251,191,36,0.4)]'
-                                : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(251,191,36,0.4)]'
+                            : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
                             }`}>
                             <span>☀️</span>
                             <span>{isUnlocked ? 'Enter Battle' : 'Locked'}</span>
@@ -815,7 +815,7 @@ export default function MissionControl() {
                     <div className="absolute hidden md:block top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-500 via-orange-500 to-green-500 opacity-40 -translate-y-1/2 rounded-full" />
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-3">
-                        {planets.map((planet) => {
+                        {planets.filter(p => !p.isMasterChallenge && !p.isBossChallenge).map((planet) => {
                             const unlocked = isUnlocked(planet.id);
                             const highScore = progress.highScores[planet.id] || 0;
                             const isNext = nextPlanet?.id === planet.id;

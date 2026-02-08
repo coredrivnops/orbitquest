@@ -79,16 +79,35 @@ export default function EarthGamePage() {
         };
     }, []);
 
-    // Handle mouse movement
-    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    // Touch/Mouse controls
+    const handleMouseMove = (e: React.MouseEvent) => {
         const game = gameLogicRef.current;
         if (!game || !isPlaying) return;
 
-        const rect = e.currentTarget.getBoundingClientRect();
+        const canvas = e.currentTarget as HTMLCanvasElement;
+        const rect = canvas.getBoundingClientRect();
         const x = (e.clientX - rect.left) * (1280 / rect.width);
         const y = (e.clientY - rect.top) * (720 / rect.height);
+
         game.handleMouseMove(x, y);
-    }, [isPlaying]);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        const game = gameLogicRef.current;
+        if (!game || !isPlaying) return;
+
+        // Prevent default scrolling behavior
+        // e.preventDefault(); // Note: React's synthetic events might not support this directly here, usually done in CSS touch-action
+
+        if (e.touches.length > 0) {
+            const canvas = e.currentTarget as HTMLCanvasElement;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.touches[0].clientX - rect.left) * (1280 / rect.width);
+            const y = (e.touches[0].clientY - rect.top) * (720 / rect.height);
+
+            game.handleMouseMove(x, y);
+        }
+    };
 
     const handleGameLoop = (ctx: CanvasRenderingContext2D, frameCount: number) => {
         const game = gameLogicRef.current;
@@ -191,13 +210,19 @@ export default function EarthGamePage() {
                         {/* Game Canvas Area */}
                         <div className="relative max-w-[1280px] mx-auto">
                             <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-red-500/20 border border-red-500/30">
-                                <GameCanvas
-                                    width={1280}
-                                    height={720}
-                                    onGameLoop={handleGameLoop}
-                                    className="w-full cursor-crosshair"
+                                <div
+                                    className="game-canvas-container relative cursor-none touch-none select-none"
                                     onMouseMove={handleMouseMove}
-                                />
+                                    onTouchMove={handleTouchMove}
+                                    onTouchStart={handleTouchMove}
+                                >
+                                    <GameCanvas
+                                        width={1280}
+                                        height={720}
+                                        onGameLoop={handleGameLoop}
+                                        className="w-full cursor-crosshair"
+                                    />
+                                </div>
 
                                 {/* HUD Overlay */}
                                 {isPlaying && !isGameOver && (

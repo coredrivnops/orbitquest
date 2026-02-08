@@ -1,3 +1,4 @@
+/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +15,7 @@
   --text-primary: #e0e0ff;
   --text-secondary: #a0a0c0;
   --text-dim: #606080;
-  
+
   /* Effects */
   --glow: 0 0 20px currentColor;
   --glow-lg: 0 0 40px currentColor;
@@ -37,7 +38,7 @@ body {
 .starfield {
   position: fixed;
   inset: 0;
-  background: 
+  background:
     radial-gradient(ellipse at center, var(--bg-secondary) 0%, var(--bg-primary) 100%),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
   z-index: -1;
@@ -161,4 +162,37 @@ body {
   html {
     font-size: 14px;
   }
+
+  /* Remove container padding on mobile for game pages */
+  .container.mx-auto.px-4 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Forced Fullscreen Override (JS toggled) */
+.force-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  background: #050510 !important;
+  /* bg-primary */
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.force-fullscreen .game-canvas-container {
+  aspect-ratio: unset !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
 }

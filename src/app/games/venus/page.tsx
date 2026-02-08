@@ -34,7 +34,7 @@ export default function VenusGamePage() {
         };
     }, []);
 
-    // Handle mouse movement for horizontal control
+    // Handle movement controls
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         const game = gameLogicRef.current;
         if (!game || !isPlaying || showTrivia) return;
@@ -43,6 +43,18 @@ export default function VenusGamePage() {
         const x = ((e.clientX - rect.left) / rect.width) * 1280;
         const y = ((e.clientY - rect.top) / rect.height) * 720;
         game.handleInput(x, y);
+    }, [isPlaying, showTrivia]);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+        const game = gameLogicRef.current;
+        if (!game || !isPlaying || showTrivia) return;
+
+        if (e.touches.length > 0) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = ((e.touches[0].clientX - rect.left) / rect.width) * 1280;
+            const y = ((e.touches[0].clientY - rect.top) / rect.height) * 720;
+            game.handleInput(x, y);
+        }
     }, [isPlaying, showTrivia]);
 
     const handleGameLoop = (ctx: CanvasRenderingContext2D, frameCount: number) => {
@@ -186,6 +198,8 @@ export default function VenusGamePage() {
                         <div
                             className="game-canvas-container relative cursor-pointer touch-none select-none"
                             onMouseMove={handleMouseMove}
+                            onTouchMove={handleTouchMove}
+                            onTouchStart={handleTouchMove}
                         >
                             <GameCanvas
                                 onGameLoop={handleGameLoop}
