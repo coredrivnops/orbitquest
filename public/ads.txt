@@ -1,3 +1,1 @@
-# ads.txt - Placeholder
-# Will be updated with Google AdSense publisher ID upon approval
-# Format: google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+# ads.txt will be configured after Google AdSense approval

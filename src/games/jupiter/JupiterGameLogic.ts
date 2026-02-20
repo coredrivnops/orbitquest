@@ -1,6 +1,7 @@
 // Jupiter Game Logic - "STORM RIDER"
 // Ride through Jupiter's atmospheric bands, dodging storms from the Great Red Spot!
 // Simple one-click controls - Click/hold to rise, release to fall
+import { soundManager } from '@/utils/soundManager';
 
 interface Storm {
     x: number;
@@ -271,6 +272,9 @@ export class JupiterGameLogic {
 
     setRising(rising: boolean) {
         if (this.showTrivia || this.isGameOver) return;
+        if (rising && !this.isRising) {
+            soundManager.playThrust();
+        }
         this.isRising = rising;
     }
 
@@ -288,6 +292,7 @@ export class JupiterGameLogic {
             this.hasShield = true;
             this.shieldTimer = 300; // 5 second shield as reward
             this.createCelebrationEffect();
+            soundManager.playLevelUp();
         } else {
             this.combo = 1;
         }
@@ -527,6 +532,7 @@ export class JupiterGameLogic {
                 this.score += 50 * Math.floor(this.combo);
                 this.combo = Math.min(10, this.combo + 0.25);
                 this.comboTimer = 120;
+                soundManager.playPing();
             }
 
             // Collision detection
@@ -587,6 +593,7 @@ export class JupiterGameLogic {
                     this.combo = Math.min(10, this.combo + 0.1);
                     this.comboTimer = 120;
                     this.createCollectEffect(star.x, star.y, star.type);
+                    soundManager.playCollect();
                 }
             }
 
@@ -614,6 +621,7 @@ export class JupiterGameLogic {
                     this.score += 200;
                     this.applyMoonEffect(moon.effect);
                     this.createMoonCollectEffect(moon.x, moon.y, moon.color);
+                    soundManager.playLevelUp();
                 }
             }
 
@@ -717,6 +725,7 @@ export class JupiterGameLogic {
     gameOver() {
         this.isGameOver = true;
         this.screenShake = 20;
+        soundManager.playCrash();
 
         // Death explosion
         for (let i = 0; i < 40; i++) {
@@ -784,7 +793,7 @@ export class JupiterGameLogic {
 
     drawBackground(ctx: CanvasRenderingContext2D) {
         // Jupiter's colorful bands
-        this.cloudBands.forEach((band, index) => {
+        this.cloudBands.forEach((band) => {
             const bandHeight = this.height / this.cloudBands.length;
 
             // Draw band

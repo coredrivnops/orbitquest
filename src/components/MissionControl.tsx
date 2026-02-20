@@ -3,13 +3,14 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getPlanetsInOrder, canUnlock, Planet, getMainJourneyPlanets, isBossChallengeUnlocked, getGamesRequiredForBoss, PLANETS } from '@/lib/gameTypes';
+import { getPlanetsInOrder, canUnlock, Planet, getMainJourneyPlanets, isBossChallengeUnlocked, getGamesRequiredForBoss } from '@/lib/gameTypes';
 import { loadProgress, unlockPlanet } from '@/lib/localStorage';
 import { PlanetOrb } from './PlanetOrb';
 import Confetti from './Confetti';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { RotatingFunFacts } from './PlanetTooltip';
 import { AchievementsDisplay } from './Achievements';
+import { soundManager } from '@/utils/soundManager';
 
 // Shooting star component
 function ShootingStar({ delay }: { delay: number }) {
@@ -190,6 +191,72 @@ export default function MissionControl() {
     const [unlockingPlanet, setUnlockingPlanet] = useState<string | null>(null);
     const [showConfetti, setShowConfetti] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isAmbiencePlaying, setIsAmbiencePlaying] = useState(false);
+
+    const [userHasInteracted, setUserHasInteracted] = useState(false);
+
+    const toggleAmbience = async (e?: React.MouseEvent) => {
+        // Stop propagation if triggered by click to prevent double-firing with window listener
+        e?.stopPropagation();
+
+        if (!isAmbiencePlaying) {
+            await soundManager.resumeAudioContext();
+
+            // If muted, unmute it so we actually hear the ambience
+            if (soundManager.getMuted()) {
+                soundManager.toggleMute();
+            }
+
+            soundManager.startAmbience();
+            setIsAmbiencePlaying(true);
+            setUserHasInteracted(true);
+        } else {
+            soundManager.stopAmbience();
+            setIsAmbiencePlaying(false);
+            // Don't set userHasInteracted to false, we want to respect the user's choice to stop it
+        }
+    };
+
+    // Auto-start ambience on first interaction (browser policy)
+    // We want the sound to be ON by default, so we aggressively try to start it
+    useEffect(() => {
+        const handleInteraction = async () => {
+            // Only run once per session load
+            if (userHasInteracted) return;
+
+            // Try to start automatically
+            try {
+                await soundManager.resumeAudioContext();
+
+                // If it's not playing, start it!
+                // We ignore getMuted() because the requirement is "ON by default"
+                // The user can turn it off later if they wish
+                soundManager.startAmbience();
+                setIsAmbiencePlaying(true);
+                setUserHasInteracted(true);
+
+                // Remove listeners immediately once successful
+                window.removeEventListener('click', handleInteraction);
+                window.removeEventListener('keydown', handleInteraction);
+                window.removeEventListener('scroll', handleInteraction);
+                window.removeEventListener('touchstart', handleInteraction);
+            } catch {
+                // Silent fail, will try again next interaction
+            }
+        };
+
+        window.addEventListener('click', handleInteraction);
+        window.addEventListener('keydown', handleInteraction);
+        window.addEventListener('scroll', handleInteraction);
+        window.addEventListener('touchstart', handleInteraction);
+
+        return () => {
+            window.removeEventListener('click', handleInteraction);
+            window.removeEventListener('keydown', handleInteraction);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+        };
+    }, [userHasInteracted]);
 
     // Load progress and set up listeners
     const refreshProgress = useCallback(() => {
@@ -262,6 +329,12 @@ export default function MissionControl() {
         }
     }, [unlockingPlanet, router]);
 
+
+
+    // Ref to track audio state inside animation loop specific to this component without re-renders
+    const isAmbiencePlayingRef = useRef(isAmbiencePlaying);
+    useEffect(() => { isAmbiencePlayingRef.current = isAmbiencePlaying; }, [isAmbiencePlaying]);
+
     // Animated starfield canvas
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -298,9 +371,22 @@ export default function MissionControl() {
 
         let animationId: number;
         let frame = 0;
+        const dataArray = new Uint8Array(32); // For audio data
 
         const animate = () => {
             frame++;
+
+            // Audio reactivity
+            let audioBoost = 0;
+            if (isAmbiencePlayingRef.current) {
+                const analyser = soundManager.getAnalyser();
+                if (analyser) {
+                    analyser.getByteFrequencyData(dataArray);
+                    // Use low frequencies for pulse (bass)
+                    audioBoost = (dataArray[2] + dataArray[3] + dataArray[4]) / 3 / 255;
+                }
+            }
+
             ctx.fillStyle = '#050510';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -310,8 +396,8 @@ export default function MissionControl() {
                     nebula.x, nebula.y, 0,
                     nebula.x, nebula.y, nebula.radius
                 );
-                gradient.addColorStop(0, `rgba(${nebula.color}, 0.1)`);
-                gradient.addColorStop(0.5, `rgba(${nebula.color}, 0.03)`);
+                gradient.addColorStop(0, `rgba(${nebula.color}, ${0.1 + audioBoost * 0.15})`); // Pulse with audio
+                gradient.addColorStop(0.5, `rgba(${nebula.color}, ${0.03 + audioBoost * 0.05})`);
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -327,7 +413,7 @@ export default function MissionControl() {
                 ctx.fill();
 
                 // Slow drift
-                star.y += star.speed;
+                star.y += star.speed + (audioBoost * 0.5); // Speed up slightly with bass
                 if (star.y > canvas.height) {
                     star.y = 0;
                     star.x = Math.random() * canvas.width;
@@ -477,7 +563,40 @@ export default function MissionControl() {
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 }
+                @keyframes yoyo {
+                    0%, 100% { height: 20%; }
+                    50% { height: 80%; }
+                }
             `}</style>
+
+            {/* Space Ambience Toggle - Floating FAB */}
+            <div className="fixed bottom-6 right-6 z-50 animate-fade-in-up animation-delay-500">
+                <button
+                    onClick={toggleAmbience}
+                    className={`group relative flex items-center gap-3 px-5 py-3 rounded-full border border-white/10 backdrop-blur-md transition-all duration-300 overflow-hidden ${isAmbiencePlaying
+                        ? 'bg-purple-900/60 text-neon-cyan shadow-[0_0_20px_rgba(168,85,247,0.3)] border-neon-purple/50'
+                        : 'bg-black/60 text-text-dim hover:bg-black/80 hover:text-white hover:border-white/30'
+                        }`}
+                >
+                    <span className="relative z-10 text-xl animate-pulse">
+                        {isAmbiencePlaying ? '🪐' : '🔇'}
+                    </span>
+                    <span className={`relative z-10 text-sm font-heading tracking-wider transition-all duration-300 ${isAmbiencePlaying ? 'text-white' : 'text-gray-400'}`}>
+                        {isAmbiencePlaying ? 'COSMIC DRONE' : 'ENABLE SOUND'}
+                    </span>
+
+                    {/* Visualizer bars simulation when playing */}
+                    {isAmbiencePlaying && (
+                        <div className="absolute inset-0 opacity-20 pointer-events-none">
+                            <div className="absolute bottom-0 left-[20%] w-1 bg-neon-cyan h-full animate-[yoyo_1s_infinite]" />
+                            <div className="absolute bottom-0 left-[35%] w-1 bg-neon-purple h-full animate-[yoyo_1.5s_infinite]" />
+                            <div className="absolute bottom-0 left-[50%] w-1 bg-pink-500 h-full animate-[yoyo_0.8s_infinite]" />
+                            <div className="absolute bottom-0 left-[65%] w-1 bg-blue-500 h-full animate-[yoyo_1.2s_infinite]" />
+                            <div className="absolute bottom-0 left-[80%] w-1 bg-yellow-400 h-full animate-[yoyo_1.8s_infinite]" />
+                        </div>
+                    )}
+                </button>
+            </div>
 
             {/* Hero Section with Animated Starfield */}
             <section className="relative h-[700px] overflow-hidden border-b border-neon-cyan/20">
@@ -942,9 +1061,16 @@ export default function MissionControl() {
 
             {/* 🏆 MASTER CHALLENGE BANNER - Black Hole Escape */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Link
-                    href="/games/blackhole"
-                    className="group relative block rounded-2xl overflow-hidden border-2 border-purple-500/40 hover:border-purple-400/80 transition-all duration-500 hover:shadow-[0_0_60px_rgba(168,85,247,0.3)]"
+                <div
+                    onClick={() => {
+                        if (progress.unlockedPlanets.includes('saturn')) {
+                            router.push('/games/blackhole');
+                        }
+                    }}
+                    className={`group relative block rounded-2xl overflow-hidden border-2 transition-all duration-500 ${progress.unlockedPlanets.includes('saturn')
+                        ? 'border-purple-500/40 hover:border-purple-400/80 hover:shadow-[0_0_60px_rgba(168,85,247,0.3)] cursor-pointer'
+                        : 'border-gray-700/50 opacity-80 cursor-not-allowed'
+                        }`}
                 >
                     {/* Animated gradient background */}
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-950 via-black to-orange-950 opacity-90" />
@@ -974,8 +1100,23 @@ export default function MissionControl() {
                         <div className="absolute inset-12 rounded-full border border-purple-400/20 animate-spin" style={{ animationDuration: '20s' }} />
                     </div>
 
+                    {/* Lock Overlay */}
+                    {!progress.unlockedPlanets.includes('saturn') && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="px-4 py-2 bg-red-500/20 text-red-300 rounded-full text-sm font-bold border border-red-500/30 flex items-center gap-2">
+                                    <span>🔒</span>
+                                    <span>LOCKED</span>
+                                </div>
+                                <p className="text-white font-heading text-lg drop-shadow-lg">
+                                    Unlock <span className="text-yellow-400">Saturn</span> to Reveal
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Content */}
-                    <div className="relative py-8 px-8 pl-24 md:pl-36 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className={`relative py-8 px-8 pl-24 md:pl-36 flex flex-col md:flex-row items-center justify-between gap-4 z-10 ${!progress.unlockedPlanets.includes('saturn') ? 'blur-[1px] opacity-50' : ''}`}>
                         <div className="text-center md:text-left">
                             <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
                                 <span className="px-3 py-1 bg-gradient-to-r from-purple-500/30 to-orange-500/30 text-orange-400 text-sm rounded-full font-bold border border-orange-500/30 animate-pulse">
@@ -998,17 +1139,23 @@ export default function MissionControl() {
                                 <span className="text-2xl mb-1">🌀</span>
                                 <span className="text-pink-300 text-xs">Gravity Anchors</span>
                             </div>
-                            <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-orange-600 hover:from-purple-500 hover:to-orange-500 text-white font-bold rounded-xl transition-all group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] flex items-center gap-2">
+                            <button
+                                disabled={!progress.unlockedPlanets.includes('saturn')}
+                                className={`px-6 py-3 font-bold rounded-xl transition-all flex items-center gap-2 ${progress.unlockedPlanets.includes('saturn')
+                                    ? 'bg-gradient-to-r from-purple-600 to-orange-600 hover:from-purple-500 hover:to-orange-500 text-white group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'
+                                    : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
+                                    }`}
+                            >
                                 <span>🕳️</span>
                                 <span>Enter the Void</span>
-                                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                {progress.unlockedPlanets.includes('saturn') && <span className="group-hover:translate-x-1 transition-transform">→</span>}
                             </button>
                         </div>
                     </div>
 
                     {/* Glowing edge */}
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 opacity-60" />
-                </Link>
+                </div>
             </section>
 
             {/* ☀️ FINAL BOSS CHALLENGE - Solar Showdown */}

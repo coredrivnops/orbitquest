@@ -18,7 +18,7 @@ export default function TermsPage() {
 
                     <div className="prose prose-invert max-w-none space-y-8 text-text-secondary">
                         <p className="text-text-dim text-sm">
-                            Last Updated: January 2026
+                            Last Updated: February 2026
                         </p>
 
                         <section>

@@ -33,7 +33,8 @@ export default function CosmicHub() {
     }, []);
 
     useEffect(() => {
-        if (!containerRef.current) return;
+        const currentContainer = containerRef.current;
+        if (!currentContainer) return;
 
         // --- Scene Setup ---
         const scene = new THREE.Scene();
@@ -52,7 +53,7 @@ export default function CosmicHub() {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for performance
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.outputColorSpace = THREE.SRGBColorSpace;
-        containerRef.current.appendChild(renderer.domElement);
+        currentContainer.appendChild(renderer.domElement);
 
         // --- Lights ---
         const ambientLight = new THREE.AmbientLight(0x111111); // Very dim ambient
@@ -218,11 +219,12 @@ export default function CosmicHub() {
         return () => {
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(frameId);
-            if (containerRef.current) {
-                containerRef.current.removeChild(renderer.domElement);
+            if (currentContainer) {
+                currentContainer.removeChild(renderer.domElement);
             }
             renderer.dispose();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Run once
 
     return (
@@ -287,9 +289,7 @@ export default function CosmicHub() {
                         {loadProgress().unlockedPlanets.includes(PLANETS[focusedIndex].id) ? (
                             <button
                                 onClick={() => {
-                                    if (PLANETS[focusedIndex].id === 'earth') router.push('/games/earth');
-                                    else if (PLANETS[focusedIndex].id === 'neptune') router.push('/games/neptune');
-                                    else alert('System ready. Launching sequence... (Game coming soon)');
+                                    router.push(`/games/${PLANETS[focusedIndex].id}`);
                                 }}
                                 className="pointer-events-auto btn-neon w-full py-4 text-xl glow-cyan tracking-widest font-bold group relative overflow-hidden"
                             >

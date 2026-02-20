@@ -1,6 +1,7 @@
 // Uranus Game Logic - "Polar Night"
 // ENDLESS Red Light Green Light inspired by Uranus's 42-year seasons
 // Move during SUMMER (light), freeze during WINTER (dark)
+import { soundManager } from '@/utils/soundManager';
 
 interface Collectible {
     x: number;
@@ -281,6 +282,7 @@ export class UranusGameLogic {
 
                     const color = c.type === 'mega' ? '#ff00ff' : c.type === 'bonus' ? '#00ffff' : '#ffd700';
                     this.createExplosion(c.x, c.y, color);
+                    soundManager.playCollect();
                 }
             }
         }
@@ -352,6 +354,7 @@ export class UranusGameLogic {
         this.totalLevelsCompleted++;
 
         this.createExplosion(this.goalX, this.goalY, '#00ff00');
+        soundManager.playLevelUp();
 
         // Show level complete briefly, then continue
         this.level++;
@@ -365,6 +368,7 @@ export class UranusGameLogic {
 
     gameOver() {
         this.isGameOver = true;
+        soundManager.playCrash();
         this.combo = 1;
 
         // Final survival bonus

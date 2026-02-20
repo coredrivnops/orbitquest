@@ -116,12 +116,12 @@ export default function BlackHoleGamePage() {
             setShowTrivia(game.showTrivia);
 
             if (game.isGameOver && !isGameOver) {
-                handleGameOver(game.score, game.hasEscaped, game);
+                handleGameOver(game.score, game.hasEscaped);
             }
         }
     };
 
-    const handleGameOver = (finalScore: number, escaped: boolean, game: BlackHoleGameLogic) => {
+    const handleGameOver = (finalScore: number, escaped: boolean) => {
         setIsGameOver(true);
         setHasEscaped(escaped);
 

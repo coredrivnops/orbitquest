@@ -3,6 +3,7 @@
 // Simple mouse controls - swoop in, collect survivors, deliver to safety!
 
 import { TriviaQuestion, getShuffledTrivia } from '@/data/spaceTrivia';
+import { soundManager } from '@/utils/soundManager';
 
 interface Astronaut {
     x: number;
@@ -216,6 +217,7 @@ export class BlackHoleGameLogic {
             // Bonus: extra carrying capacity for 30 seconds
             this.maxCarry = 5;
             setTimeout(() => { this.maxCarry = 3; }, 30000);
+            soundManager.playPing();
         }
 
         // Show feedback for 3 seconds then resume
@@ -419,13 +421,14 @@ export class BlackHoleGameLogic {
                         const angle = Math.random() * Math.PI * 2;
                         this.spawnParticle(astro.x, astro.y, Math.cos(angle) * 3, Math.sin(angle) * 3, '#88ff88', 4);
                     }
+                    soundManager.playCollect();
                 }
             }
         }
 
         // Update carrying astronauts (follow ship)
         this.carrying.forEach((astro, idx) => {
-            const followAngle = this.shipAngle + Math.PI + (idx - 1) * 0.4;
+            // const followAngle = this.shipAngle + Math.PI + (idx - 1) * 0.4; // Unused but kept for reference if needed
             const followDist = 25 + idx * 12;
             const targetX = this.shipX - Math.cos(this.shipAngle) * followDist;
             const targetY = this.shipY - Math.sin(this.shipAngle) * followDist;

@@ -1,5 +1,6 @@
 // Mercury Game Logic - "SUN CHASER"
 // Race around Mercury staying in the shadow zone - outrun the deadly sunrise!
+import { soundManager } from '@/utils/soundManager';
 
 export interface ShadowZone {
     startAngle: number;
@@ -229,6 +230,7 @@ export class MercuryGameLogic {
         if (action === 'boost-start') {
             this.isBoosting = true;
             this.playerSpeed = this.boostedSpeed;
+            soundManager.playThrust();
         } else if (action === 'boost-stop') {
             this.isBoosting = false;
             this.playerSpeed = this.baseSpeed;
@@ -252,6 +254,7 @@ export class MercuryGameLogic {
             this.shieldPower = Math.min(this.maxShield, this.shieldPower + 30);
             this.heat = Math.max(0, this.heat - 30);
             this.createCelebration();
+            soundManager.playLevelUp();
         }
 
         setTimeout(() => {
@@ -335,6 +338,7 @@ export class MercuryGameLogic {
         if (this.heat >= this.maxHeat) {
             this.isGameOver = true;
             this.createDeathEffect();
+            soundManager.playCrash();
         }
 
         // Create heat particles when hot
@@ -378,11 +382,10 @@ export class MercuryGameLogic {
                     this.score += 75;
                 }
 
+                soundManager.playCollect();
                 this.createCollectEffect(crater);
             }
         });
-
-        // Spawn new craters
         this.nextCraterSpawn--;
         if (this.nextCraterSpawn <= 0) {
             this.spawnCrater();

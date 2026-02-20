@@ -23,6 +23,7 @@ export default function JupiterGamePage() {
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -155,64 +156,64 @@ export default function JupiterGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="jupiter">
-            <>
-                <Header />
+        <>
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="font-heading text-3xl text-orange-400">Jupiter: Storm Rider 🌪️</h1>
-                                    <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full font-bold">80⭐</span>
-                                </div>
-                                <p className="text-text-secondary font-ui">
-                                    Ride through Jupiter&apos;s bands! Dodge storms from the Great Red Spot!
-                                </p>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="font-heading text-3xl text-orange-400">Jupiter: Storm Rider 🌪️</h1>
+                                <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full font-bold">80⭐</span>
                             </div>
-                            <div className="text-right">
-                                <p className="font-heading text-2xl text-orange-400">{Math.floor(distance / 10).toLocaleString()}km</p>
-                                {combo > 1 && (
-                                    <p className="text-pink-400 font-bold">🔥 x{combo} Combo!</p>
+                            <p className="text-text-secondary font-ui">
+                                Ride through Jupiter&apos;s bands! Dodge storms from the Great Red Spot!
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="font-heading text-2xl text-orange-400">{Math.floor(distance / 10).toLocaleString()}km</p>
+                            {combo > 1 && (
+                                <p className="text-pink-400 font-bold">🔥 x{combo} Combo!</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Status Display */}
+                    {isPlaying && !isGameOver && (
+                        <div className="mb-4 flex gap-4 items-center justify-between bg-gradient-to-r from-orange-900/30 to-yellow-900/30 p-3 rounded-lg">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-text-dim">🌪️ STORMS:</span>
+                                    <span className="font-bold text-orange-400">{stormsDodged}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-text-dim">⭐ STARDUST:</span>
+                                    <span className="font-bold text-yellow-400">{earnedStardust}</span>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                {hasShield && (
+                                    <span className="px-3 py-1 rounded-full text-sm font-bold bg-cyan-500/30 text-cyan-400 border border-cyan-500/50">
+                                        🛡️ SHIELD
+                                    </span>
+                                )}
+                                {hasMagnet && (
+                                    <span className="px-3 py-1 rounded-full text-sm font-bold bg-yellow-500/30 text-yellow-400 border border-yellow-500/50">
+                                        🧲 MAGNET
+                                    </span>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Status Display */}
-                        {isPlaying && !isGameOver && (
-                            <div className="mb-4 flex gap-4 items-center justify-between bg-gradient-to-r from-orange-900/30 to-yellow-900/30 p-3 rounded-lg">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-text-dim">🌪️ STORMS:</span>
-                                        <span className="font-bold text-orange-400">{stormsDodged}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-text-dim">⭐ STARDUST:</span>
-                                        <span className="font-bold text-yellow-400">{earnedStardust}</span>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    {hasShield && (
-                                        <span className="px-3 py-1 rounded-full text-sm font-bold bg-cyan-500/30 text-cyan-400 border border-cyan-500/50">
-                                            🛡️ SHIELD
-                                        </span>
-                                    )}
-                                    {hasMagnet && (
-                                        <span className="px-3 py-1 rounded-full text-sm font-bold bg-yellow-500/30 text-yellow-400 border border-yellow-500/50">
-                                            🧲 MAGNET
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="text-right">
-                                    <span className="font-bold text-white text-lg">{score.toLocaleString()}</span>
-                                </div>
+                            <div className="text-right">
+                                <span className="font-bold text-white text-lg">{score.toLocaleString()}</span>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="jupiter">
                         <div
                             className="game-canvas-container relative cursor-pointer touch-none select-none"
                             onMouseDown={handleMouseDown}
@@ -379,152 +380,152 @@ export default function JupiterGamePage() {
                                 </div>
                             )}
                         </div>
+                    </PlanetGuard>
 
 
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                            <article className="planet-card bg-gradient-to-br from-orange-900/30 to-red-900/20">
-                                <h2 className="font-heading text-3xl text-orange-400 mb-6">
-                                    🌪️ Jupiter&apos;s Incredible Storms
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        Jupiter is home to the most <strong className="text-orange-400">violent storms</strong> in our solar system!
-                                        The Great Red Spot is a massive anticyclonic storm that has been raging for at least 400 years -
-                                        possibly much longer. It&apos;s so big that <strong>Earth could fit inside it twice</strong>!
-                                    </p>
+                        <article className="planet-card bg-gradient-to-br from-orange-900/30 to-red-900/20">
+                            <h2 className="font-heading text-3xl text-orange-400 mb-6">
+                                🌪️ Jupiter&apos;s Incredible Storms
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    Jupiter is home to the most <strong className="text-orange-400">violent storms</strong> in our solar system!
+                                    The Great Red Spot is a massive anticyclonic storm that has been raging for at least 400 years -
+                                    possibly much longer. It&apos;s so big that <strong>Earth could fit inside it twice</strong>!
+                                </p>
 
-                                    <h3 className="font-heading text-xl text-red-400 mt-8 mb-4">The Great Red Spot</h3>
+                                <h3 className="font-heading text-xl text-red-400 mt-8 mb-4">The Great Red Spot</h3>
+                                <p>
+                                    The iconic Great Red Spot is a high-pressure region in Jupiter&apos;s atmosphere producing
+                                    winds up to 400 mph (644 km/h). Its distinctive red color comes from chemicals brought up
+                                    from deep within Jupiter&apos;s atmosphere. Despite shrinking over the past century,
+                                    it remains the largest storm in our solar system!
+                                </p>
+
+                                <div className="bg-orange-900/30 p-6 rounded-lg border-l-4 border-red-500 my-8">
+                                    <p className="font-ui text-red-400 font-bold mb-2">🎮 GAME CONNECTION</p>
                                     <p>
-                                        The iconic Great Red Spot is a high-pressure region in Jupiter&apos;s atmosphere producing
-                                        winds up to 400 mph (644 km/h). Its distinctive red color comes from chemicals brought up
-                                        from deep within Jupiter&apos;s atmosphere. Despite shrinking over the past century,
-                                        it remains the largest storm in our solar system!
-                                    </p>
-
-                                    <div className="bg-orange-900/30 p-6 rounded-lg border-l-4 border-red-500 my-8">
-                                        <p className="font-ui text-red-400 font-bold mb-2">🎮 GAME CONNECTION</p>
-                                        <p>
-                                            In Storm Rider, the Great Red Spot on the left side of the screen is the source
-                                            of all the storms you&apos;re dodging! As Jupiter&apos;s bands scroll past,
-                                            you&apos;re essentially flying through the turbulent atmosphere near this
-                                            legendary storm system!
-                                        </p>
-                                    </div>
-
-                                    <h3 className="font-heading text-xl text-amber-400 mt-8 mb-4">Jupiter&apos;s Colorful Bands</h3>
-                                    <p>
-                                        Jupiter&apos;s distinctive banded appearance comes from clouds of ammonia and other compounds
-                                        at different altitudes. The light-colored bands (zones) are high-altitude clouds, while
-                                        dark bands (belts) are lower-altitude windows into the deeper atmosphere. Massive jet
-                                        streams traveling up to 360 mph separate these bands!
+                                        In Storm Rider, the Great Red Spot on the left side of the screen is the source
+                                        of all the storms you&apos;re dodging! As Jupiter&apos;s bands scroll past,
+                                        you&apos;re essentially flying through the turbulent atmosphere near this
+                                        legendary storm system!
                                     </p>
                                 </div>
-                            </article>
 
-                            {/* Jupiter's Moons as Power-ups */}
+                                <h3 className="font-heading text-xl text-amber-400 mt-8 mb-4">Jupiter&apos;s Colorful Bands</h3>
+                                <p>
+                                    Jupiter&apos;s distinctive banded appearance comes from clouds of ammonia and other compounds
+                                    at different altitudes. The light-colored bands (zones) are high-altitude clouds, while
+                                    dark bands (belts) are lower-altitude windows into the deeper atmosphere. Massive jet
+                                    streams traveling up to 360 mph separate these bands!
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* Jupiter's Moons as Power-ups */}
+                        <div className="planet-card">
+                            <h3 className="font-heading text-2xl text-orange-400 mb-6">🌙 Jupiter&apos;s Power-Up Moons</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="p-4 rounded-lg bg-amber-900/20 border border-amber-500/30">
+                                    <p className="text-amber-400 font-bold text-lg">Io 🔥</p>
+                                    <p className="text-sm text-amber-300 mb-2">+⭐ BONUS</p>
+                                    <p className="text-text-dim text-sm">Most volcanic body in the solar system! Over 400 active volcanoes.</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-sky-900/20 border border-sky-500/30">
+                                    <p className="text-sky-400 font-bold text-lg">Europa 🛡️</p>
+                                    <p className="text-sm text-sky-300 mb-2">SHIELD</p>
+                                    <p className="text-text-dim text-sm">Has a subsurface ocean that may harbor life!</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-gray-700/20 border border-gray-500/30">
+                                    <p className="text-gray-300 font-bold text-lg">Ganymede 🧲</p>
+                                    <p className="text-sm text-gray-400 mb-2">MAGNET</p>
+                                    <p className="text-text-dim text-sm">Largest moon in the solar system - bigger than Mercury!</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-gray-800/20 border border-gray-600/30">
+                                    <p className="text-gray-400 font-bold text-lg">Callisto ⏱️</p>
+                                    <p className="text-sm text-gray-500 mb-2">SLOW-MO</p>
+                                    <p className="text-text-dim text-sm">Most heavily cratered object known!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Quick Facts */}
+                        <div className="grid md:grid-cols-2 gap-6">
                             <div className="planet-card">
-                                <h3 className="font-heading text-2xl text-orange-400 mb-6">🌙 Jupiter&apos;s Power-Up Moons</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div className="p-4 rounded-lg bg-amber-900/20 border border-amber-500/30">
-                                        <p className="text-amber-400 font-bold text-lg">Io 🔥</p>
-                                        <p className="text-sm text-amber-300 mb-2">+⭐ BONUS</p>
-                                        <p className="text-text-dim text-sm">Most volcanic body in the solar system! Over 400 active volcanoes.</p>
-                                    </div>
-                                    <div className="p-4 rounded-lg bg-sky-900/20 border border-sky-500/30">
-                                        <p className="text-sky-400 font-bold text-lg">Europa 🛡️</p>
-                                        <p className="text-sm text-sky-300 mb-2">SHIELD</p>
-                                        <p className="text-text-dim text-sm">Has a subsurface ocean that may harbor life!</p>
-                                    </div>
-                                    <div className="p-4 rounded-lg bg-gray-700/20 border border-gray-500/30">
-                                        <p className="text-gray-300 font-bold text-lg">Ganymede 🧲</p>
-                                        <p className="text-sm text-gray-400 mb-2">MAGNET</p>
-                                        <p className="text-text-dim text-sm">Largest moon in the solar system - bigger than Mercury!</p>
-                                    </div>
-                                    <div className="p-4 rounded-lg bg-gray-800/20 border border-gray-600/30">
-                                        <p className="text-gray-400 font-bold text-lg">Callisto ⏱️</p>
-                                        <p className="text-sm text-gray-500 mb-2">SLOW-MO</p>
-                                        <p className="text-text-dim text-sm">Most heavily cratered object known!</p>
-                                    </div>
-                                </div>
+                                <h3 className="font-heading text-xl text-orange-400 mb-4">📊 Jupiter Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Size</span>
+                                        <span className="text-orange-400">11x Earth diameter</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Earths that fit inside</span>
+                                        <span className="text-orange-400">Over 1,300!</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Day Length</span>
+                                        <span className="text-orange-400">~10 hours</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Moons</span>
+                                        <span className="text-orange-400">95 confirmed</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Great Red Spot Age</span>
+                                        <span className="text-red-400">400+ years!</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Has Rings?</span>
+                                        <span className="text-yellow-400">Yes! (Faint)</span>
+                                    </li>
+                                </ul>
                             </div>
 
-                            {/* Quick Facts */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-orange-400 mb-4">📊 Jupiter Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Size</span>
-                                            <span className="text-orange-400">11x Earth diameter</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Earths that fit inside</span>
-                                            <span className="text-orange-400">Over 1,300!</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Day Length</span>
-                                            <span className="text-orange-400">~10 hours</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Moons</span>
-                                            <span className="text-orange-400">95 confirmed</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Great Red Spot Age</span>
-                                            <span className="text-red-400">400+ years!</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Has Rings?</span>
-                                            <span className="text-yellow-400">Yes! (Faint)</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card bg-gradient-to-br from-red-900/20 to-orange-900/20">
-                                    <h3 className="font-heading text-xl text-red-400 mb-4">🌪️ Storm Facts</h3>
-                                    <div className="space-y-3 text-sm text-text-dim">
-                                        <p className="border-l-2 border-red-500 pl-3">
-                                            The Great Red Spot&apos;s winds reach <strong className="text-red-400">400 mph</strong> -
-                                            twice as fast as Earth&apos;s strongest hurricanes!
-                                        </p>
-                                        <p className="border-l-2 border-orange-500 pl-3">
-                                            Jupiter has <strong className="text-orange-400">lightning storms</strong>
-                                            that are 1,000 times more powerful than Earth&apos;s!
-                                        </p>
-                                        <p className="border-l-2 border-yellow-500 pl-3">
-                                            The planet&apos;s jet streams reach speeds of
-                                            <strong className="text-yellow-400"> 360 mph</strong>!
-                                        </p>
-                                        <p className="border-l-2 border-amber-500 pl-3">
-                                            Despite its size, Jupiter completes a full rotation in just
-                                            <strong className="text-amber-400"> 10 hours</strong>!
-                                        </p>
-                                    </div>
+                            <div className="planet-card bg-gradient-to-br from-red-900/20 to-orange-900/20">
+                                <h3 className="font-heading text-xl text-red-400 mb-4">🌪️ Storm Facts</h3>
+                                <div className="space-y-3 text-sm text-text-dim">
+                                    <p className="border-l-2 border-red-500 pl-3">
+                                        The Great Red Spot&apos;s winds reach <strong className="text-red-400">400 mph</strong> -
+                                        twice as fast as Earth&apos;s strongest hurricanes!
+                                    </p>
+                                    <p className="border-l-2 border-orange-500 pl-3">
+                                        Jupiter has <strong className="text-orange-400">lightning storms</strong>
+                                        that are 1,000 times more powerful than Earth&apos;s!
+                                    </p>
+                                    <p className="border-l-2 border-yellow-500 pl-3">
+                                        The planet&apos;s jet streams reach speeds of
+                                        <strong className="text-yellow-400"> 360 mph</strong>!
+                                    </p>
+                                    <p className="border-l-2 border-amber-500 pl-3">
+                                        Despite its size, Jupiter completes a full rotation in just
+                                        <strong className="text-amber-400"> 10 hours</strong>!
+                                    </p>
                                 </div>
                             </div>
+                        </div>
 
-                        </section>
+                    </section>
 
 
-                    </div>
-                </main>
+                </div>
+            </main>
 
-                <Footer />
+            <Footer />
 
-                <style jsx global>{`
-                @keyframes gradient-x {
-                    0%, 100% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                }
-                .animate-gradient-x {
-                    background-size: 200% 200%;
-                    animation: gradient-x 3s ease infinite;
-                }
-            `}</style>
-            </>
-        </PlanetGuard>
+            <style jsx global>{`
+            @keyframes gradient-x {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+            .animate-gradient-x {
+                background-size: 200% 200%;
+                animation: gradient-x 3s ease infinite;
+            }
+        `}</style>
+        </>
     );
 }
 

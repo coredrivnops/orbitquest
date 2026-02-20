@@ -15,13 +15,14 @@ export default function MoonGamePage() {
     const [score, setScore] = useState(0);
     const [level, setLevel] = useState(1);
     const [landings, setLandings] = useState(0);
-    const [fuel, setFuel] = useState(100);
+    const [, setFuel] = useState(100);
     const [isLanded, setIsLanded] = useState(false);
     const [isCrashed, setIsCrashed] = useState(false);
     const [earnedStardust, setEarnedStardust] = useState(0);
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -48,7 +49,7 @@ export default function MoonGamePage() {
                 setIsPlaying(false);
                 setIsCrashed(false);
                 // Save progress
-                handleGameEnd(game.score, game.stardustCollected, game.successfulLandings);
+                handleGameEnd(game.score, game.stardustCollected);
             }
             return;
         }
@@ -116,7 +117,7 @@ export default function MoonGamePage() {
         }
     };
 
-    const handleGameEnd = (finalScore: number, stardust: number, finalLandings: number) => {
+    const handleGameEnd = (finalScore: number, stardust: number) => {
         addStardust(stardust);
         updateHighScore('moon', finalScore);
         markGamePlayed('moon');
@@ -151,7 +152,7 @@ export default function MoonGamePage() {
         } else if (game.isCrashed) {
             setIsPlaying(false);
             setIsCrashed(false);
-            handleGameEnd(game.score, game.stardustCollected, game.successfulLandings);
+            handleGameEnd(game.score, game.stardustCollected);
         }
     };
 
@@ -171,31 +172,31 @@ export default function MoonGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="moon">
-            <>
-                <Header />
+        <>
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="font-heading text-3xl text-gray-300">Moon: Lunar Lander</h1>
-                                    <span className="px-3 py-1 bg-gray-500/20 text-gray-400 text-sm rounded-full font-bold">HIDDEN</span>
-                                </div>
-                                <p className="text-text-secondary font-ui">
-                                    Land the module safely on the green landing pads!
-                                </p>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="font-heading text-3xl text-gray-300">Moon: Lunar Lander</h1>
+                                <span className="px-3 py-1 bg-gray-500/20 text-gray-400 text-sm rounded-full font-bold">HIDDEN</span>
                             </div>
-                            <div className="text-right">
-                                <p className="font-heading text-2xl text-gray-300">Level {level}</p>
-                                <p className="text-green-400">🛬 {landings} landings</p>
-                            </div>
+                            <p className="text-text-secondary font-ui">
+                                Land the module safely on the green landing pads!
+                            </p>
                         </div>
+                        <div className="text-right">
+                            <p className="font-heading text-2xl text-gray-300">Level {level}</p>
+                            <p className="text-green-400">🛬 {landings} landings</p>
+                        </div>
+                    </div>
 
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="moon">
                         <div
                             className="game-canvas-container relative cursor-pointer touch-none select-none"
                             onClick={handleCanvasClick}
@@ -369,109 +370,110 @@ export default function MoonGamePage() {
                                 </div>
                             )}
                         </div>
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    </PlanetGuard>
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                            <article className="planet-card bg-gradient-to-br from-gray-900/50 to-gray-800/30">
-                                <h2 className="font-heading text-3xl text-gray-300 mb-6">
-                                    The Moon: Our Nearest Neighbor
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        The Moon is humanity&apos;s first destination beyond Earth. Between 1969 and 1972,
-                                        twelve astronauts walked on its dusty surface during the Apollo program.
-                                        Now, with NASA&apos;s Artemis program, we&apos;re going back!
-                                    </p>
+                        <article className="planet-card bg-gradient-to-br from-gray-900/50 to-gray-800/30">
+                            <h2 className="font-heading text-3xl text-gray-300 mb-6">
+                                The Moon: Our Nearest Neighbor
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    The Moon is humanity&apos;s first destination beyond Earth. Between 1969 and 1972,
+                                    twelve astronauts walked on its dusty surface during the Apollo program.
+                                    Now, with NASA&apos;s Artemis program, we&apos;re going back!
+                                </p>
 
-                                    <div className="bg-gray-800/50 p-6 rounded-lg border-l-4 border-gray-400 my-8">
-                                        <p className="font-ui text-gray-300 font-bold mb-2">🎮 GAME CONNECTION</p>
-                                        <p>
-                                            Lunar Lander recreates the challenge Apollo astronauts faced! With
-                                            only 1/6th of Earth&apos;s gravity, the Moon requires careful fuel
-                                            management and precise control to land safely. The game gets harder
-                                            as gravity increases and landing pads get smaller!
-                                        </p>
-                                    </div>
-                                </div>
-                            </article>
-
-                            {/* Apollo Missions */}
-                            <div className="grid md:grid-cols-4 gap-4">
-                                <div className="planet-card text-center">
-                                    <div className="text-4xl mb-3">🚀</div>
-                                    <h3 className="font-heading text-lg text-gray-300 mb-1">Apollo 11</h3>
-                                    <p className="text-text-dim text-sm">First Moon landing</p>
-                                    <p className="text-gray-500 text-xs">July 20, 1969</p>
-                                </div>
-                                <div className="planet-card text-center">
-                                    <div className="text-4xl mb-3">👨‍🚀</div>
-                                    <h3 className="font-heading text-lg text-gray-300 mb-1">12 Moonwalkers</h3>
-                                    <p className="text-text-dim text-sm">Humans on the Moon</p>
-                                    <p className="text-gray-500 text-xs">1969-1972</p>
-                                </div>
-                                <div className="planet-card text-center">
-                                    <div className="text-4xl mb-3">🌓</div>
-                                    <h3 className="font-heading text-lg text-gray-300 mb-1">238,855 mi</h3>
-                                    <p className="text-text-dim text-sm">Distance from Earth</p>
-                                    <p className="text-gray-500 text-xs">~1.3 light seconds</p>
-                                </div>
-                                <div className="planet-card text-center">
-                                    <div className="text-4xl mb-3">🏳️</div>
-                                    <h3 className="font-heading text-lg text-gray-300 mb-1">Artemis</h3>
-                                    <p className="text-text-dim text-sm">We&apos;re going back!</p>
-                                    <p className="text-gray-500 text-xs">2020s</p>
-                                </div>
-                            </div>
-
-                            {/* Quick Facts */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-gray-300 mb-4">📊 Moon Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Diameter</span>
-                                            <span className="text-gray-400">3,474 km</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Gravity</span>
-                                            <span className="text-gray-400">1/6th of Earth</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Orbit Period</span>
-                                            <span className="text-gray-400">27.3 days</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Temperature</span>
-                                            <span className="text-gray-400">-173°C to 127°C</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Atmosphere</span>
-                                            <span className="text-yellow-400">None (vacuum)</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card bg-gradient-to-br from-gray-800/30 to-gray-900/30">
-                                    <h3 className="font-heading text-xl text-gray-400 mb-4">👣 Eternal Footprints</h3>
-                                    <p className="text-text-secondary text-sm mb-4">
-                                        On the Moon, footprints last millions of years. With no wind,
-                                        rain, or erosion, the marks left by Apollo astronauts are still
-                                        there today, exactly as they left them!
-                                    </p>
-                                    <p className="text-text-dim text-sm italic">
-                                        &quot;That&apos;s one small step for man, one giant leap for mankind.&quot;
-                                        <br />— Neil Armstrong, 1969
+                                <div className="bg-gray-800/50 p-6 rounded-lg border-l-4 border-gray-400 my-8">
+                                    <p className="font-ui text-gray-300 font-bold mb-2">🎮 GAME CONNECTION</p>
+                                    <p>
+                                        Lunar Lander recreates the challenge Apollo astronauts faced! With
+                                        only 1/6th of Earth&apos;s gravity, the Moon requires careful fuel
+                                        management and precise control to land safely. The game gets harder
+                                        as gravity increases and landing pads get smaller!
                                     </p>
                                 </div>
                             </div>
+                        </article>
 
-                        </section>
-                    </div>
-                </main>
+                        {/* Apollo Missions */}
+                        <div className="grid md:grid-cols-4 gap-4">
+                            <div className="planet-card text-center">
+                                <div className="text-4xl mb-3">🚀</div>
+                                <h3 className="font-heading text-lg text-gray-300 mb-1">Apollo 11</h3>
+                                <p className="text-text-dim text-sm">First Moon landing</p>
+                                <p className="text-gray-500 text-xs">July 20, 1969</p>
+                            </div>
+                            <div className="planet-card text-center">
+                                <div className="text-4xl mb-3">👨‍🚀</div>
+                                <h3 className="font-heading text-lg text-gray-300 mb-1">12 Moonwalkers</h3>
+                                <p className="text-text-dim text-sm">Humans on the Moon</p>
+                                <p className="text-gray-500 text-xs">1969-1972</p>
+                            </div>
+                            <div className="planet-card text-center">
+                                <div className="text-4xl mb-3">🌓</div>
+                                <h3 className="font-heading text-lg text-gray-300 mb-1">238,855 mi</h3>
+                                <p className="text-text-dim text-sm">Distance from Earth</p>
+                                <p className="text-gray-500 text-xs">~1.3 light seconds</p>
+                            </div>
+                            <div className="planet-card text-center">
+                                <div className="text-4xl mb-3">🏳️</div>
+                                <h3 className="font-heading text-lg text-gray-300 mb-1">Artemis</h3>
+                                <p className="text-text-dim text-sm">We&apos;re going back!</p>
+                                <p className="text-gray-500 text-xs">2020s</p>
+                            </div>
+                        </div>
 
-                <Footer />
+                        {/* Quick Facts */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl text-gray-300 mb-4">📊 Moon Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Diameter</span>
+                                        <span className="text-gray-400">3,474 km</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Gravity</span>
+                                        <span className="text-gray-400">1/6th of Earth</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Orbit Period</span>
+                                        <span className="text-gray-400">27.3 days</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Temperature</span>
+                                        <span className="text-gray-400">-173°C to 127°C</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Atmosphere</span>
+                                        <span className="text-yellow-400">None (vacuum)</span>
+                                    </li>
+                                </ul>
+                            </div>
 
-                <style jsx global>{`
+                            <div className="planet-card bg-gradient-to-br from-gray-800/30 to-gray-900/30">
+                                <h3 className="font-heading text-xl text-gray-400 mb-4">👣 Eternal Footprints</h3>
+                                <p className="text-text-secondary text-sm mb-4">
+                                    On the Moon, footprints last millions of years. With no wind,
+                                    rain, or erosion, the marks left by Apollo astronauts are still
+                                    there today, exactly as they left them!
+                                </p>
+                                <p className="text-text-dim text-sm italic">
+                                    &quot;That&apos;s one small step for man, one giant leap for mankind.&quot;
+                                    <br />— Neil Armstrong, 1969
+                                </p>
+                            </div>
+                        </div>
+
+                    </section>
+                </div>
+            </main>
+
+            <Footer />
+
+            <style jsx global>{`
                 @keyframes gradient-x {
                     0%, 100% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
@@ -481,8 +483,7 @@ export default function MoonGamePage() {
                     animation: gradient-x 3s ease infinite;
                 }
             `}</style>
-            </>
-        </PlanetGuard>
+        </>
     );
 }
 

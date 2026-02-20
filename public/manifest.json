@@ -3,27 +3,57 @@
     "short_name": "OrbitQuest",
     "description": "Explore the solar system through arcade-style mini-games. Learn about planets while having fun!",
     "start_url": "/",
+    "id": "/",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#0a0a1a",
-    "theme_color": "#00f0ff",
-    "orientation": "portrait-primary",
+    "display_override": [
+        "standalone",
+        "fullscreen"
+    ],
+    "background_color": "#050510",
+    "theme_color": "#0a0a1a",
+    "orientation": "any",
     "categories": [
         "games",
         "education",
         "entertainment"
     ],
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
     "icons": [
         {
             "src": "/favicon.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
         },
         {
             "src": "/logo.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/og-image.png",
+            "sizes": "1200x630",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "OrbitQuest Solar System Hub"
         }
     ],
     "shortcuts": [
@@ -50,6 +80,20 @@
                     "sizes": "192x192"
                 }
             ]
+        },
+        {
+            "name": "Mission Control",
+            "short_name": "Hub",
+            "description": "View your progress in the solar system",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/favicon.png",
+                    "sizes": "192x192"
+                }
+            ]
         }
-    ]
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
 }

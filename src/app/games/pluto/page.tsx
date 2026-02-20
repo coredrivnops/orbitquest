@@ -19,6 +19,7 @@ export default function PlutoGamePage() {
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);

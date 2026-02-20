@@ -1,5 +1,6 @@
 // Mars Game Logic - "ROVER RUSH"
 // A simple sample-catching game as the Perseverance rover!
+import { soundManager } from '@/utils/soundManager';
 
 export interface FallingObject {
     id: number;
@@ -254,6 +255,7 @@ export class MarsGameLogic {
             this.score += 500;
             this.lives = Math.min(this.maxLives, this.lives + 1);
             this.createCelebration();
+            soundManager.playLevelUp();
         }
 
         setTimeout(() => {
@@ -398,7 +400,10 @@ export class MarsGameLogic {
                     this.combo = 1;
                     this.screenShake = 15;
                     this.flashAlpha = 0.5;
+                    this.screenShake = 15;
+                    this.flashAlpha = 0.5;
                     this.createHitEffect(obj.x, obj.y);
+                    soundManager.playCrash();
 
                     if (this.lives <= 0) {
                         this.isGameOver = true;
@@ -419,6 +424,7 @@ export class MarsGameLogic {
                     this.combo = Math.min(5, this.combo + 0.25);
                     this.comboTimer = 90;
                     this.createCollectEffect(obj.x, obj.y, obj.type);
+                    soundManager.playCollect();
                 }
                 return false;
             }

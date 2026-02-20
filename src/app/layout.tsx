@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Orbitron, Rajdhani } from 'next/font/google'
 import './globals.css'
-import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 // Font configurations
@@ -25,6 +24,12 @@ const rajdhani = Rajdhani({
 })
 
 const siteUrl = 'https://orbitquest.games';
+
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover' as const,
+};
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
@@ -159,8 +164,10 @@ export default function RootLayout({
                 <meta name="apple-mobile-web-app-title" content="OrbitQuest" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="msapplication-TileColor" content="#00f0ff" />
+                <meta name="format-detection" content="telephone=no" />
                 <GoogleAnalytics gaId="G-2LS6MLDXLV" />
-                <meta name="theme-color" content="#0a0a1a" />
+                <meta name="theme-color" content="#0a0a1a" media="(prefers-color-scheme: dark)" />
+                <meta name="theme-color" content="#0a0a1a" media="(prefers-color-scheme: light)" />
 
                 {/* PWA Manifest */}
                 <link rel="manifest" href="/manifest.json" />
@@ -197,6 +204,19 @@ export default function RootLayout({
                 <div className="relative z-10 min-h-screen flex flex-col">
                     {children}
                 </div>
+
+                {/* Service Worker Registration */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            if ('serviceWorker' in navigator) {
+                                window.addEventListener('load', function() {
+                                    navigator.serviceWorker.register('/sw.js').catch(function() {});
+                                });
+                            }
+                        `,
+                    }}
+                />
             </body>
         </html>
     )

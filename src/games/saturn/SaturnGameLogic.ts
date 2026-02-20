@@ -1,6 +1,7 @@
 // Saturn Game Logic - "Ring Runner"
 // ENDLESS horizontal platformer jumping across Saturn's rings
 // Unique mechanic: Low gravity floaty jumps, ring gaps, debris
+import { soundManager } from '@/utils/soundManager';
 
 interface RingSegment {
     x: number;
@@ -237,6 +238,7 @@ export class SaturnGameLogic {
                     size: 4
                 });
             }
+            soundManager.playJump();
         }
     }
 
@@ -261,6 +263,7 @@ export class SaturnGameLogic {
             }
             this.score += 300;
             this.combo = Math.min(3, this.combo + 1); // Capped at x3
+            soundManager.playLevelUp(); // Rewards sound
         } else {
             this.combo = 1;
         }
@@ -422,6 +425,7 @@ export class SaturnGameLogic {
 
                     const color = c.type === 'mega' ? '#ff00ff' : c.type === 'bonus' ? '#00ffff' : '#ffd700';
                     this.createExplosion(c.x, c.y, color);
+                    soundManager.playCollect();
                 }
             }
         }
@@ -489,6 +493,7 @@ export class SaturnGameLogic {
 
     gameOver() {
         this.isGameOver = true;
+        soundManager.playCrash();
         // Small death bonus (capped)
         const deathBonus = Math.min(3, Math.floor(this.distance / 500));
         if (this.stardustCollected < this.STARDUST_CAP) {

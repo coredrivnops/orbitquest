@@ -19,6 +19,7 @@ export default function SaturnGamePage() {
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -182,33 +183,33 @@ export default function SaturnGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="saturn">
-            <>
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-                />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
 
-                <Header />
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <h1 className="font-heading text-3xl" style={{ color: '#fbbf24' }}>Saturn: Ring Runner</h1>
-                                <p className="text-text-secondary font-ui">
-                                    Jump across Saturn&apos;s famous rings! Low gravity means big, floaty jumps.
-                                </p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-text-dim text-sm uppercase tracking-wider">Level {level}</p>
-                                <p className="font-heading text-2xl" style={{ color: '#fbbf24' }}>{score.toLocaleString()}</p>
-                            </div>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <h1 className="font-heading text-3xl" style={{ color: '#fbbf24' }}>Saturn: Ring Runner</h1>
+                            <p className="text-text-secondary font-ui">
+                                Jump across Saturn&apos;s famous rings! Low gravity means big, floaty jumps.
+                            </p>
                         </div>
+                        <div className="text-right">
+                            <p className="text-text-dim text-sm uppercase tracking-wider">Level {level}</p>
+                            <p className="font-heading text-2xl" style={{ color: '#fbbf24' }}>{score.toLocaleString()}</p>
+                        </div>
+                    </div>
 
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="saturn">
                         <div
                             className="game-canvas-container relative touch-none cursor-pointer"
                             onMouseDown={handleJump}
@@ -320,178 +321,179 @@ export default function SaturnGamePage() {
                                 </div>
                             )}
                         </div>
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    </PlanetGuard>
 
-                            {/* Main Article */}
-                            <article className="planet-card">
-                                <h2 className="font-heading text-3xl mb-6" style={{ color: '#fbbf24' }}>
-                                    Saturn: The Jewel of Our Solar System
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        Saturn, the sixth planet from the Sun, is often called the most beautiful planet in
-                                        our solar system. Its magnificent ring system, visible even with a small telescope
-                                        from Earth, has captivated astronomers for over 400 years since Galileo first
-                                        observed them in 1610.
-                                    </p>
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                                    <h3 className="font-heading text-xl mt-8 mb-4" style={{ color: '#d97706' }}>The Magnificent Rings</h3>
+                        {/* Main Article */}
+                        <article className="planet-card">
+                            <h2 className="font-heading text-3xl mb-6" style={{ color: '#fbbf24' }}>
+                                Saturn: The Jewel of Our Solar System
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    Saturn, the sixth planet from the Sun, is often called the most beautiful planet in
+                                    our solar system. Its magnificent ring system, visible even with a small telescope
+                                    from Earth, has captivated astronomers for over 400 years since Galileo first
+                                    observed them in 1610.
+                                </p>
+
+                                <h3 className="font-heading text-xl mt-8 mb-4" style={{ color: '#d97706' }}>The Magnificent Rings</h3>
+                                <p>
+                                    Saturn&apos;s rings are made of billions of particles—chunks of ice and rock ranging
+                                    from tiny grains to pieces the size of houses. Despite spanning 282,000 kilometers
+                                    in diameter, the rings are remarkably thin, averaging just 10 meters in thickness.
+                                    If you could shrink Saturn to the size of a basketball, its rings would be thinner
+                                    than a sheet of paper.
+                                </p>
+                                <p>
+                                    The rings are divided into seven main sections (A through G), separated by gaps
+                                    like the Cassini Division. These gaps are caused by the gravitational influence
+                                    of Saturn&apos;s moons, which clear out ring material like cosmic vacuum cleaners.
+                                </p>
+
+                                <div className="p-6 rounded-lg border-l-4 my-8" style={{ background: 'rgba(251, 191, 36, 0.1)', borderColor: '#fbbf24' }}>
+                                    <p className="font-ui font-bold mb-2" style={{ color: '#fbbf24' }}>🎮 GAME CONNECTION</p>
                                     <p>
-                                        Saturn&apos;s rings are made of billions of particles—chunks of ice and rock ranging
-                                        from tiny grains to pieces the size of houses. Despite spanning 282,000 kilometers
-                                        in diameter, the rings are remarkably thin, averaging just 10 meters in thickness.
-                                        If you could shrink Saturn to the size of a basketball, its rings would be thinner
-                                        than a sheet of paper.
+                                        In Ring Runner, you jump across segments of Saturn&apos;s rings, experiencing
+                                        the planet&apos;s lower gravity with big, floaty jumps. The icy platforms
+                                        represent the frozen particles that make up the actual rings, while the
+                                        gaps mirror the divisions carved by Saturn&apos;s many moons!
                                     </p>
-                                    <p>
-                                        The rings are divided into seven main sections (A through G), separated by gaps
-                                        like the Cassini Division. These gaps are caused by the gravitational influence
-                                        of Saturn&apos;s moons, which clear out ring material like cosmic vacuum cleaners.
-                                    </p>
+                                </div>
 
-                                    <div className="p-6 rounded-lg border-l-4 my-8" style={{ background: 'rgba(251, 191, 36, 0.1)', borderColor: '#fbbf24' }}>
-                                        <p className="font-ui font-bold mb-2" style={{ color: '#fbbf24' }}>🎮 GAME CONNECTION</p>
-                                        <p>
-                                            In Ring Runner, you jump across segments of Saturn&apos;s rings, experiencing
-                                            the planet&apos;s lower gravity with big, floaty jumps. The icy platforms
-                                            represent the frozen particles that make up the actual rings, while the
-                                            gaps mirror the divisions carved by Saturn&apos;s many moons!
-                                        </p>
+                                <h3 className="font-heading text-xl mt-8 mb-4" style={{ color: '#d97706' }}>A World of Gas</h3>
+                                <p>
+                                    Like Jupiter, Saturn is a gas giant with no solid surface. If you tried to land
+                                    on Saturn, you would simply sink through layers of increasingly dense hydrogen
+                                    and helium gas. The planet&apos;s famous pale yellow color comes from ammonia
+                                    crystals in its upper atmosphere.
+                                </p>
+                                <p>
+                                    Saturn is the least dense planet in our solar system—only 0.687 grams per cubic
+                                    centimeter, less than water. This means that if you could find a bathtub large
+                                    enough, Saturn would actually float!
+                                </p>
+
+                                <h3 className="font-heading text-xl mt-8 mb-4" style={{ color: '#d97706' }}>The Hexagonal Mystery</h3>
+                                <p>
+                                    One of Saturn&apos;s strangest features is the hexagonal storm at its north pole.
+                                    This six-sided weather pattern is about 30,000 kilometers across—large enough to
+                                    fit four Earths inside. Scientists believe the hexagon is caused by differences
+                                    in wind speeds at different latitudes, creating standing wave patterns in the
+                                    atmosphere. The storm has been raging for at least 40 years.
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* Quick Facts Grid */}
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl mb-4" style={{ color: '#fbbf24' }}>📊 Saturn Quick Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Distance from Sun</span>
+                                        <span style={{ color: '#fbbf24' }}>1.4 billion km</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Orbital Period</span>
+                                        <span style={{ color: '#fbbf24' }}>29.4 Earth years</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Day Length</span>
+                                        <span style={{ color: '#fbbf24' }}>10.7 hours</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Diameter</span>
+                                        <span style={{ color: '#fbbf24' }}>116,460 km</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Moons</span>
+                                        <span style={{ color: '#fbbf24' }}>146+ known</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Rings</span>
+                                        <span style={{ color: '#fbbf24' }}>7 main rings</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Density</span>
+                                        <span style={{ color: '#fbbf24' }}>0.687 g/cm³</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl mb-4" style={{ color: '#d97706' }}>🌙 Saturn&apos;s Major Moons</h3>
+                                <div className="space-y-4 text-sm text-text-secondary">
+                                    <div>
+                                        <p className="font-bold text-white">Titan (Largest)</p>
+                                        <p>Bigger than Mercury with a thick atmosphere and lakes of liquid methane.
+                                            The only moon with a dense atmosphere.</p>
                                     </div>
-
-                                    <h3 className="font-heading text-xl mt-8 mb-4" style={{ color: '#d97706' }}>A World of Gas</h3>
-                                    <p>
-                                        Like Jupiter, Saturn is a gas giant with no solid surface. If you tried to land
-                                        on Saturn, you would simply sink through layers of increasingly dense hydrogen
-                                        and helium gas. The planet&apos;s famous pale yellow color comes from ammonia
-                                        crystals in its upper atmosphere.
-                                    </p>
-                                    <p>
-                                        Saturn is the least dense planet in our solar system—only 0.687 grams per cubic
-                                        centimeter, less than water. This means that if you could find a bathtub large
-                                        enough, Saturn would actually float!
-                                    </p>
-
-                                    <h3 className="font-heading text-xl mt-8 mb-4" style={{ color: '#d97706' }}>The Hexagonal Mystery</h3>
-                                    <p>
-                                        One of Saturn&apos;s strangest features is the hexagonal storm at its north pole.
-                                        This six-sided weather pattern is about 30,000 kilometers across—large enough to
-                                        fit four Earths inside. Scientists believe the hexagon is caused by differences
-                                        in wind speeds at different latitudes, creating standing wave patterns in the
-                                        atmosphere. The storm has been raging for at least 40 years.
-                                    </p>
-                                </div>
-                            </article>
-
-                            {/* Quick Facts Grid */}
-                            <div className="grid md:grid-cols-3 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl mb-4" style={{ color: '#fbbf24' }}>📊 Saturn Quick Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Distance from Sun</span>
-                                            <span style={{ color: '#fbbf24' }}>1.4 billion km</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Orbital Period</span>
-                                            <span style={{ color: '#fbbf24' }}>29.4 Earth years</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Day Length</span>
-                                            <span style={{ color: '#fbbf24' }}>10.7 hours</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Diameter</span>
-                                            <span style={{ color: '#fbbf24' }}>116,460 km</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Moons</span>
-                                            <span style={{ color: '#fbbf24' }}>146+ known</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Rings</span>
-                                            <span style={{ color: '#fbbf24' }}>7 main rings</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Density</span>
-                                            <span style={{ color: '#fbbf24' }}>0.687 g/cm³</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl mb-4" style={{ color: '#d97706' }}>🌙 Saturn&apos;s Major Moons</h3>
-                                    <div className="space-y-4 text-sm text-text-secondary">
-                                        <div>
-                                            <p className="font-bold text-white">Titan (Largest)</p>
-                                            <p>Bigger than Mercury with a thick atmosphere and lakes of liquid methane.
-                                                The only moon with a dense atmosphere.</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-white">Enceladus</p>
-                                            <p>Has geysers shooting water ice into space! May harbor an underground
-                                                ocean that could support life.</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-white">Mimas</p>
-                                            <p>Looks like the Death Star from Star Wars due to its massive impact crater.</p>
-                                        </div>
+                                    <div>
+                                        <p className="font-bold text-white">Enceladus</p>
+                                        <p>Has geysers shooting water ice into space! May harbor an underground
+                                            ocean that could support life.</p>
                                     </div>
-                                </div>
-
-                                <div className="planet-card" style={{ background: 'linear-gradient(to bottom right, rgba(251, 191, 36, 0.1), rgba(15, 23, 42, 0.5))' }}>
-                                    <h3 className="font-heading text-xl mb-4" style={{ color: '#fbbf24' }}>💡 Did You Know?</h3>
-                                    <div className="space-y-4 text-sm text-text-dim">
-                                        <p className="italic">
-                                            &quot;Saturn&apos;s rings are disappearing! They&apos;re slowly raining down onto
-                                            the planet and will be completely gone in about 300 million years.&quot;
-                                        </p>
-                                        <p className="italic">
-                                            &quot;Saturn has been visited by only four spacecraft: Pioneer 11, Voyager 1,
-                                            Voyager 2, and the Cassini mission which orbited Saturn for 13 years.&quot;
-                                        </p>
-                                        <p className="italic">
-                                            &quot;Winds on Saturn can reach up to 1,800 km/h at the equator—five times
-                                            faster than the strongest hurricanes on Earth.&quot;
-                                        </p>
+                                    <div>
+                                        <p className="font-bold text-white">Mimas</p>
+                                        <p>Looks like the Death Star from Star Wars due to its massive impact crater.</p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Exploration History */}
-                            <article className="planet-card">
-                                <h2 className="font-heading text-2xl mb-6" style={{ color: '#fbbf24' }}>
-                                    Cassini-Huygens: Saturn&apos;s Greatest Explorer
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary">
-                                    <p>
-                                        The Cassini-Huygens mission, launched in 1997, revolutionized our understanding
-                                        of Saturn. After arriving in 2004, the Cassini spacecraft spent 13 years studying
-                                        the planet, its rings, and its moons in unprecedented detail.
+                            <div className="planet-card" style={{ background: 'linear-gradient(to bottom right, rgba(251, 191, 36, 0.1), rgba(15, 23, 42, 0.5))' }}>
+                                <h3 className="font-heading text-xl mb-4" style={{ color: '#fbbf24' }}>💡 Did You Know?</h3>
+                                <div className="space-y-4 text-sm text-text-dim">
+                                    <p className="italic">
+                                        &quot;Saturn&apos;s rings are disappearing! They&apos;re slowly raining down onto
+                                        the planet and will be completely gone in about 300 million years.&quot;
                                     </p>
-                                    <p className="mt-4">
-                                        The Huygens probe, carried by Cassini, made history in 2005 by landing on Titan—the
-                                        first landing ever achieved in the outer solar system. It transmitted data for
-                                        72 minutes from Titan&apos;s surface, revealing a world with lakes, rivers, and
-                                        weather patterns similar to Earth, but with liquid methane instead of water.
+                                    <p className="italic">
+                                        &quot;Saturn has been visited by only four spacecraft: Pioneer 11, Voyager 1,
+                                        Voyager 2, and the Cassini mission which orbited Saturn for 13 years.&quot;
                                     </p>
-                                    <p className="mt-4">
-                                        In September 2017, with its fuel running low, Cassini was deliberately plunged
-                                        into Saturn&apos;s atmosphere in a &quot;Grand Finale&quot; maneuver. This protected
-                                        the potentially life-harboring moons Titan and Enceladus from contamination while
-                                        sending back unprecedented data about Saturn&apos;s atmosphere until the very end.
+                                    <p className="italic">
+                                        &quot;Winds on Saturn can reach up to 1,800 km/h at the equator—five times
+                                        faster than the strongest hurricanes on Earth.&quot;
                                     </p>
                                 </div>
-                            </article>
+                            </div>
+                        </div>
 
-                        </section>
-                    </div>
-                </main>
+                        {/* Exploration History */}
+                        <article className="planet-card">
+                            <h2 className="font-heading text-2xl mb-6" style={{ color: '#fbbf24' }}>
+                                Cassini-Huygens: Saturn&apos;s Greatest Explorer
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary">
+                                <p>
+                                    The Cassini-Huygens mission, launched in 1997, revolutionized our understanding
+                                    of Saturn. After arriving in 2004, the Cassini spacecraft spent 13 years studying
+                                    the planet, its rings, and its moons in unprecedented detail.
+                                </p>
+                                <p className="mt-4">
+                                    The Huygens probe, carried by Cassini, made history in 2005 by landing on Titan—the
+                                    first landing ever achieved in the outer solar system. It transmitted data for
+                                    72 minutes from Titan&apos;s surface, revealing a world with lakes, rivers, and
+                                    weather patterns similar to Earth, but with liquid methane instead of water.
+                                </p>
+                                <p className="mt-4">
+                                    In September 2017, with its fuel running low, Cassini was deliberately plunged
+                                    into Saturn&apos;s atmosphere in a &quot;Grand Finale&quot; maneuver. This protected
+                                    the potentially life-harboring moons Titan and Enceladus from contamination while
+                                    sending back unprecedented data about Saturn&apos;s atmosphere until the very end.
+                                </p>
+                            </div>
+                        </article>
 
-                <Footer />
-            </>
-        </PlanetGuard>
+                    </section>
+                </div>
+            </main>
+
+            <Footer />
+        </>
     );
 }
 

@@ -19,11 +19,18 @@
   /* Effects */
   --glow: 0 0 20px currentColor;
   --glow-lg: 0 0 40px currentColor;
+
+  /* Safe Areas (notch, home indicator) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 /* Base Styles */
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -31,7 +38,19 @@ body {
   color: var(--text-primary);
   font-family: var(--font-inter), system-ui, sans-serif;
   min-height: 100vh;
+  min-height: 100dvh;
+  /* Dynamic viewport height for mobile */
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  /* Remove tap highlight on mobile */
+}
+
+/* Prevent body scroll when fullscreen game is active */
+body.game-fullscreen-active {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 /* Starfield Background */
@@ -113,13 +132,214 @@ body {
   border: 1px solid rgba(168, 85, 247, 0.5);
 }
 
-/* Game Canvas Container */
+/* ================================================
+   GAME CANVAS - Mobile-First Responsive Design
+   ================================================ */
+
 .game-canvas-container {
   @apply relative w-full rounded-2xl overflow-hidden;
   aspect-ratio: 16/9;
   background: var(--bg-secondary);
   border: 2px solid rgba(0, 240, 255, 0.3);
   box-shadow: inset 0 0 50px rgba(0, 240, 255, 0.1);
+  /* Prevent all browser gestures on the game area */
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Game Canvas Wrapper */
+.game-canvas-wrapper {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.game-canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  touch-action: none;
+}
+
+/* Fullscreen Button - Unified Styling */
+.fullscreen-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10000;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+  /* Minimum touch target 44x44px for accessibility */
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  border-color: var(--accent-neon);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.92);
+}
+
+/* Mobile Exit Fullscreen Button */
+.mobile-exit-fs {
+  position: fixed;
+  top: max(8px, var(--safe-top));
+  left: max(8px, var(--safe-left));
+  z-index: 10001;
+  padding: 12px;
+  background: rgba(255, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: pulse-exit 2s ease-in-out infinite;
+}
+
+@keyframes pulse-exit {
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Landscape Orientation Hint */
+.landscape-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 5, 16, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.landscape-hint-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 16px;
+}
+
+.landscape-hint-icon {
+  position: relative;
+  color: var(--accent-neon);
+  animation: rotate-hint 2s ease-in-out infinite;
+}
+
+.rotate-arrow {
+  position: absolute;
+  top: -6px;
+  right: -12px;
+  font-size: 20px;
+  color: var(--accent-purple);
+  animation: rotate-arrow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-90deg);
+  }
+}
+
+@keyframes rotate-arrow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* PWA Install Banner */
+.pwa-install-banner {
+  position: fixed;
+  bottom: max(16px, var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9990;
+  max-width: 400px;
+  width: calc(100% - 32px);
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(10, 10, 31, 0.95), rgba(5, 5, 16, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.1);
+  animation: slide-up 0.4s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ================================================
+   MOBILE GAME OVERLAYS
+   ================================================ */
+
+/* Game HUD elements - ensure readability on small screens */
+@media (max-width: 640px) {
+  .game-hud {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+  }
+
+  .game-score {
+    font-size: 14px !important;
+  }
 }
 
 /* Scrollbar Styling */
@@ -140,6 +360,22 @@ body {
   background: var(--accent-purple);
 }
 
+/* Reduced Motion */
+.reduced-motion .starfield,
+.reduced-motion .starfield::after,
+.reduced-motion .animate-pulse,
+.reduced-motion .animate-float,
+.reduced-motion .animate-spin,
+.reduced-motion .animate-bounce,
+.reduced-motion .animate-nebula,
+.reduced-motion .animate-aurora,
+.reduced-motion .animate-orbit,
+.reduced-motion .animate-orbit-small,
+.reduced-motion .animate-pulse-ring {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* Selection */
 ::selection {
   background: rgba(0, 240, 255, 0.3);
@@ -157,28 +393,78 @@ body {
   display: none;
 }
 
-/* Responsive Typography */
-@media (max-width: 768px) {
+/* ================================================
+   RESPONSIVE: MOBILE BREAKPOINTS
+   ================================================ */
+
+/* Mobile: 0-767px */
+@media (max-width: 767px) {
   html {
     font-size: 14px;
   }
 
-  /* Remove container padding on mobile for game pages */
-  .container.mx-auto.px-4 {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    max-width: 100% !important;
+  /* Edge-to-edge game canvas on mobile */
+  .game-canvas-container {
+    border-radius: 12px;
+    border-width: 1px;
+    margin-left: -4px;
+    margin-right: -4px;
+  }
+
+  /* Tighter padding on game pages */
+  .game-page-content {
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
 
+/* Small Mobile: 0-479px */
+@media (max-width: 479px) {
+  .game-canvas-container {
+    border-radius: 8px;
+  }
 
+  .fullscreen-btn {
+    top: 8px;
+    right: 8px;
+    padding: 8px;
+  }
+}
 
-/* Forced Fullscreen Override (JS toggled - still useful for Desktop/Portrait forcing) */
+/* Mobile Landscape */
+@media (max-width: 767px) and (orientation: landscape) {
+
+  /* When mobile is landscape, maximize game canvas */
+  .game-canvas-container {
+    border-radius: 0;
+    border: none;
+    margin: 0;
+  }
+
+  /* Hide non-essential UI in landscape mobile */
+  .mobile-landscape-hide {
+    display: none !important;
+  }
+}
+
+/* Tablet: 768-1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .game-canvas-container {
+    border-radius: 16px;
+  }
+}
+
+/* ================================================
+   FULLSCREEN GAME MODE (CSS Fallback for iOS)
+   ================================================ */
+
 .force-fullscreen {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
+  width: 100dvw !important;
   height: 100vh !important;
+  height: 100dvh !important;
   z-index: 9999 !important;
   background: #050510 !important;
   max-width: none !important;
@@ -188,12 +474,72 @@ body {
   display: flex !important;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  /* Safe areas for notched devices */
+  padding-top: var(--safe-top) !important;
+  padding-bottom: var(--safe-bottom) !important;
+  padding-left: var(--safe-left) !important;
+  padding-right: var(--safe-right) !important;
 }
 
-.force-fullscreen .game-canvas-container {
+.force-fullscreen .game-canvas-container,
+:fullscreen .game-canvas-container {
   aspect-ratio: unset !important;
   width: 100% !important;
   height: 100% !important;
   border: none !important;
   border-radius: 0 !important;
+  margin: 0 !important;
+}
+
+.force-fullscreen .game-canvas-wrapper,
+:fullscreen .game-canvas-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.force-fullscreen canvas,
+:fullscreen canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Hide overlays that shouldn't show in fullscreen */
+.force-fullscreen .landscape-hint {
+  display: none !important;
+}
+
+/* Native Fullscreen vendor prefixes */
+:-webkit-full-screen .game-canvas-container {
+  aspect-ratio: unset !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* ================================================
+   STANDALONE PWA MODE ADJUSTMENTS
+   ================================================ */
+
+@media (display-mode: standalone) {
+
+  /* In PWA mode, the header doesn't need as much top padding */
+  .header-spacer {
+    padding-top: var(--safe-top);
+  }
+
+  /* Hide install-related UI in PWA mode */
+  .pwa-install-banner {
+    display: none !important;
+  }
+}
+
+/* iOS standalone mode */
+@media (display-mode: standalone) and (-webkit-min-device-pixel-ratio: 2) {
+  body {
+    /* Prevent overscroll bounce in iOS PWA */
+    overscroll-behavior: none;
+  }
 }

@@ -1,6 +1,7 @@
 // Neptune Game Logic - "MACH SURFER"
 // Horizontal supersonic wind racing through Neptune's atmosphere!
 // Unique mechanic: Surf wind currents, break the sound barrier, collect diamonds!
+import { soundManager } from '@/utils/soundManager';
 
 interface WindCurrent {
     x: number;
@@ -263,6 +264,7 @@ export class NeptuneGameLogic {
             this.score += 500;
             this.combo = Math.min(5, this.combo + 1);
             this.createCollectEffect(this.width / 2, this.height / 2, '#00ff88');
+            soundManager.playLevelUp(); // Celebration for correct trivia
         } else {
             this.combo = 1;
         }
@@ -298,6 +300,7 @@ export class NeptuneGameLogic {
             this.createSonicBoom();
             this.score += 200 * this.combo;
             this.sonicBoomCooldown = 120;
+            soundManager.playExplosion(); // Sonic boom sound
         }
         this.sonicBoomCooldown = Math.max(0, this.sonicBoomCooldown - 1);
 
@@ -494,6 +497,7 @@ export class NeptuneGameLogic {
                 this.sessionStardust += stardustGain;
                 this.stardustCollected += stardustGain;
                 this.score += diamond.value * 50 * this.combo;
+                soundManager.playCollect();
 
                 // Speed boost from collection
                 this.playerSpeed = Math.min(this.maxSpeed, this.playerSpeed + 20);
@@ -650,6 +654,7 @@ export class NeptuneGameLogic {
     gameOver() {
         this.isGameOver = true;
         this.screenShake = 20;
+        soundManager.playCrash();
 
         // Explosion effect
         for (let i = 0; i < 40; i++) {

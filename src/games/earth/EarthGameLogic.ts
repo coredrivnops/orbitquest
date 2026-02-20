@@ -1,6 +1,7 @@
 // Earth Game Logic - "LAST STAND: EARTH"
 // Bullet Heaven / Vampire Survivors style alien defense!
 // Auto-fire weapons, collect XP, evolve your arsenal!
+import { soundManager } from '@/utils/soundManager';
 
 interface Alien {
     id: number;
@@ -325,6 +326,7 @@ export class EarthGameLogic {
             this.earthHealth = Math.min(this.maxEarthHealth, this.earthHealth + 10);
             this.createLevelUpEffect();
             this.onStardustCollected?.(20);
+            soundManager.playLevelUp();
         }
 
         this.onTriviaResult?.(correct, this.currentTrivia.fact);
@@ -419,6 +421,8 @@ export class EarthGameLogic {
     fireWeapon(weapon: Weapon) {
         const nearestAlien = this.findNearestAlien();
         if (!nearestAlien && weapon.type !== 'pulse') return;
+
+        soundManager.playShoot(); // Play sound when firing
 
         const count = weapon.projectileCount;
         const spreadAngle = Math.min(count * 0.15, Math.PI / 3);
@@ -625,6 +629,7 @@ export class EarthGameLogic {
                     this.flashIntensity = 0.3;
                     proj.hitsLeft = 0;
                     this.onHealthUpdate?.(this.earthHealth);
+                    soundManager.playCrash();
 
                     if (this.earthHealth <= 0) {
                         this.earthHealth = 0;
@@ -704,6 +709,7 @@ export class EarthGameLogic {
         // Explosion effect
         const explosionSize = alien.type === 'boss' ? 30 : alien.type === 'elite' ? 15 : 8;
         this.createExplosion(alien.x, alien.y, this.getAlienColor(alien.type), explosionSize);
+        soundManager.playExplosion();
 
         if (alien.type === 'boss') {
             this.screenShake = 20;
@@ -743,6 +749,7 @@ export class EarthGameLogic {
             if (dist < 20) {
                 this.xp += orb.value;
                 orb.value = 0;
+                soundManager.playCollect();
 
                 // Level up check
                 if (this.xp >= this.xpToLevel) {

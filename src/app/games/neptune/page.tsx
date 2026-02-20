@@ -23,6 +23,7 @@ export default function NeptuneGamePage() {
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -184,38 +185,38 @@ export default function NeptuneGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="neptune">
-            <>
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-                />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
 
-                <Header />
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <h1 className="font-heading text-3xl text-neon-cyan">
-                                    Neptune: Mach Surfer
-                                    <span className="ml-2 text-lg">🔊💎🌊</span>
-                                </h1>
-                                <p className="text-text-secondary font-ui">
-                                    Surf Neptune&apos;s supersonic winds at Mach speed! Collect diamond rain!
-                                </p>
-                            </div>
-                            <div className="text-right">
-                                <p className={`text-sm font-bold uppercase tracking-wider ${isSuperSonic ? 'text-cyan-400 animate-pulse' : 'text-text-dim'}`}>
-                                    {isSuperSonic ? '🔊 SUPERSONIC!' : `Mach ${machNumber.toFixed(2)}`}
-                                </p>
-                                <p className="font-heading text-2xl text-white">{Math.floor(distance / 10).toLocaleString()}km</p>
-                            </div>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <h1 className="font-heading text-3xl text-neon-cyan">
+                                Neptune: Mach Surfer
+                                <span className="ml-2 text-lg">🔊💎🌊</span>
+                            </h1>
+                            <p className="text-text-secondary font-ui">
+                                Surf Neptune&apos;s supersonic winds at Mach speed! Collect diamond rain!
+                            </p>
                         </div>
+                        <div className="text-right">
+                            <p className={`text-sm font-bold uppercase tracking-wider ${isSuperSonic ? 'text-cyan-400 animate-pulse' : 'text-text-dim'}`}>
+                                {isSuperSonic ? '🔊 SUPERSONIC!' : `Mach ${machNumber.toFixed(2)}`}
+                            </p>
+                            <p className="font-heading text-2xl text-white">{Math.floor(distance / 10).toLocaleString()}km</p>
+                        </div>
+                    </div>
 
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="neptune">
                         <div
                             className="game-canvas-container relative cursor-crosshair touch-none"
                             onMouseMove={handleMouseMove}
@@ -381,172 +382,171 @@ export default function NeptuneGamePage() {
                                 </div>
                             )}
                         </div>
+                    </PlanetGuard>
 
 
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                            {/* Main Article */}
-                            <article className="planet-card">
-                                <h2 className="font-heading text-3xl text-neon-cyan mb-6">
-                                    🌊 Neptune: The Windiest World with Diamond Rain
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        Neptune, the eighth and farthest known planet from the Sun, is a world of extremes.
-                                        Despite receiving less than 1/900th of the sunlight that reaches Earth, this ice giant
-                                        generates some of the most violent weather phenomena in our solar system. Its supersonic
-                                        winds, reaching speeds of <strong className="text-cyan-400">2,000 kilometers per hour</strong>, make Earth&apos;s most powerful
-                                        hurricanes seem like gentle breezes in comparison.
-                                    </p>
+                        {/* Main Article */}
+                        <article className="planet-card">
+                            <h2 className="font-heading text-3xl text-neon-cyan mb-6">
+                                🌊 Neptune: The Windiest World with Diamond Rain
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    Neptune, the eighth and farthest known planet from the Sun, is a world of extremes.
+                                    Despite receiving less than 1/900th of the sunlight that reaches Earth, this ice giant
+                                    generates some of the most violent weather phenomena in our solar system. Its supersonic
+                                    winds, reaching speeds of <strong className="text-cyan-400">2,000 kilometers per hour</strong>, make Earth&apos;s most powerful
+                                    hurricanes seem like gentle breezes in comparison.
+                                </p>
 
-                                    <h3 className="font-heading text-xl text-neon-purple mt-8 mb-4">💎 Diamond Rain - It&apos;s Real!</h3>
+                                <h3 className="font-heading text-xl text-neon-purple mt-8 mb-4">💎 Diamond Rain - It&apos;s Real!</h3>
+                                <p>
+                                    One of Neptune&apos;s most astonishing features is that it literally <strong className="text-purple-400">rains diamonds</strong>!
+                                    Deep within Neptune&apos;s atmosphere, extreme pressure and temperature squeeze methane molecules
+                                    so intensely that they break apart, releasing carbon atoms that compress into diamond crystals.
+                                    These diamonds then sink toward the planet&apos;s core like glittering rain. Scientists have
+                                    successfully recreated this phenomenon in laboratory experiments, confirming what was once
+                                    just theoretical!
+                                </p>
+
+                                <div className="bg-space-dark p-6 rounded-lg border-l-4 border-cyan-400 my-8">
+                                    <p className="font-ui text-cyan-400 font-bold mb-2">🎮 GAME CONNECTION</p>
                                     <p>
-                                        One of Neptune&apos;s most astonishing features is that it literally <strong className="text-purple-400">rains diamonds</strong>!
-                                        Deep within Neptune&apos;s atmosphere, extreme pressure and temperature squeeze methane molecules
-                                        so intensely that they break apart, releasing carbon atoms that compress into diamond crystals.
-                                        These diamonds then sink toward the planet&apos;s core like glittering rain. Scientists have
-                                        successfully recreated this phenomenon in laboratory experiments, confirming what was once
-                                        just theoretical!
+                                        In Mach Surfer, you pilot a probe through Neptune&apos;s supersonic winds, racing at
+                                        speeds approaching and exceeding Mach 1 (the speed of sound). The diamonds you
+                                        collect in the game represent Neptune&apos;s real diamond rain! Ride green wind currents
+                                        for speed boosts and break the sound barrier for bonus points!
                                     </p>
+                                </div>
 
-                                    <div className="bg-space-dark p-6 rounded-lg border-l-4 border-cyan-400 my-8">
-                                        <p className="font-ui text-cyan-400 font-bold mb-2">🎮 GAME CONNECTION</p>
-                                        <p>
-                                            In Mach Surfer, you pilot a probe through Neptune&apos;s supersonic winds, racing at
-                                            speeds approaching and exceeding Mach 1 (the speed of sound). The diamonds you
-                                            collect in the game represent Neptune&apos;s real diamond rain! Ride green wind currents
-                                            for speed boosts and break the sound barrier for bonus points!
-                                        </p>
+                                <h3 className="font-heading text-xl text-neon-purple mt-8 mb-4">🔊 Supersonic Winds</h3>
+                                <p>
+                                    Neptune&apos;s winds are the fastest in the solar system, reaching speeds that would be
+                                    supersonic on Earth. What makes this even more remarkable is that Neptune receives very
+                                    little heat from the Sun due to its extreme distance. Scientists believe the planet&apos;s
+                                    internal heat, possibly from gravitational compression or radioactive decay, powers these
+                                    incredible atmospheric phenomena. The wind speeds in the game are inspired by these
+                                    real supersonic currents!
+                                </p>
+
+                                <h3 className="font-heading text-xl text-neon-purple mt-8 mb-4">📐 Mathematical Discovery</h3>
+                                <p>
+                                    Neptune was the first planet discovered through mathematical prediction rather than
+                                    observation. In 1846, French mathematician Urbain Le Verrier and British mathematician
+                                    John Couch Adams independently calculated that an unknown planet must exist based on
+                                    perturbations in Uranus&apos;s orbit. When German astronomer Johann Galle pointed his
+                                    telescope at the predicted location, Neptune was exactly where the math said it would be!
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* Quick Facts Grid */}
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl text-neon-cyan mb-4">📊 Neptune Quick Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Distance from Sun</span>
+                                        <span className="text-neon-cyan">4.5 billion km</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Orbital Period</span>
+                                        <span className="text-neon-cyan">165 Earth years</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Day Length</span>
+                                        <span className="text-neon-cyan">16 hours</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Diameter</span>
+                                        <span className="text-neon-cyan">49,528 km</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Max Wind Speed</span>
+                                        <span className="text-cyan-400 font-bold">2,000 km/h 🔊</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Moons</span>
+                                        <span className="text-neon-cyan">16 known</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Diamond Rain?</span>
+                                        <span className="text-purple-400 font-bold">YES! 💎</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl text-neon-purple mb-4">🌙 Neptune&apos;s Moons</h3>
+                                <div className="space-y-4 text-sm text-text-secondary">
+                                    <div>
+                                        <p className="font-bold text-white">Triton (Largest)</p>
+                                        <p>The only large moon in the solar system that orbits retrograde
+                                            (backwards). Has active nitrogen geysers!</p>
                                     </div>
-
-                                    <h3 className="font-heading text-xl text-neon-purple mt-8 mb-4">🔊 Supersonic Winds</h3>
-                                    <p>
-                                        Neptune&apos;s winds are the fastest in the solar system, reaching speeds that would be
-                                        supersonic on Earth. What makes this even more remarkable is that Neptune receives very
-                                        little heat from the Sun due to its extreme distance. Scientists believe the planet&apos;s
-                                        internal heat, possibly from gravitational compression or radioactive decay, powers these
-                                        incredible atmospheric phenomena. The wind speeds in the game are inspired by these
-                                        real supersonic currents!
-                                    </p>
-
-                                    <h3 className="font-heading text-xl text-neon-purple mt-8 mb-4">📐 Mathematical Discovery</h3>
-                                    <p>
-                                        Neptune was the first planet discovered through mathematical prediction rather than
-                                        observation. In 1846, French mathematician Urbain Le Verrier and British mathematician
-                                        John Couch Adams independently calculated that an unknown planet must exist based on
-                                        perturbations in Uranus&apos;s orbit. When German astronomer Johann Galle pointed his
-                                        telescope at the predicted location, Neptune was exactly where the math said it would be!
-                                    </p>
-                                </div>
-                            </article>
-
-                            {/* Quick Facts Grid */}
-                            <div className="grid md:grid-cols-3 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-neon-cyan mb-4">📊 Neptune Quick Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Distance from Sun</span>
-                                            <span className="text-neon-cyan">4.5 billion km</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Orbital Period</span>
-                                            <span className="text-neon-cyan">165 Earth years</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Day Length</span>
-                                            <span className="text-neon-cyan">16 hours</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Diameter</span>
-                                            <span className="text-neon-cyan">49,528 km</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Max Wind Speed</span>
-                                            <span className="text-cyan-400 font-bold">2,000 km/h 🔊</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Moons</span>
-                                            <span className="text-neon-cyan">16 known</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Diamond Rain?</span>
-                                            <span className="text-purple-400 font-bold">YES! 💎</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-neon-purple mb-4">🌙 Neptune&apos;s Moons</h3>
-                                    <div className="space-y-4 text-sm text-text-secondary">
-                                        <div>
-                                            <p className="font-bold text-white">Triton (Largest)</p>
-                                            <p>The only large moon in the solar system that orbits retrograde
-                                                (backwards). Has active nitrogen geysers!</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-white">Nereid</p>
-                                            <p>Has one of the most eccentric orbits of any moon, ranging from
-                                                1.4 to 9.6 million km from Neptune.</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-white">Proteus</p>
-                                            <p>Neptune&apos;s second-largest moon, irregularly shaped like a
-                                                giant potato tumbling through space.</p>
-                                        </div>
+                                    <div>
+                                        <p className="font-bold text-white">Nereid</p>
+                                        <p>Has one of the most eccentric orbits of any moon, ranging from
+                                            1.4 to 9.6 million km from Neptune.</p>
                                     </div>
-                                </div>
-
-                                <div className="planet-card bg-gradient-to-br from-cyan-900/30 to-blue-900/30">
-                                    <h3 className="font-heading text-xl text-cyan-400 mb-4">💡 Amazing Facts</h3>
-                                    <div className="space-y-4 text-sm text-text-dim">
-                                        <p className="italic border-l-2 border-cyan-500 pl-3">
-                                            &quot;Neptune&apos;s Great Dark Spot (discovered 1989) completely
-                                            disappeared by 1994 - unlike Jupiter&apos;s persistent Great Red Spot!&quot;
-                                        </p>
-                                        <p className="italic border-l-2 border-purple-500 pl-3">
-                                            &quot;It rains diamonds on Neptune! The extreme pressure converts
-                                            methane into diamond crystals that sink toward the core.&quot;
-                                        </p>
-                                        <p className="italic border-l-2 border-blue-500 pl-3">
-                                            &quot;Neptune has completed only one full orbit around the Sun since
-                                            its discovery in 1846 - it finished in 2011!&quot;
-                                        </p>
+                                    <div>
+                                        <p className="font-bold text-white">Proteus</p>
+                                        <p>Neptune&apos;s second-largest moon, irregularly shaped like a
+                                            giant potato tumbling through space.</p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Exploration History */}
-                            <article className="planet-card">
-                                <h2 className="font-heading text-2xl text-neon-cyan mb-6">
-                                    🛸 Exploration History: Voyager 2&apos;s Grand Finale
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary">
-                                    <p>
-                                        The only spacecraft to ever visit Neptune was NASA&apos;s Voyager 2, which made
-                                        its closest approach on August 25, 1989. This flyby was the culmination of
-                                        the &quot;Grand Tour&quot;—a rare planetary alignment that allowed a single spacecraft
-                                        to visit Jupiter, Saturn, Uranus, and Neptune using gravity assists.
+                            <div className="planet-card bg-gradient-to-br from-cyan-900/30 to-blue-900/30">
+                                <h3 className="font-heading text-xl text-cyan-400 mb-4">💡 Amazing Facts</h3>
+                                <div className="space-y-4 text-sm text-text-dim">
+                                    <p className="italic border-l-2 border-cyan-500 pl-3">
+                                        &quot;Neptune&apos;s Great Dark Spot (discovered 1989) completely
+                                        disappeared by 1994 - unlike Jupiter&apos;s persistent Great Red Spot!&quot;
                                     </p>
-                                    <p className="mt-4">
-                                        During its encounter, Voyager 2 discovered six new moons, five rings, and
-                                        captured stunning images of the Great Dark Spot. It detected Neptune&apos;s
-                                        magnetic field, measured the planet&apos;s rotation period, and recorded the
-                                        supersonic winds that inspired the Mach Surfer game!
+                                    <p className="italic border-l-2 border-purple-500 pl-3">
+                                        &quot;It rains diamonds on Neptune! The extreme pressure converts
+                                        methane into diamond crystals that sink toward the core.&quot;
+                                    </p>
+                                    <p className="italic border-l-2 border-blue-500 pl-3">
+                                        &quot;Neptune has completed only one full orbit around the Sun since
+                                        its discovery in 1846 - it finished in 2011!&quot;
                                     </p>
                                 </div>
-                            </article>
+                            </div>
+                        </div>
 
-                        </section>
+                        {/* Exploration History */}
+                        <article className="planet-card">
+                            <h2 className="font-heading text-2xl text-neon-cyan mb-6">
+                                🛸 Exploration History: Voyager 2&apos;s Grand Finale
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary">
+                                <p>
+                                    The only spacecraft to ever visit Neptune was NASA&apos;s Voyager 2, which made
+                                    its closest approach on August 25, 1989. This flyby was the culmination of
+                                    the &quot;Grand Tour&quot;—a rare planetary alignment that allowed a single spacecraft
+                                    to visit Jupiter, Saturn, Uranus, and Neptune using gravity assists.
+                                </p>
+                                <p className="mt-4">
+                                    During its encounter, Voyager 2 discovered six new moons, five rings, and
+                                    captured stunning images of the Great Dark Spot. It detected Neptune&apos;s
+                                    magnetic field, measured the planet&apos;s rotation period, and recorded the
+                                    supersonic winds that inspired the Mach Surfer game!
+                                </p>
+                            </div>
+                        </article>
+
+                    </section>
 
 
-                    </div>
-                </main>
+                </div>
+            </main>
 
-                <Footer />
-            </>
-        </PlanetGuard>
+            <Footer />
+        </>
     );
 }
-

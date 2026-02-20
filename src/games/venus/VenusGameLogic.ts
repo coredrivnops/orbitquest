@@ -1,6 +1,7 @@
 // Venus Game Logic - "PRESSURE DROP"
 // Vertical descent through Venus's crushing atmosphere!
 // Unique mechanic: Pressure increases as you descend, collect coolant to survive
+import { soundManager } from '@/utils/soundManager';
 
 interface AtmosphereLayer {
     name: string;
@@ -237,7 +238,7 @@ export class VenusGameLogic {
         this.lightningFlash = 0;
     }
 
-    handleInput(x: number, y: number) {
+    handleInput(x: number) {
         if (this.showTrivia || this.isGameOver) return;
         // Player moves horizontally toward cursor
         const targetX = Math.max(50, Math.min(this.width - 50, x));
@@ -262,6 +263,7 @@ export class VenusGameLogic {
             this.shieldActive = true;
             this.shieldTimer = 180;
             this.createCelebration();
+            soundManager.playLevelUp();
         }
 
         setTimeout(() => {
@@ -457,6 +459,7 @@ export class VenusGameLogic {
             if (dist < cloud.radius + this.playerRadius && !this.shieldActive) {
                 this.hullIntegrity -= 0.5;
                 this.createAcidParticles(this.playerX, this.playerY);
+                if (Math.random() < 0.1) soundManager.playCrash(); // Occasional sound for continuous damage
             }
 
             return cloud.y < this.height + cloud.radius;
@@ -502,6 +505,7 @@ export class VenusGameLogic {
                 this.combo = Math.min(5, this.combo + 0.25);
                 this.comboTimer = 120;
                 this.createCollectEffect(col.x, col.y, col.type);
+                soundManager.playCollect();
                 return false;
             }
 
@@ -526,6 +530,7 @@ export class VenusGameLogic {
         if (this.hullIntegrity <= 0) {
             this.isGameOver = true;
             this.createDeathEffect();
+            soundManager.playCrash();
         }
 
         // Score increases with depth

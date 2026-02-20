@@ -14,13 +14,14 @@ export default function MarsGamePage() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [score, setScore] = useState(0);
     const [samples, setSamples] = useState(0);
-    const [lives, setLives] = useState(3);
+    const [, setLives] = useState(3);
     const [combo, setCombo] = useState(1);
     const [isGameOver, setIsGameOver] = useState(false);
     const [earnedStardust, setEarnedStardust] = useState(0);
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -164,33 +165,33 @@ export default function MarsGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="mars">
-            <>
-                <Header />
+        <>
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="font-heading text-3xl text-red-400">Mars: Rover Rush</h1>
-                                    <span className="px-3 py-1 bg-red-500/20 text-red-400 text-sm rounded-full font-bold">1200⭐</span>
-                                </div>
-                                <p className="text-text-secondary font-ui">
-                                    Drive the Perseverance rover! Collect samples with ← → or A/D
-                                </p>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="font-heading text-3xl text-red-400">Mars: Rover Rush</h1>
+                                <span className="px-3 py-1 bg-red-500/20 text-red-400 text-sm rounded-full font-bold">1200⭐</span>
                             </div>
-                            <div className="text-right">
-                                <p className="font-heading text-2xl text-red-400">{samples} samples</p>
-                                {combo > 1 && (
-                                    <p className="text-yellow-400 font-bold">x{combo.toFixed(1)} Combo!</p>
-                                )}
-                            </div>
+                            <p className="text-text-secondary font-ui">
+                                Drive the Perseverance rover! Collect samples with ← → or A/D
+                            </p>
                         </div>
+                        <div className="text-right">
+                            <p className="font-heading text-2xl text-red-400">{samples} samples</p>
+                            {combo > 1 && (
+                                <p className="text-yellow-400 font-bold">x{combo.toFixed(1)} Combo!</p>
+                            )}
+                        </div>
+                    </div>
 
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="mars">
                         <div
                             className="game-canvas-container relative cursor-none touch-none select-none"
                             onMouseMove={handleMouseMove}
@@ -349,95 +350,95 @@ export default function MarsGamePage() {
                                 </div>
                             )}
                         </div>
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    </PlanetGuard>
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                            <article className="planet-card bg-gradient-to-br from-red-900/30 to-orange-900/20">
-                                <h2 className="font-heading text-3xl text-red-400 mb-6">
-                                    Mars: The Next Frontier
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        Mars is humanity&apos;s next destination! The Red Planet has fascinated us
-                                        for centuries, and now we have rovers actively exploring its surface.
-                                        Perseverance, which landed in 2021, is collecting samples that will
-                                        eventually be returned to Earth for analysis.
+                        <article className="planet-card bg-gradient-to-br from-red-900/30 to-orange-900/20">
+                            <h2 className="font-heading text-3xl text-red-400 mb-6">
+                                Mars: The Next Frontier
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    Mars is humanity&apos;s next destination! The Red Planet has fascinated us
+                                    for centuries, and now we have rovers actively exploring its surface.
+                                    Perseverance, which landed in 2021, is collecting samples that will
+                                    eventually be returned to Earth for analysis.
+                                </p>
+
+                                <div className="bg-red-900/30 p-6 rounded-lg border-l-4 border-red-500 my-8">
+                                    <p className="font-ui text-red-400 font-bold mb-2">🎮 GAME CONNECTION</p>
+                                    <p>
+                                        In Rover Rush, you&apos;re piloting the Perseverance rover across the
+                                        Martian surface! The rock samples, ice, and crystals represent real
+                                        materials scientists hope to study. Dust storms are a real hazard
+                                        that rovers must survive - Opportunity was killed by a global dust
+                                        storm in 2018!
                                     </p>
-
-                                    <div className="bg-red-900/30 p-6 rounded-lg border-l-4 border-red-500 my-8">
-                                        <p className="font-ui text-red-400 font-bold mb-2">🎮 GAME CONNECTION</p>
-                                        <p>
-                                            In Rover Rush, you&apos;re piloting the Perseverance rover across the
-                                            Martian surface! The rock samples, ice, and crystals represent real
-                                            materials scientists hope to study. Dust storms are a real hazard
-                                            that rovers must survive - Opportunity was killed by a global dust
-                                            storm in 2018!
-                                        </p>
-                                    </div>
-                                </div>
-                            </article>
-
-                            {/* Quick Facts */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-red-400 mb-4">📊 Mars Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Size</span>
-                                            <span className="text-red-400">Half of Earth</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Day Length</span>
-                                            <span className="text-red-400">24h 37min</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Moons</span>
-                                            <span className="text-red-400">Phobos & Deimos</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Tallest Mountain</span>
-                                            <span className="text-red-400">Olympus Mons (22km)</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Active Rovers</span>
-                                            <span className="text-green-400">Curiosity & Perseverance</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card bg-gradient-to-br from-amber-900/20 to-red-900/20">
-                                    <h3 className="font-heading text-xl text-amber-400 mb-4">🤖 Perseverance Rover</h3>
-                                    <p className="text-text-secondary text-sm mb-4">
-                                        NASA&apos;s most advanced Mars rover, searching for signs of ancient
-                                        microbial life and collecting samples for future return to Earth.
-                                    </p>
-                                    <ul className="text-sm text-text-dim space-y-2">
-                                        <li>• Landed February 18, 2021</li>
-                                        <li>• Carries Ingenuity helicopter</li>
-                                        <li>• Collecting samples in tubes</li>
-                                        <li>• Exploring Jezero Crater</li>
-                                    </ul>
                                 </div>
                             </div>
+                        </article>
 
-                        </section>
-                    </div>
-                </main>
+                        {/* Quick Facts */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="planet-card">
+                                <h3 className="font-heading text-xl text-red-400 mb-4">📊 Mars Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Size</span>
+                                        <span className="text-red-400">Half of Earth</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Day Length</span>
+                                        <span className="text-red-400">24h 37min</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Moons</span>
+                                        <span className="text-red-400">Phobos & Deimos</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Tallest Mountain</span>
+                                        <span className="text-red-400">Olympus Mons (22km)</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Active Rovers</span>
+                                        <span className="text-green-400">Curiosity & Perseverance</span>
+                                    </li>
+                                </ul>
+                            </div>
 
-                <Footer />
+                            <div className="planet-card bg-gradient-to-br from-amber-900/20 to-red-900/20">
+                                <h3 className="font-heading text-xl text-amber-400 mb-4">🤖 Perseverance Rover</h3>
+                                <p className="text-text-secondary text-sm mb-4">
+                                    NASA&apos;s most advanced Mars rover, searching for signs of ancient
+                                    microbial life and collecting samples for future return to Earth.
+                                </p>
+                                <ul className="text-sm text-text-dim space-y-2">
+                                    <li>• Landed February 18, 2021</li>
+                                    <li>• Carries Ingenuity helicopter</li>
+                                    <li>• Collecting samples in tubes</li>
+                                    <li>• Exploring Jezero Crater</li>
+                                </ul>
+                            </div>
+                        </div>
 
-                <style jsx global>{`
-                @keyframes gradient-x {
-                    0%, 100% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                }
-                .animate-gradient-x {
-                    background-size: 200% 200%;
-                    animation: gradient-x 3s ease infinite;
-                }
-            `}</style>
-            </>
-        </PlanetGuard>
+                    </section>
+                </div>
+            </main>
+
+            <Footer />
+
+            <style jsx global>{`
+            @keyframes gradient-x {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+            .animate-gradient-x {
+                background-size: 200% 200%;
+                animation: gradient-x 3s ease infinite;
+            }
+        `}</style>
+        </>
     );
 }
 

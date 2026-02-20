@@ -128,33 +128,33 @@ export default function UranusGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="uranus">
-            <>
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-                />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
 
-                <Header />
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <h1 className="font-heading text-3xl" style={{ color: '#22d3ee' }}>Uranus: Polar Night</h1>
-                                <p className="text-text-secondary font-ui">
-                                    Move during Summer. Freeze during Winter. Inspired by Squid Game!
-                                </p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-text-dim text-sm uppercase tracking-wider">Level {level}/5</p>
-                                <p className="font-heading text-2xl text-neon-purple">{score.toLocaleString()}</p>
-                            </div>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <h1 className="font-heading text-3xl" style={{ color: '#22d3ee' }}>Uranus: Polar Night</h1>
+                            <p className="text-text-secondary font-ui">
+                                Move during Summer. Freeze during Winter. Inspired by Squid Game!
+                            </p>
                         </div>
+                        <div className="text-right">
+                            <p className="text-text-dim text-sm uppercase tracking-wider">Level {level}/5</p>
+                            <p className="font-heading text-2xl text-neon-purple">{score.toLocaleString()}</p>
+                        </div>
+                    </div>
 
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="uranus">
                         <div
                             className="game-canvas-container relative touch-none"
                             onMouseMove={handleInput}
@@ -188,7 +188,7 @@ export default function UranusGamePage() {
                                             <div className="p-4 rounded-lg" style={{ background: 'rgba(59, 130, 246, 0.2)' }}>
                                                 <p className="text-2xl mb-1">❄️</p>
                                                 <p className="font-bold text-blue-400">WINTER</p>
-                                                <p className="text-sm text-text-dim">DON'T MOVE or you freeze!</p>
+                                                <p className="text-sm text-text-dim">DON&apos;T MOVE or you freeze!</p>
                                             </div>
                                         </div>
                                         <p className="text-text-secondary">
@@ -232,87 +232,87 @@ export default function UranusGamePage() {
                                 </div>
                             )}
                         </div>
+                    </PlanetGuard>
 
-                        {/* Educational Content */}
-                        <section className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2 space-y-8">
-                                <div className="planet-card">
-                                    <h2 className="font-heading text-2xl mb-4" style={{ color: '#22d3ee' }}>
-                                        The Planet of Eternal Seasons
-                                    </h2>
-                                    <div className="prose prose-invert max-w-none text-text-secondary">
-                                        <p>
-                                            Uranus is tilted 98 degrees on its axis—it essentially rolls around the Sun
-                                            on its side! This extreme tilt creates the most unusual seasons in the solar system.
+                    {/* Educational Content */}
+                    <section className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2 space-y-8">
+                            <div className="planet-card">
+                                <h2 className="font-heading text-2xl mb-4" style={{ color: '#22d3ee' }}>
+                                    The Planet of Eternal Seasons
+                                </h2>
+                                <div className="prose prose-invert max-w-none text-text-secondary">
+                                    <p>
+                                        Uranus is tilted 98 degrees on its axis—it essentially rolls around the Sun
+                                        on its side! This extreme tilt creates the most unusual seasons in the solar system.
+                                    </p>
+                                    <p>
+                                        During Uranian summer, one pole points directly at the Sun for <strong>21 Earth years</strong>.
+                                        Meanwhile, the opposite pole experiences complete darkness—a &quot;polar night&quot; that lasts
+                                        for over two decades.
+                                    </p>
+                                    <h3 className="font-heading mt-6 mb-2" style={{ color: '#a855f7' }}>The Great Collision</h3>
+                                    <p>
+                                        Why is Uranus so tilted? Scientists believe that billions of years ago, an
+                                        Earth-sized object slammed into the young planet, knocking it onto its side.
+                                        This cosmic impact also created Uranus&apos;s unusual ring system and may have
+                                        contributed to its extreme cold (-224°C).
+                                    </p>
+                                    <div className="bg-space-dark p-4 rounded-lg border-l-4 my-6" style={{ borderColor: '#22d3ee' }}>
+                                        <p className="font-ui font-bold mb-1" style={{ color: '#22d3ee' }}>GAME CONNECTION</p>
+                                        <p className="text-sm">
+                                            This game simulates the extreme seasonal changes on Uranus. When Summer comes,
+                                            you can move freely. But during the long Polar Night (Winter), you must stay
+                                            completely still—or be frozen solid!
                                         </p>
-                                        <p>
-                                            During Uranian summer, one pole points directly at the Sun for <strong>21 Earth years</strong>.
-                                            Meanwhile, the opposite pole experiences complete darkness—a "polar night" that lasts
-                                            for over two decades.
-                                        </p>
-                                        <h3 className="font-heading mt-6 mb-2" style={{ color: '#a855f7' }}>The Great Collision</h3>
-                                        <p>
-                                            Why is Uranus so tilted? Scientists believe that billions of years ago, an
-                                            Earth-sized object slammed into the young planet, knocking it onto its side.
-                                            This cosmic impact also created Uranus's unusual ring system and may have
-                                            contributed to its extreme cold (-224°C).
-                                        </p>
-                                        <div className="bg-space-dark p-4 rounded-lg border-l-4 my-6" style={{ borderColor: '#22d3ee' }}>
-                                            <p className="font-ui font-bold mb-1" style={{ color: '#22d3ee' }}>GAME CONNECTION</p>
-                                            <p className="text-sm">
-                                                This game simulates the extreme seasonal changes on Uranus. When Summer comes,
-                                                you can move freely. But during the long Polar Night (Winter), you must stay
-                                                completely still—or be frozen solid!
-                                            </p>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="space-y-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-lg mb-4" style={{ color: '#a855f7' }}>
-                                        Uranus Quick Facts
-                                    </h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Axial Tilt</span>
-                                            <span style={{ color: '#22d3ee' }}>98°</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Season Length</span>
-                                            <span style={{ color: '#22d3ee' }}>21 Earth years</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Temperature</span>
-                                            <span style={{ color: '#22d3ee' }}>-224°C</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Rings</span>
-                                            <span style={{ color: '#22d3ee' }}>13 faint rings</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card" style={{ background: 'linear-gradient(to bottom right, rgba(6, 182, 212, 0.1), rgba(15, 23, 42, 0.5))' }}>
-                                    <h3 className="font-heading text-lg mb-2" style={{ color: '#22d3ee' }}>
-                                        Did You Know?
-                                    </h3>
-                                    <p className="text-sm text-text-dim italic">
-                                        &quot;If you could stand on Uranus's north pole during summer, the Sun would
-                                        appear to spiral around the sky for 42 years without setting—followed by
-                                        42 years of complete darkness.&quot;
-                                    </p>
-                                </div>
+                        <div className="space-y-6">
+                            <div className="planet-card">
+                                <h3 className="font-heading text-lg mb-4" style={{ color: '#a855f7' }}>
+                                    Uranus Quick Facts
+                                </h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Axial Tilt</span>
+                                        <span style={{ color: '#22d3ee' }}>98°</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Season Length</span>
+                                        <span style={{ color: '#22d3ee' }}>21 Earth years</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Temperature</span>
+                                        <span style={{ color: '#22d3ee' }}>-224°C</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Rings</span>
+                                        <span style={{ color: '#22d3ee' }}>13 faint rings</span>
+                                    </li>
+                                </ul>
                             </div>
-                        </section>
 
-                    </div>
-                </main>
+                            <div className="planet-card" style={{ background: 'linear-gradient(to bottom right, rgba(6, 182, 212, 0.1), rgba(15, 23, 42, 0.5))' }}>
+                                <h3 className="font-heading text-lg mb-2" style={{ color: '#22d3ee' }}>
+                                    Did You Know?
+                                </h3>
+                                <p className="text-sm text-text-dim italic">
+                                    &quot;If you could stand on Uranus&apos;s north pole during summer, the Sun would
+                                    appear to spiral around the sky for 42 years without setting—followed by
+                                    42 years of complete darkness.&quot;
+                                </p>
+                            </div>
+                        </div>
+                    </section>
 
-                <Footer />
-            </>
-        </PlanetGuard>
+                </div>
+            </main>
+
+            <Footer />
+        </>
     );
 }
 

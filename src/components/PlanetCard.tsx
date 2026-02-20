@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Planet } from '@/lib/gameTypes';
-import { isPlanetUnlocked, loadProgress } from '@/lib/localStorage';
+import { loadProgress } from '@/lib/localStorage';
 import { useEffect, useState } from 'react';
 
 interface PlanetCardProps {

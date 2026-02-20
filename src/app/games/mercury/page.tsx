@@ -23,6 +23,7 @@ export default function MercuryGamePage() {
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -162,63 +163,63 @@ export default function MercuryGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="mercury">
-            <>
-                <Header />
+        <>
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="font-heading text-3xl text-gray-400">Mercury: Sun Chaser</h1>
-                                    <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full font-bold">2000⭐</span>
-                                </div>
-                                <p className="text-text-secondary font-ui">
-                                    Outrun the sunrise! Stay in the shadow zone to survive!
-                                </p>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="font-heading text-3xl text-gray-400">Mercury: Sun Chaser</h1>
+                                <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full font-bold">2000⭐</span>
                             </div>
-                            <div className="text-right">
-                                <p className="font-heading text-2xl text-gray-400">Level {level}</p>
-                                <p className={`font-bold ${inShadow ? 'text-green-400' : 'text-red-400'}`}>
-                                    {inShadow ? '✓ In Shadow' : '⚠️ IN SUNLIGHT!'}
-                                </p>
+                            <p className="text-text-secondary font-ui">
+                                Outrun the sunrise! Stay in the shadow zone to survive!
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="font-heading text-2xl text-gray-400">Level {level}</p>
+                            <p className={`font-bold ${inShadow ? 'text-green-400' : 'text-red-400'}`}>
+                                {inShadow ? '✓ In Shadow' : '⚠️ IN SUNLIGHT!'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Status Display */}
+                    {isPlaying && !isGameOver && (
+                        <div className="mb-4 grid grid-cols-2 gap-4">
+                            <div className={`p-3 rounded-lg ${heat > 70 ? 'bg-red-900/50 animate-pulse' : 'bg-orange-900/30'}`}>
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-orange-400 font-bold">🔥 Heat</span>
+                                    <span className={`font-bold ${heat > 70 ? 'text-red-400' : 'text-orange-400'}`}>{heat}%</span>
+                                </div>
+                                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full transition-all ${heat > 70 ? 'bg-red-500' : heat > 40 ? 'bg-orange-500' : 'bg-green-500'}`}
+                                        style={{ width: `${heat}%` }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="p-3 rounded-lg bg-purple-900/30">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-purple-400 font-bold">🛡️ Shield</span>
+                                    <span className={`font-bold ${shieldPower < 20 ? 'text-red-400' : 'text-purple-400'}`}>{shieldPower}%</span>
+                                </div>
+                                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-purple-500 transition-all"
+                                        style={{ width: `${shieldPower}%` }}
+                                    />
+                                </div>
                             </div>
                         </div>
+                    )}
 
-                        {/* Status Display */}
-                        {isPlaying && !isGameOver && (
-                            <div className="mb-4 grid grid-cols-2 gap-4">
-                                <div className={`p-3 rounded-lg ${heat > 70 ? 'bg-red-900/50 animate-pulse' : 'bg-orange-900/30'}`}>
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="text-orange-400 font-bold">🔥 Heat</span>
-                                        <span className={`font-bold ${heat > 70 ? 'text-red-400' : 'text-orange-400'}`}>{heat}%</span>
-                                    </div>
-                                    <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full transition-all ${heat > 70 ? 'bg-red-500' : heat > 40 ? 'bg-orange-500' : 'bg-green-500'}`}
-                                            style={{ width: `${heat}%` }}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="p-3 rounded-lg bg-purple-900/30">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="text-purple-400 font-bold">🛡️ Shield</span>
-                                        <span className={`font-bold ${shieldPower < 20 ? 'text-red-400' : 'text-purple-400'}`}>{shieldPower}%</span>
-                                    </div>
-                                    <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-purple-500 transition-all"
-                                            style={{ width: `${shieldPower}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="mercury">
                         <div
                             className="game-canvas-container relative cursor-pointer touch-none select-none"
                             onTouchStart={handleTouchStart}
@@ -363,109 +364,110 @@ export default function MercuryGamePage() {
                                 </div>
                             )}
                         </div>
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    </PlanetGuard>
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                            <article className="planet-card bg-gradient-to-br from-gray-900/50 to-orange-900/20">
-                                <h2 className="font-heading text-3xl text-gray-400 mb-6">
-                                    Mercury: The Swift Messenger
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        Mercury is the smallest planet and closest to the Sun. It races around
-                                        the Sun in just 88 Earth days - the fastest orbit in our solar system!
-                                        Despite being closest to the Sun, it&apos;s not the hottest (that&apos;s Venus)
-                                        because it has no atmosphere to trap heat.
+                        <article className="planet-card bg-gradient-to-br from-gray-900/50 to-orange-900/20">
+                            <h2 className="font-heading text-3xl text-gray-400 mb-6">
+                                Mercury: The Swift Messenger
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    Mercury is the smallest planet and closest to the Sun. It races around
+                                    the Sun in just 88 Earth days - the fastest orbit in our solar system!
+                                    Despite being closest to the Sun, it&apos;s not the hottest (that&apos;s Venus)
+                                    because it has no atmosphere to trap heat.
+                                </p>
+
+                                <div className="bg-orange-900/30 p-6 rounded-lg border-l-4 border-orange-500 my-8">
+                                    <p className="font-ui text-orange-400 font-bold mb-2">🎮 GAME CONNECTION</p>
+                                    <p>
+                                        In &quot;Sun Chaser,&quot; you&apos;re racing around Mercury&apos;s surface,
+                                        staying in the shadow zone to avoid the extreme heat. The game simulates
+                                        Mercury&apos;s real temperature extremes: -180°C in shadow to 430°C in
+                                        direct sunlight! The Sun&apos;s rotation catches up to you over time,
+                                        making survival increasingly difficult.
                                     </p>
-
-                                    <div className="bg-orange-900/30 p-6 rounded-lg border-l-4 border-orange-500 my-8">
-                                        <p className="font-ui text-orange-400 font-bold mb-2">🎮 GAME CONNECTION</p>
-                                        <p>
-                                            In &quot;Sun Chaser,&quot; you&apos;re racing around Mercury&apos;s surface,
-                                            staying in the shadow zone to avoid the extreme heat. The game simulates
-                                            Mercury&apos;s real temperature extremes: -180°C in shadow to 430°C in
-                                            direct sunlight! The Sun&apos;s rotation catches up to you over time,
-                                            making survival increasingly difficult.
-                                        </p>
-                                    </div>
                                 </div>
-                            </article>
+                            </div>
+                        </article>
 
-                            {/* Temperature Comparison */}
+                        {/* Temperature Comparison */}
+                        <div className="planet-card">
+                            <h3 className="font-heading text-2xl text-orange-400 mb-6">🌡️ Mercury&apos;s Extreme Temperatures</h3>
+                            <div className="flex justify-between items-end h-48 bg-gradient-to-r from-blue-900/30 via-gray-900/30 to-red-900/30 rounded-xl p-4 relative">
+                                <div className="text-center">
+                                    <div className="h-32 w-12 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-lg"></div>
+                                    <p className="text-blue-400 font-bold mt-2">-180°C</p>
+                                    <p className="text-text-dim text-xs">Shadow</p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="h-8 w-12 bg-gray-500 rounded-t-lg"></div>
+                                    <p className="text-gray-400 font-bold mt-2">0°C</p>
+                                    <p className="text-text-dim text-xs">Freezing</p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="h-24 w-12 bg-gradient-to-t from-red-500 to-orange-400 rounded-t-lg"></div>
+                                    <p className="text-red-400 font-bold mt-2">+430°C</p>
+                                    <p className="text-text-dim text-xs">Sunlight</p>
+                                </div>
+                                <div className="absolute top-2 right-2 text-xs text-text-dim">
+                                    610°C temperature swing!
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Quick Facts */}
+                        <div className="grid md:grid-cols-2 gap-6">
                             <div className="planet-card">
-                                <h3 className="font-heading text-2xl text-orange-400 mb-6">🌡️ Mercury&apos;s Extreme Temperatures</h3>
-                                <div className="flex justify-between items-end h-48 bg-gradient-to-r from-blue-900/30 via-gray-900/30 to-red-900/30 rounded-xl p-4 relative">
-                                    <div className="text-center">
-                                        <div className="h-32 w-12 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-lg"></div>
-                                        <p className="text-blue-400 font-bold mt-2">-180°C</p>
-                                        <p className="text-text-dim text-xs">Shadow</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="h-8 w-12 bg-gray-500 rounded-t-lg"></div>
-                                        <p className="text-gray-400 font-bold mt-2">0°C</p>
-                                        <p className="text-text-dim text-xs">Freezing</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="h-24 w-12 bg-gradient-to-t from-red-500 to-orange-400 rounded-t-lg"></div>
-                                        <p className="text-red-400 font-bold mt-2">+430°C</p>
-                                        <p className="text-text-dim text-xs">Sunlight</p>
-                                    </div>
-                                    <div className="absolute top-2 right-2 text-xs text-text-dim">
-                                        610°C temperature swing!
-                                    </div>
-                                </div>
+                                <h3 className="font-heading text-xl text-gray-400 mb-4">📊 Mercury Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Orbital Period</span>
+                                        <span className="text-orange-400">88 Earth days</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Day Length</span>
+                                        <span className="text-orange-400">59 Earth days</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Size</span>
+                                        <span className="text-gray-400">Smallest planet</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Moons</span>
+                                        <span className="text-gray-400">None</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Core</span>
+                                        <span className="text-orange-400">85% iron!</span>
+                                    </li>
+                                </ul>
                             </div>
 
-                            {/* Quick Facts */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-gray-400 mb-4">📊 Mercury Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Orbital Period</span>
-                                            <span className="text-orange-400">88 Earth days</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Day Length</span>
-                                            <span className="text-orange-400">59 Earth days</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Size</span>
-                                            <span className="text-gray-400">Smallest planet</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Moons</span>
-                                            <span className="text-gray-400">None</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Core</span>
-                                            <span className="text-orange-400">85% iron!</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card bg-gradient-to-br from-orange-900/20 to-yellow-900/20">
-                                    <h3 className="font-heading text-xl text-yellow-400 mb-4">☀️ Closest to the Sun</h3>
-                                    <p className="text-text-secondary text-sm mb-4">
-                                        Mercury orbits just 58 million km from the Sun - about 1/3 the distance
-                                        from Earth. The Sun appears 3 times larger in Mercury&apos;s sky!
-                                    </p>
-                                    <ul className="text-sm text-text-dim space-y-2">
-                                        <li>• No atmosphere (solar wind strips it away)</li>
-                                        <li>• Covered in impact craters</li>
-                                        <li>• Has a weak magnetic field</li>
-                                        <li>• Only visited by 2 spacecraft (Mariner 10, MESSENGER)</li>
-                                    </ul>
-                                </div>
+                            <div className="planet-card bg-gradient-to-br from-orange-900/20 to-yellow-900/20">
+                                <h3 className="font-heading text-xl text-yellow-400 mb-4">☀️ Closest to the Sun</h3>
+                                <p className="text-text-secondary text-sm mb-4">
+                                    Mercury orbits just 58 million km from the Sun - about 1/3 the distance
+                                    from Earth. The Sun appears 3 times larger in Mercury&apos;s sky!
+                                </p>
+                                <ul className="text-sm text-text-dim space-y-2">
+                                    <li>• No atmosphere (solar wind strips it away)</li>
+                                    <li>• Covered in impact craters</li>
+                                    <li>• Has a weak magnetic field</li>
+                                    <li>• Only visited by 2 spacecraft (Mariner 10, MESSENGER)</li>
+                                </ul>
                             </div>
+                        </div>
 
-                        </section>
-                    </div>
-                </main>
+                    </section>
+                </div>
+            </main>
 
-                <Footer />
+            <Footer />
 
-                <style jsx global>{`
+            <style jsx global>{`
                 @keyframes gradient-x {
                     0%, 100% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
@@ -475,8 +477,7 @@ export default function MercuryGamePage() {
                     animation: gradient-x 3s ease infinite;
                 }
             `}</style>
-            </>
-        </PlanetGuard>
+        </>
     );
 }
 

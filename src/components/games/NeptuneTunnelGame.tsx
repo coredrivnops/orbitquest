@@ -30,7 +30,9 @@ export default function NeptuneTunnelGame() {
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const playerGroupRef = useRef<THREE.Group | null>(null);
     const bulletsRef = useRef<THREE.Mesh[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const enemiesRef = useRef<any[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const particlesRef = useRef<any[]>([]);
     const tunnelRingsRef = useRef<THREE.Mesh[]>([]);
 
@@ -106,10 +108,10 @@ export default function NeptuneTunnelGame() {
         };
 
         const onClick = () => {
-            if (!gameState.isPlaying && !gameState.gameOver) {
+            if (!stateRef.current.isPlaying && !stateRef.current.gameOver) {
                 // Lock pointer on start
                 containerRef.current?.requestPointerLock();
-            } else if (gameState.isPlaying) {
+            } else if (stateRef.current.isPlaying) {
                 shoot();
             }
         };
@@ -293,12 +295,13 @@ export default function NeptuneTunnelGame() {
         };
         window.addEventListener('resize', handleResize);
 
+        const currentContainer = containerRef.current;
         return () => {
             document.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(frameId);
-            if (containerRef.current && rendererRef.current) {
-                containerRef.current.removeChild(rendererRef.current.domElement);
+            if (currentContainer && rendererRef.current) {
+                currentContainer.removeChild(rendererRef.current.domElement);
             }
             renderer.dispose();
             // Unlock pointer if component unmounts

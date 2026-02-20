@@ -142,25 +142,26 @@ export default function PlanetTooltip({ planet, children, className = '' }: Plan
     );
 }
 
+const allFacts = [
+    "If you could stand on Neptune, the winds would blow you away at 2,000 km/h — faster than the speed of sound on Earth!",
+    "One day on Venus is longer than one year on Venus. It takes 243 Earth days to rotate, but only 225 Earth days to orbit the Sun!",
+    "Saturn is so light it could float in water — if you had a bathtub big enough!",
+    "The footprints left by Apollo astronauts on the Moon will remain there for at least 100 million years.",
+    "Jupiter's Great Red Spot is a storm that's been raging for over 400 years and is bigger than Earth!",
+    "Olympus Mons on Mars is nearly three times the height of Mount Everest!",
+    "Uranus rotates on its side, so it essentially rolls around the Sun like a ball!",
+    "Mercury experiences extreme temperature swings from -180°C at night to 430°C during the day.",
+    "Earth is the only planet in our solar system with liquid water on its surface.",
+    "Pluto's largest moon, Charon, is so big that Pluto and Charon orbit each other!",
+    "The Sun contains 99.86% of all the mass in the solar system!",
+    "Light from the Sun takes about 8 minutes to reach Earth.",
+    "There are more stars in the universe than grains of sand on all of Earth's beaches.",
+    "A year on Neptune is 165 Earth years. Neptune has only completed one orbit since its discovery in 1846!",
+    "Venus is the hottest planet at 465°C, even though Mercury is closer to the Sun.",
+];
+
 // Rotating fun facts component for the bottom of the page
 export function RotatingFunFacts() {
-    const allFacts = [
-        "If you could stand on Neptune, the winds would blow you away at 2,000 km/h — faster than the speed of sound on Earth!",
-        "One day on Venus is longer than one year on Venus. It takes 243 Earth days to rotate, but only 225 Earth days to orbit the Sun!",
-        "Saturn is so light it could float in water — if you had a bathtub big enough!",
-        "The footprints left by Apollo astronauts on the Moon will remain there for at least 100 million years.",
-        "Jupiter's Great Red Spot is a storm that's been raging for over 400 years and is bigger than Earth!",
-        "Olympus Mons on Mars is nearly three times the height of Mount Everest!",
-        "Uranus rotates on its side, so it essentially rolls around the Sun like a ball!",
-        "Mercury experiences extreme temperature swings from -180°C at night to 430°C during the day.",
-        "Earth is the only planet in our solar system with liquid water on its surface.",
-        "Pluto's largest moon, Charon, is so big that Pluto and Charon orbit each other!",
-        "The Sun contains 99.86% of all the mass in the solar system!",
-        "Light from the Sun takes about 8 minutes to reach Earth.",
-        "There are more stars in the universe than grains of sand on all of Earth's beaches.",
-        "A year on Neptune is 165 Earth years. Neptune has only completed one orbit since its discovery in 1846!",
-        "Venus is the hottest planet at 465°C, even though Mercury is closer to the Sun.",
-    ];
 
     const [currentFact, setCurrentFact] = useState(allFacts[0]);
     const [isAnimating, setIsAnimating] = useState(false);

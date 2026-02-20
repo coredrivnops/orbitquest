@@ -1,5 +1,6 @@
 // Moon Game Logic - "LUNAR LANDER"
 // A retro arcade classic - land your module on the Moon!
+import { soundManager } from '@/utils/soundManager';
 
 export interface LandingZone {
     x: number;
@@ -313,6 +314,7 @@ export class MoonGameLogic {
             this.score += 500;
             this.fuel = Math.min(this.maxFuel, this.fuel + 30);
             this.createCelebration();
+            soundManager.playLevelUp();
         }
 
         setTimeout(() => {
@@ -364,6 +366,7 @@ export class MoonGameLogic {
             this.landerVX += thrustX;
             this.landerVY += thrustY;
             this.fuel -= this.fuelConsumption;
+            soundManager.playThrust();
 
             // Thrust particles
             if (Math.random() > 0.3) {
@@ -404,6 +407,7 @@ export class MoonGameLogic {
                 canister.collected = true;
                 this.fuel = Math.min(this.maxFuel, this.fuel + 25);
                 this.createCollectEffect(canister.x, canister.y);
+                soundManager.playCollect();
             }
         });
 
@@ -442,12 +446,14 @@ export class MoonGameLogic {
                     this.sessionStardust += earned;
                 }
 
+                soundManager.playLevelUp();
                 this.createLandingEffect();
             } else {
                 // Crash!
                 this.isCrashed = true;
                 this.screenShake = 20;
                 this.createCrashEffect();
+                soundManager.playCrash();
             }
 
             this.landerVX = 0;

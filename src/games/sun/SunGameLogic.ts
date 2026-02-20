@@ -1,5 +1,6 @@
 // Sun Game Logic - "SOLAR SHOWDOWN"
 // Final Boss arcade shooter - defend the Sun from aliens!
+import { soundManager } from '@/utils/soundManager';
 
 interface Alien {
     id: number;
@@ -206,6 +207,7 @@ export class SunGameLogic {
         if (this.shootCooldown > 0 || this.showTrivia) return;
 
         this.shootCooldown = this.rapidFireActive ? 5 : 12;
+        soundManager.playShoot();
         const bulletSpeed = 15;
 
         if (this.multiShotActive) {
@@ -291,6 +293,7 @@ export class SunGameLogic {
             this.score += 300;
             this.stardustCollected += 15;
             this.lives = Math.min(5, this.lives + 1);
+            soundManager.playLevelUp();
         }
 
         setTimeout(() => {
@@ -453,6 +456,7 @@ export class SunGameLogic {
                     proj.damage = 0;
                     this.screenShake = 8;
                     this.createExplosion(this.playerX, this.playerY, 20);
+                    soundManager.playCrash();
 
                     if (this.lives <= 0) {
                         this.isGameOver = true;
@@ -473,6 +477,7 @@ export class SunGameLogic {
                     alien.health = 0;
                     this.screenShake = 12;
                     this.createExplosion(alien.x, alien.y, alien.size);
+                    soundManager.playCrash();
 
                     if (this.lives <= 0) {
                         this.isGameOver = true;
@@ -518,6 +523,7 @@ export class SunGameLogic {
                         this.aliens = [];
                         break;
                 }
+                soundManager.playCollect();
                 return false;
             }
             return true;
@@ -525,6 +531,7 @@ export class SunGameLogic {
     }
 
     createExplosion(x: number, y: number, size: number) {
+        soundManager.playExplosion();
         for (let i = 0; i < size; i++) {
             const angle = Math.random() * Math.PI * 2;
             const speed = 2 + Math.random() * 4;

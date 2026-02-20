@@ -18,7 +18,7 @@ export default function PrivacyPage() {
 
                     <div className="prose prose-invert max-w-none space-y-8 text-text-secondary">
                         <p className="text-text-dim text-sm">
-                            Last Updated: January 2026
+                            Last Updated: February 2026
                         </p>
 
                         <section>
@@ -136,7 +136,9 @@ export default function PrivacyPage() {
                             </p>
                             <ul className="list-disc list-inside mt-4 space-y-2">
                                 <li>
-                                    <strong>Google AdSense:</strong> For displaying advertisements.{' '}
+                                    <strong>Google Analytics (GA4):</strong> For understanding how visitors use our site,
+                                    including pages visited, time spent, and anonymous usage statistics. Google Analytics
+                                    uses cookies and collects anonymized IP addresses.{' '}
                                     <a
                                         href="https://policies.google.com/privacy"
                                         className="text-neon-cyan hover:underline"
@@ -144,6 +146,18 @@ export default function PrivacyPage() {
                                         rel="noopener noreferrer"
                                     >
                                         Google Privacy Policy
+                                    </a>
+                                </li>
+                                <li>
+                                    <strong>Google AdSense:</strong> For displaying advertisements. Google AdSense
+                                    uses cookies to serve ads based on your browsing history.{' '}
+                                    <a
+                                        href="https://policies.google.com/technologies/ads"
+                                        className="text-neon-cyan hover:underline"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Google Ads Policy
                                     </a>
                                 </li>
                             </ul>

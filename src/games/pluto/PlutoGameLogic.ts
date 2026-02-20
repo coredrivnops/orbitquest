@@ -1,5 +1,6 @@
 // Pluto Game Logic - "ORBIT DEFENDER"
 // A retro twin-stick shooter where Pluto defends against Kuiper Belt invaders
+import { soundManager } from '@/utils/soundManager';
 
 export interface Projectile {
     x: number;
@@ -301,6 +302,7 @@ export class PlutoGameLogic {
                 type: 'spark',
             });
         }
+        soundManager.playShoot();
     }
 
     answerTrivia(index: number) {
@@ -326,6 +328,7 @@ export class PlutoGameLogic {
             }
 
             this.createExplosion(this.centerX, this.centerY, '#00ff88', 30);
+            soundManager.playLevelUp(); // Celebration sound for correct answer
         }
 
         setTimeout(() => {
@@ -433,10 +436,12 @@ export class PlutoGameLogic {
                 break;
             case 'heart':
                 this.heartShield = true;
+                soundManager.playShield();
                 break;
         }
 
         this.createExplosion(powerUp.x, powerUp.y, '#ffffff', 20);
+        soundManager.playCollect(); // Powerup collect sound
     }
 
     update() {
@@ -550,6 +555,7 @@ export class PlutoGameLogic {
 
                         this.enemies.splice(i, 1);
                         this.screenShake = 5;
+                        soundManager.playExplosion();
                     }
                     return false; // Remove projectile
                 }
@@ -581,6 +587,8 @@ export class PlutoGameLogic {
                     moon.respawnTimer = 600; // 10 seconds
                     this.createExplosion(enemy.x, enemy.y, moon.color, 25);
                     this.createExplosion(moonX, moonY, '#ff4444', 15);
+                    soundManager.playShield(); // Shield hit/break sound
+                    soundManager.playExplosion();
 
                     // Remove enemy
                     const idx = this.enemies.indexOf(enemy);
@@ -600,6 +608,7 @@ export class PlutoGameLogic {
                     // Heart shield protects once
                     this.heartShield = false;
                     this.createExplosion(enemy.x, enemy.y, '#ff69b4', 30);
+                    soundManager.playShield(); // Shield break
                     const idx = this.enemies.indexOf(enemy);
                     if (idx > -1) this.enemies.splice(idx, 1);
                     this.screenShake = 15;
@@ -608,6 +617,7 @@ export class PlutoGameLogic {
                     this.isGameOver = true;
                     this.createExplosion(this.centerX, this.centerY, '#ff4444', 50);
                     this.screenShake = 30;
+                    soundManager.playCrash(); // Game over crash
                 }
             }
         });

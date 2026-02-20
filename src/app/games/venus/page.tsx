@@ -23,6 +23,7 @@ export default function VenusGamePage() {
 
     // Trivia state
     const [showTrivia, setShowTrivia] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [triviaQuestion, setTriviaQuestion] = useState<any>(null);
     const [triviaAnswered, setTriviaAnswered] = useState(false);
     const [triviaCorrect, setTriviaCorrect] = useState(false);
@@ -41,8 +42,8 @@ export default function VenusGamePage() {
 
         const rect = e.currentTarget.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 1280;
-        const y = ((e.clientY - rect.top) / rect.height) * 720;
-        game.handleInput(x, y);
+        // const y is unused
+        game.handleInput(x);
     }, [isPlaying, showTrivia]);
 
     const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
@@ -52,8 +53,8 @@ export default function VenusGamePage() {
         if (e.touches.length > 0) {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = ((e.touches[0].clientX - rect.left) / rect.width) * 1280;
-            const y = ((e.touches[0].clientY - rect.top) / rect.height) * 720;
-            game.handleInput(x, y);
+            // const y is unused
+            game.handleInput(x);
         }
     }, [isPlaying, showTrivia]);
 
@@ -136,65 +137,65 @@ export default function VenusGamePage() {
     };
 
     return (
-        <PlanetGuard planetId="venus">
-            <>
-                <Header />
+        <>
+            <Header />
 
-                <main className="flex-1 py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                        {/* Game Header */}
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h1 className="font-heading text-3xl text-orange-400">Venus: Pressure Drop</h1>
-                                    <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full font-bold">150⭐</span>
+                    {/* Game Header */}
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="font-heading text-3xl text-orange-400">Venus: Pressure Drop</h1>
+                                <span className="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full font-bold">150⭐</span>
+                            </div>
+                            <p className="text-text-secondary font-ui">
+                                Descend through Venus&apos;s crushing atmosphere!
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="font-heading text-2xl text-orange-400">{depth}km</p>
+                            <p className="text-yellow-400">{currentLayer}</p>
+                        </div>
+                    </div>
+
+                    {/* Status Display */}
+                    {isPlaying && !isGameOver && (
+                        <div className="mb-4 flex gap-4 items-center justify-between bg-gradient-to-r from-orange-900/30 to-red-900/30 p-3 rounded-lg">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-text-dim">HULL:</span>
+                                    <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all ${hullIntegrity > 50 ? 'bg-green-500' : hullIntegrity > 25 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                            style={{ width: `${hullIntegrity}%` }}
+                                        ></div>
+                                    </div>
+                                    <span className={`font-bold ${hullIntegrity > 50 ? 'text-green-400' : hullIntegrity > 25 ? 'text-yellow-400' : 'text-red-400'}`}>{hullIntegrity}%</span>
                                 </div>
-                                <p className="text-text-secondary font-ui">
-                                    Descend through Venus&apos;s crushing atmosphere!
-                                </p>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-text-dim">🌡️</span>
+                                    <div className="w-24 h-4 bg-gray-700 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 transition-all"
+                                            style={{ width: `${temperature}%` }}
+                                        ></div>
+                                    </div>
+                                    <span className={`font-bold ${temperature < 50 ? 'text-green-400' : temperature < 80 ? 'text-yellow-400' : 'text-red-400'}`}>{temperature}°</span>
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <span className="text-white font-bold text-lg">📡 {dataProbes} Data Probes</span>
                             </div>
                             <div className="text-right">
-                                <p className="font-heading text-2xl text-orange-400">{depth}km</p>
-                                <p className="text-yellow-400">{currentLayer}</p>
+                                <span className="text-yellow-400">⭐ {earnedStardust}</span>
                             </div>
                         </div>
+                    )}
 
-                        {/* Status Display */}
-                        {isPlaying && !isGameOver && (
-                            <div className="mb-4 flex gap-4 items-center justify-between bg-gradient-to-r from-orange-900/30 to-red-900/30 p-3 rounded-lg">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-text-dim">HULL:</span>
-                                        <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full transition-all ${hullIntegrity > 50 ? 'bg-green-500' : hullIntegrity > 25 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                                style={{ width: `${hullIntegrity}%` }}
-                                            ></div>
-                                        </div>
-                                        <span className={`font-bold ${hullIntegrity > 50 ? 'text-green-400' : hullIntegrity > 25 ? 'text-yellow-400' : 'text-red-400'}`}>{hullIntegrity}%</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-text-dim">🌡️</span>
-                                        <div className="w-24 h-4 bg-gray-700 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 transition-all"
-                                                style={{ width: `${temperature}%` }}
-                                            ></div>
-                                        </div>
-                                        <span className={`font-bold ${temperature < 50 ? 'text-green-400' : temperature < 80 ? 'text-yellow-400' : 'text-red-400'}`}>{temperature}°</span>
-                                    </div>
-                                </div>
-                                <div className="text-center">
-                                    <span className="text-white font-bold text-lg">📡 {dataProbes} Data Probes</span>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-yellow-400">⭐ {earnedStardust}</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Game Container */}
+                    {/* Game Container */}
+                    <PlanetGuard planetId="venus">
                         <div
                             className="game-canvas-container relative cursor-pointer touch-none select-none"
                             onMouseMove={handleMouseMove}
@@ -358,117 +359,118 @@ export default function VenusGamePage() {
                                 </div>
                             )}
                         </div>
-                        {/* Educational Content */}
-                        <section className="mt-8 space-y-12">
+                    </PlanetGuard>
+                    {/* Educational Content */}
+                    <section className="mt-8 space-y-12">
 
-                            <article className="planet-card bg-gradient-to-br from-orange-900/30 to-red-900/20">
-                                <h2 className="font-heading text-3xl text-orange-400 mb-6">
-                                    🔥 Venus: Earth&apos;s Evil Twin
-                                </h2>
-                                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                                    <p className="text-lg">
-                                        Venus is often called Earth&apos;s twin because of its similar size, but the
-                                        similarities end there. Venus has a <strong>runaway greenhouse effect</strong> that
-                                        makes it the hottest planet in our solar system - even hotter than Mercury!
+                        <article className="planet-card bg-gradient-to-br from-orange-900/30 to-red-900/20">
+                            <h2 className="font-heading text-3xl text-orange-400 mb-6">
+                                🔥 Venus: Earth&apos;s Evil Twin
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
+                                <p className="text-lg">
+                                    Venus is often called Earth&apos;s twin because of its similar size, but the
+                                    similarities end there. Venus has a <strong>runaway greenhouse effect</strong> that
+                                    makes it the hottest planet in our solar system - even hotter than Mercury!
+                                </p>
+
+                                <div className="bg-red-900/30 p-6 rounded-lg border-l-4 border-red-500 my-8">
+                                    <p className="font-ui text-red-400 font-bold mb-2">🎮 GAME CONNECTION</p>
+                                    <p>
+                                        In &quot;Pressure Drop,&quot; you&apos;re experiencing what any probe descending into
+                                        Venus would face: crushing pressure that increases 92x as you descend,
+                                        temperatures hot enough to melt lead, and clouds of sulfuric acid. The
+                                        Soviet Venera probes only survived 23-127 minutes on the surface!
                                     </p>
+                                </div>
+                            </div>
+                        </article>
 
-                                    <div className="bg-red-900/30 p-6 rounded-lg border-l-4 border-red-500 my-8">
-                                        <p className="font-ui text-red-400 font-bold mb-2">🎮 GAME CONNECTION</p>
-                                        <p>
-                                            In &quot;Pressure Drop,&quot; you&apos;re experiencing what any probe descending into
-                                            Venus would face: crushing pressure that increases 92x as you descend,
-                                            temperatures hot enough to melt lead, and clouds of sulfuric acid. The
-                                            Soviet Venera probes only survived 23-127 minutes on the surface!
-                                        </p>
+                        {/* Atmosphere Layers */}
+                        <div className="planet-card">
+                            <h3 className="font-heading text-2xl text-orange-400 mb-6">🌫️ Venus Atmosphere Layers</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-4 p-3 rounded-lg bg-yellow-200/10">
+                                    <div className="w-4 h-4 rounded-full bg-yellow-200"></div>
+                                    <div>
+                                        <p className="text-yellow-200 font-bold">Upper Clouds (65-70 km)</p>
+                                        <p className="text-text-dim text-sm">Lightning storms, sulfuric acid droplets, UV absorption</p>
                                     </div>
                                 </div>
-                            </article>
+                                <div className="flex items-center gap-4 p-3 rounded-lg bg-yellow-400/10">
+                                    <div className="w-4 h-4 rounded-full bg-yellow-400"></div>
+                                    <div>
+                                        <p className="text-yellow-400 font-bold">Middle Clouds (50-55 km)</p>
+                                        <p className="text-text-dim text-sm">Most Earth-like! NASA proposes floating cities here</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 p-3 rounded-lg bg-orange-500/10">
+                                    <div className="w-4 h-4 rounded-full bg-orange-500"></div>
+                                    <div>
+                                        <p className="text-orange-400 font-bold">Lower Clouds (35-45 km)</p>
+                                        <p className="text-text-dim text-sm">Dense cloud layer, extreme heat begins</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 p-3 rounded-lg bg-red-500/10">
+                                    <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                                    <div>
+                                        <p className="text-red-400 font-bold">Deep Atmosphere (0-35 km)</p>
+                                        <p className="text-text-dim text-sm">Crushing pressure, 465°C surface, volcanic activity</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                            {/* Atmosphere Layers */}
+                        {/* Quick Facts */}
+                        <div className="grid md:grid-cols-2 gap-6">
                             <div className="planet-card">
-                                <h3 className="font-heading text-2xl text-orange-400 mb-6">🌫️ Venus Atmosphere Layers</h3>
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-4 p-3 rounded-lg bg-yellow-200/10">
-                                        <div className="w-4 h-4 rounded-full bg-yellow-200"></div>
-                                        <div>
-                                            <p className="text-yellow-200 font-bold">Upper Clouds (65-70 km)</p>
-                                            <p className="text-text-dim text-sm">Lightning storms, sulfuric acid droplets, UV absorption</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4 p-3 rounded-lg bg-yellow-400/10">
-                                        <div className="w-4 h-4 rounded-full bg-yellow-400"></div>
-                                        <div>
-                                            <p className="text-yellow-400 font-bold">Middle Clouds (50-55 km)</p>
-                                            <p className="text-text-dim text-sm">Most Earth-like! NASA proposes floating cities here</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4 p-3 rounded-lg bg-orange-500/10">
-                                        <div className="w-4 h-4 rounded-full bg-orange-500"></div>
-                                        <div>
-                                            <p className="text-orange-400 font-bold">Lower Clouds (35-45 km)</p>
-                                            <p className="text-text-dim text-sm">Dense cloud layer, extreme heat begins</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4 p-3 rounded-lg bg-red-500/10">
-                                        <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                                        <div>
-                                            <p className="text-red-400 font-bold">Deep Atmosphere (0-35 km)</p>
-                                            <p className="text-text-dim text-sm">Crushing pressure, 465°C surface, volcanic activity</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 className="font-heading text-xl text-orange-400 mb-4">📊 Venus Facts</h3>
+                                <ul className="space-y-3 text-sm text-text-secondary">
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Surface temperature</span>
+                                        <span className="text-red-400">465°C (900°F)</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Surface pressure</span>
+                                        <span className="text-orange-400">92 atmospheres</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Day length</span>
+                                        <span className="text-yellow-400">243 Earth days</span>
+                                    </li>
+                                    <li className="flex justify-between border-b border-white/10 pb-2">
+                                        <span>Rotation direction</span>
+                                        <span className="text-yellow-400">Retrograde (backwards!)</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Cloud composition</span>
+                                        <span className="text-green-400">Sulfuric acid (H₂SO₄)</span>
+                                    </li>
+                                </ul>
                             </div>
 
-                            {/* Quick Facts */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="planet-card">
-                                    <h3 className="font-heading text-xl text-orange-400 mb-4">📊 Venus Facts</h3>
-                                    <ul className="space-y-3 text-sm text-text-secondary">
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Surface temperature</span>
-                                            <span className="text-red-400">465°C (900°F)</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Surface pressure</span>
-                                            <span className="text-orange-400">92 atmospheres</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Day length</span>
-                                            <span className="text-yellow-400">243 Earth days</span>
-                                        </li>
-                                        <li className="flex justify-between border-b border-white/10 pb-2">
-                                            <span>Rotation direction</span>
-                                            <span className="text-yellow-400">Retrograde (backwards!)</span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                            <span>Cloud composition</span>
-                                            <span className="text-green-400">Sulfuric acid (H₂SO₄)</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div className="planet-card bg-gradient-to-br from-red-900/20 to-orange-900/20">
-                                    <h3 className="font-heading text-xl text-red-400 mb-4">☠️ Why Venus is Deadly</h3>
-                                    <p className="text-text-secondary text-sm mb-4">
-                                        Any spacecraft landing on Venus faces extreme challenges:
-                                    </p>
-                                    <ul className="text-sm text-text-dim space-y-2">
-                                        <li>• Pressure crushes steel like paper</li>
-                                        <li>• Heat melts electronics</li>
-                                        <li>• Acid corrodes metal</li>
-                                        <li>• Dense atmosphere blocks solar power</li>
-                                        <li>• Venera probes survived only 23-127 min</li>
-                                    </ul>
-                                </div>
+                            <div className="planet-card bg-gradient-to-br from-red-900/20 to-orange-900/20">
+                                <h3 className="font-heading text-xl text-red-400 mb-4">☠️ Why Venus is Deadly</h3>
+                                <p className="text-text-secondary text-sm mb-4">
+                                    Any spacecraft landing on Venus faces extreme challenges:
+                                </p>
+                                <ul className="text-sm text-text-dim space-y-2">
+                                    <li>• Pressure crushes steel like paper</li>
+                                    <li>• Heat melts electronics</li>
+                                    <li>• Acid corrodes metal</li>
+                                    <li>• Dense atmosphere blocks solar power</li>
+                                    <li>• Venera probes survived only 23-127 min</li>
+                                </ul>
                             </div>
+                        </div>
 
-                        </section>
-                    </div>
-                </main>
+                    </section>
+                </div>
+            </main>
 
-                <Footer />
+            <Footer />
 
-                <style jsx global>{`
+            <style jsx global>{`
                 @keyframes gradient-x {
                     0%, 100% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
@@ -478,8 +480,7 @@ export default function VenusGamePage() {
                     animation: gradient-x 3s ease infinite;
                 }
             `}</style>
-            </>
-        </PlanetGuard>
+        </>
     );
 }
 
