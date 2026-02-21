@@ -305,17 +305,17 @@ export class JupiterGameLogic {
         }, 2500);
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver || this.isPaused) return;
         if (this.showTrivia) return;
 
         this.gameTime++;
-        this.backgroundOffset += this.gameSpeed * 0.3;
-        this.redSpotPulse += 0.03;
+        this.backgroundOffset += this.gameSpeed * 0.3 * deltaTime;
+        this.redSpotPulse += 0.03 * deltaTime;
 
         // Slow mode decay
         if (this.slowModeTimer > 0) {
-            this.slowModeTimer--;
+            this.slowModeTimer -= deltaTime;
             this.gameSpeed = this.baseSpeed * 0.5;
         } else {
             // Gradually increase speed
@@ -323,20 +323,20 @@ export class JupiterGameLogic {
         }
 
         // Update distance
-        this.distance += this.gameSpeed;
+        this.distance += this.gameSpeed * deltaTime;
 
         // Player physics - simple gravity
         if (this.isRising) {
-            this.playerVy += this.RISE_POWER;
+            this.playerVy += this.RISE_POWER * deltaTime;
         } else {
-            this.playerVy += this.GRAVITY;
+            this.playerVy += this.GRAVITY * deltaTime;
         }
 
         // Clamp velocity
         this.playerVy = Math.max(this.MAX_RISE_SPEED, Math.min(this.MAX_FALL_SPEED, this.playerVy));
 
         // Apply velocity
-        this.playerY += this.playerVy;
+        this.playerY += this.playerVy * deltaTime;
 
         // Boundary collision
         if (this.playerY < 40) {
@@ -350,27 +350,27 @@ export class JupiterGameLogic {
 
         // Shield timer
         if (this.shieldTimer > 0) {
-            this.shieldTimer--;
+            this.shieldTimer -= deltaTime;
             if (this.shieldTimer <= 0) this.hasShield = false;
         }
 
         // Magnet timer
         if (this.magnetTimer > 0) {
-            this.magnetTimer--;
+            this.magnetTimer -= deltaTime;
             if (this.magnetTimer <= 0) this.hasMagnet = false;
         }
 
         // Combo decay
         if (this.comboTimer > 0) {
-            this.comboTimer--;
+            this.comboTimer -= deltaTime;
             if (this.comboTimer <= 0) this.combo = Math.max(1, this.combo - 0.5);
         }
 
         // Screen shake decay
-        if (this.screenShake > 0) this.screenShake *= 0.9;
+        if (this.screenShake > 0) this.screenShake *= Math.pow(0.9, deltaTime);
 
         // Spawn storms
-        this.stormTimer--;
+        this.stormTimer -= deltaTime;
         if (this.stormTimer <= 0) {
             this.spawnStorm();
             // Gradually spawn more frequently
@@ -378,14 +378,14 @@ export class JupiterGameLogic {
         }
 
         // Spawn stardust
-        this.stardustTimer--;
+        this.stardustTimer -= deltaTime;
         if (this.stardustTimer <= 0) {
             this.spawnStardust();
             this.stardustTimer = 30;
         }
 
         // Spawn moon power-ups
-        this.moonTimer--;
+        this.moonTimer -= deltaTime;
         if (this.moonTimer <= 0) {
             this.spawnMoonPowerUp();
             this.moonTimer = 400 + Math.floor(Math.random() * 200);
@@ -410,7 +410,7 @@ export class JupiterGameLogic {
 
         // Update cloud bands
         this.cloudBands.forEach(band => {
-            band.offset += band.speed;
+            band.offset += band.speed * deltaTime;
         });
 
         // Trivia trigger every 2000 points

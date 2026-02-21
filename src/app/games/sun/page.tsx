@@ -114,7 +114,7 @@ export default function SunGamePage() {
         };
     }, []);
 
-    const handleGameLoop = useCallback((ctx: CanvasRenderingContext2D, frameCount: number) => {
+    const handleGameLoop = useCallback((ctx: CanvasRenderingContext2D, frameCount: number, deltaTime: number) => {
         if (!gameLogicRef.current) {
             gameLogicRef.current = new SunGameLogic(1280, 720);
         }
@@ -133,7 +133,7 @@ export default function SunGamePage() {
         if (keys.has('s') || keys.has('arrowdown')) game.handleInput('down');
         if (keys.has(' ')) game.handleInput('shoot');
 
-        game.update();
+        game.update(deltaTime);
         game.draw(ctx);
 
         // Sync state every 6 frames

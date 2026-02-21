@@ -277,18 +277,18 @@ export class NeptuneGameLogic {
         }, 2500);
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver) return;
         if (this.showTrivia) return;
 
         this.gameTime++;
 
         // Speed decay (naturally slows down)
-        this.playerSpeed = Math.max(this.baseSpeed * 0.8, this.playerSpeed - 0.5);
+        this.playerSpeed = Math.max(this.baseSpeed * 0.8, this.playerSpeed - 0.5 * deltaTime);
 
         // Update distance based on speed
         const speedFactor = this.playerSpeed / this.baseSpeed;
-        this.distance += speedFactor * 2;
+        this.distance += speedFactor * 2 * deltaTime;
 
         // Calculate Mach number (speed of sound is ~343 m/s, we use game units)
         this.machNumber = this.playerSpeed / 343;
@@ -302,11 +302,11 @@ export class NeptuneGameLogic {
             this.sonicBoomCooldown = 120;
             soundManager.playExplosion(); // Sonic boom sound
         }
-        this.sonicBoomCooldown = Math.max(0, this.sonicBoomCooldown - 1);
+        this.sonicBoomCooldown = Math.max(0, this.sonicBoomCooldown - deltaTime);
 
         // Player vertical movement
-        this.playerY += this.playerVy;
-        this.playerVy *= 0.92; // Friction
+        this.playerY += this.playerVy * deltaTime;
+        this.playerVy *= Math.pow(0.92, deltaTime); // Friction
         this.playerY = Math.max(60, Math.min(this.height - 60, this.playerY));
 
         // Score based on speed
@@ -315,7 +315,7 @@ export class NeptuneGameLogic {
         }
 
         // Combo decay
-        this.comboTimer++;
+        this.comboTimer += deltaTime;
         if (this.comboTimer > 180) {
             this.combo = Math.max(1, this.combo - 0.5);
             this.comboTimer = 0;
@@ -328,21 +328,21 @@ export class NeptuneGameLogic {
         }
 
         // Spawn wind currents
-        this.windTimer++;
+        this.windTimer += deltaTime;
         if (this.windTimer > 90) {
             this.spawnWindCurrent();
             this.windTimer = 0;
         }
 
         // Spawn diamonds
-        this.diamondTimer++;
+        this.diamondTimer += deltaTime;
         if (this.diamondTimer > 45) {
             this.spawnDiamond();
             this.diamondTimer = 0;
         }
 
         // Spawn obstacles (more as speed increases)
-        this.obstacleTimer++;
+        this.obstacleTimer += deltaTime;
         const obstacleInterval = Math.max(40, 80 - Math.floor(this.distance / 500));
         if (this.obstacleTimer > obstacleInterval) {
             this.spawnObstacle();
@@ -365,10 +365,10 @@ export class NeptuneGameLogic {
         this.updateSpeedLines();
 
         // Update auroras
-        this.auroras.forEach(a => a.phase += a.speed);
+        this.auroras.forEach(a => a.phase += a.speed * deltaTime);
 
         // Screen shake decay
-        this.screenShake *= 0.9;
+        this.screenShake *= Math.pow(0.9, deltaTime);
     }
 
     triggerTrivia() {

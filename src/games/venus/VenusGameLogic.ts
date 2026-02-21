@@ -347,12 +347,12 @@ export class VenusGameLogic {
         });
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.showTrivia || this.isGameOver) return;
 
         this.gameTime++;
-        this.depth += this.descentSpeed;
-        this.backgroundOffset = (this.backgroundOffset + this.descentSpeed * 0.5) % 100;
+        this.depth += this.descentSpeed * deltaTime;
+        this.backgroundOffset = (this.backgroundOffset + this.descentSpeed * 0.5 * deltaTime) % 100;
 
         const layer = this.getCurrentLayer();
         this.currentLayer = ATMOSPHERE_LAYERS.indexOf(layer);
@@ -362,32 +362,32 @@ export class VenusGameLogic {
 
         // Timers
         if (this.shieldTimer > 0) {
-            this.shieldTimer--;
+            this.shieldTimer -= deltaTime;
             if (this.shieldTimer <= 0) {
                 this.shieldActive = false;
             }
         }
 
         if (this.coolingPower > 0) {
-            this.coolingPower--;
-            this.temperature = Math.max(0, this.temperature - 0.5);
+            this.coolingPower -= deltaTime;
+            this.temperature = Math.max(0, this.temperature - 0.5 * deltaTime);
         }
 
         if (this.comboTimer > 0) {
-            this.comboTimer--;
+            this.comboTimer -= deltaTime;
             if (this.comboTimer <= 0) {
                 this.combo = 1;
             }
         }
 
-        if (this.warningFlash > 0) this.warningFlash -= 0.05;
-        if (this.screenShake > 0) this.screenShake *= 0.9;
-        if (this.lightningFlash > 0) this.lightningFlash -= 0.1;
+        if (this.warningFlash > 0) this.warningFlash -= 0.05 * deltaTime;
+        if (this.screenShake > 0) this.screenShake *= Math.pow(0.9, deltaTime);
+        if (this.lightningFlash > 0) this.lightningFlash -= 0.1 * deltaTime;
 
         // Temperature increases based on depth
         const heatRate = layer.pressureMultiplier * 0.1;
         if (!this.shieldActive && this.coolingPower <= 0) {
-            this.temperature = Math.min(this.maxTemperature, this.temperature + heatRate);
+            this.temperature = Math.min(this.maxTemperature, this.temperature + heatRate * deltaTime);
         }
 
         // Lightning in upper layer
@@ -397,28 +397,28 @@ export class VenusGameLogic {
         }
 
         // Player movement
-        this.playerX += this.playerVx;
-        this.playerVx *= 0.92;
+        this.playerX += this.playerVx * deltaTime;
+        this.playerVx *= Math.pow(0.92, deltaTime);
 
         // Clamp to bounds
         this.playerX = Math.max(this.playerRadius, Math.min(this.width - this.playerRadius, this.playerX));
 
         // Spawn hazards
-        this.spawnTimer--;
+        this.spawnTimer -= deltaTime;
         if (this.spawnTimer <= 0) {
             this.spawnHeatVent();
             this.spawnTimer = Math.max(40, 100 - Math.floor(this.depth / 2000));
         }
 
         // Spawn collectibles
-        this.collectibleTimer--;
+        this.collectibleTimer -= deltaTime;
         if (this.collectibleTimer <= 0) {
             this.spawnCollectible();
             this.collectibleTimer = 40;
         }
 
         // Spawn acid clouds
-        this.cloudTimer--;
+        this.cloudTimer -= deltaTime;
         if (this.cloudTimer <= 0 && this.currentLayer >= 1) {
             this.spawnAcidCloud();
             this.cloudTimer = 80;
@@ -426,8 +426,8 @@ export class VenusGameLogic {
 
         // Update heat vents
         this.heatVents = this.heatVents.filter(vent => {
-            vent.y += this.descentSpeed * 1.2;
-            vent.timer++;
+            vent.y += this.descentSpeed * 1.2 * deltaTime;
+            vent.timer += deltaTime;
 
             // Pulsing heat
             vent.active = Math.sin(vent.timer * 0.05) > 0;
@@ -438,7 +438,7 @@ export class VenusGameLogic {
                     this.playerX < vent.x + vent.width + 10 + this.playerRadius &&
                     this.playerY > vent.y - this.playerRadius &&
                     this.playerY < vent.y + vent.height + this.playerRadius) {
-                    this.temperature = Math.min(this.maxTemperature, this.temperature + 2);
+                    this.temperature = Math.min(this.maxTemperature, this.temperature + 2 * deltaTime);
                     this.createHeatParticles(this.playerX, this.playerY);
                 }
             }
@@ -448,8 +448,8 @@ export class VenusGameLogic {
 
         // Update acid clouds
         this.acidClouds = this.acidClouds.filter(cloud => {
-            cloud.y += this.descentSpeed + cloud.speed;
-            cloud.x += Math.sin(cloud.y * 0.01) * 2;
+            cloud.y += (this.descentSpeed + cloud.speed) * deltaTime;
+            cloud.x += Math.sin(cloud.y * 0.01) * 2 * deltaTime;
 
             // Check collision
             const dx = this.playerX - cloud.x;
@@ -457,7 +457,7 @@ export class VenusGameLogic {
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist < cloud.radius + this.playerRadius && !this.shieldActive) {
-                this.hullIntegrity -= 0.5;
+                this.hullIntegrity -= 0.5 * deltaTime;
                 this.createAcidParticles(this.playerX, this.playerY);
                 if (Math.random() < 0.1) soundManager.playCrash(); // Occasional sound for continuous damage
             }
@@ -467,8 +467,8 @@ export class VenusGameLogic {
 
         // Update collectibles
         this.collectibles = this.collectibles.filter(col => {
-            col.y += this.descentSpeed;
-            col.pulsePhase += 0.1;
+            col.y += this.descentSpeed * deltaTime;
+            col.pulsePhase += 0.1 * deltaTime;
 
             // Check collision
             const dx = this.playerX - col.x;
@@ -514,15 +514,15 @@ export class VenusGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy + this.descentSpeed * 0.5;
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += (p.vy + this.descentSpeed * 0.5) * deltaTime;
+            p.life -= deltaTime;
             return p.life > 0;
         });
 
         // Check damage from overheating
         if (this.temperature >= this.maxTemperature) {
-            this.hullIntegrity -= 0.5;
+            this.hullIntegrity -= 0.5 * deltaTime;
             this.warningFlash = Math.max(this.warningFlash, 0.5);
         }
 

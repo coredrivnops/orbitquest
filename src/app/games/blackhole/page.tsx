@@ -99,12 +99,12 @@ export default function BlackHoleGamePage() {
         }
     }, [isPlaying]);
 
-    const handleGameLoop = (ctx: CanvasRenderingContext2D, frameCount: number) => {
+    const handleGameLoop = (ctx: CanvasRenderingContext2D, frameCount: number, deltaTime: number) => {
         const game = gameLogicRef.current;
         if (!game) return;
 
         if (isPlaying && !isGameOver) {
-            game.update();
+            game.update(deltaTime);
         }
         game.draw(ctx);
 

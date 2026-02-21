@@ -273,13 +273,13 @@ export class BlackHoleGameLogic {
         });
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver) return;
 
         // Handle trivia pause
         if (this.isPaused && this.showTrivia) {
             if (this.triviaAnswered) {
-                this.triviaFeedbackTimer--;
+                this.triviaFeedbackTimer -= deltaTime;
                 if (this.triviaFeedbackTimer <= 0) {
                     this.isPaused = false;
                     this.showTrivia = false;
@@ -290,10 +290,10 @@ export class BlackHoleGameLogic {
         }
 
         this.gameTime++;
-        this.accretionRotation += 0.02;
+        this.accretionRotation += 0.02 * deltaTime;
 
         // Spawn astronauts
-        this.spawnTimer++;
+        this.spawnTimer += deltaTime;
         if (this.spawnTimer >= this.spawnInterval) {
             this.spawnAstronaut();
             this.spawnTimer = 0;
@@ -324,8 +324,9 @@ export class BlackHoleGameLogic {
         // Move ship toward mouse (smooth follow)
         const dx = this.shipTargetX - this.shipX;
         const dy = this.shipTargetY - this.shipY;
-        this.shipX += dx * 0.12;
-        this.shipY += dy * 0.12;
+        const shipLerp = 1 - Math.pow(1 - 0.12, deltaTime);
+        this.shipX += dx * shipLerp;
+        this.shipY += dy * shipLerp;
 
         // Update ship angle
         if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
@@ -359,8 +360,8 @@ export class BlackHoleGameLogic {
         if (shipDist < this.pullRadius && shipDist > this.eventHorizonRadius) {
             const pullStrength = this.gravitationalPull * (1 - shipDist / this.pullRadius);
             const pullAngle = Math.atan2(this.centerY - this.shipY, this.centerX - this.shipX);
-            this.shipX += Math.cos(pullAngle) * pullStrength * 3;
-            this.shipY += Math.sin(pullAngle) * pullStrength * 3;
+            this.shipX += Math.cos(pullAngle) * pullStrength * 3 * deltaTime;
+            this.shipY += Math.sin(pullAngle) * pullStrength * 3 * deltaTime;
         }
 
         // Update astronauts
@@ -368,7 +369,7 @@ export class BlackHoleGameLogic {
             const astro = this.astronauts[i];
             if (astro.rescued) continue;
 
-            astro.wobble += 0.1;
+            astro.wobble += 0.1 * deltaTime;
 
             // Apply gravity toward black hole
             const astroDx = this.centerX - astro.x;
@@ -377,16 +378,16 @@ export class BlackHoleGameLogic {
 
             if (astroDist < this.pullRadius) {
                 const pullStrength = this.gravitationalPull * (1 - astroDist / this.pullRadius) * 1.2;
-                astro.vx += (astroDx / astroDist) * pullStrength;
-                astro.vy += (astroDy / astroDist) * pullStrength;
+                astro.vx += (astroDx / astroDist) * pullStrength * deltaTime;
+                astro.vy += (astroDy / astroDist) * pullStrength * deltaTime;
 
                 // Increase panic as they get closer
                 astro.panicLevel = Math.min(1, 1 - astroDist / this.pullRadius);
             }
 
             // Apply velocity
-            astro.x += astro.vx;
-            astro.y += astro.vy;
+            astro.x += astro.vx * deltaTime;
+            astro.y += astro.vy * deltaTime;
 
             // Check if fallen into black hole
             if (astroDist < this.eventHorizonRadius) {
@@ -484,17 +485,17 @@ export class BlackHoleGameLogic {
 
         // Combo decay
         if (this.comboTimer > 0) {
-            this.comboTimer--;
+            this.comboTimer -= deltaTime;
         } else if (this.combo > 1) {
-            this.combo = Math.max(1, this.combo - 0.01);
+            this.combo = Math.max(1, this.combo - 0.01 * deltaTime);
         }
 
         // Update debris (orbiting black hole)
         this.debris.forEach(d => {
-            d.angle += d.orbitSpeed * 0.03;
+            d.angle += d.orbitSpeed * 0.03 * deltaTime;
             d.x = this.centerX + Math.cos(d.angle) * d.orbitRadius;
             d.y = this.centerY + Math.sin(d.angle) * d.orbitRadius;
-            d.rotation += 0.02;
+            d.rotation += 0.02 * deltaTime;
 
             // Check collision with ship
             const debrisDist = Math.sqrt((this.shipX - d.x) ** 2 + (this.shipY - d.y) ** 2);
@@ -519,16 +520,16 @@ export class BlackHoleGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.life -= deltaTime;
 
             // Gravity on particles near black hole
             const pdist = Math.sqrt((p.x - this.centerX) ** 2 + (p.y - this.centerY) ** 2);
             if (pdist < this.pullRadius && pdist > 30) {
                 const pAngle = Math.atan2(this.centerY - p.y, this.centerX - p.x);
-                p.vx += Math.cos(pAngle) * 0.05;
-                p.vy += Math.sin(pAngle) * 0.05;
+                p.vx += Math.cos(pAngle) * 0.05 * deltaTime;
+                p.vy += Math.sin(pAngle) * 0.05 * deltaTime;
             }
 
             return p.life > 0;
@@ -549,12 +550,12 @@ export class BlackHoleGameLogic {
         }
 
         // Visual effects decay
-        this.screenShake *= 0.9;
-        this.rescueFlash *= 0.92;
-        this.warningPulse *= 0.95;
+        this.screenShake *= Math.pow(0.9, deltaTime);
+        this.rescueFlash *= Math.pow(0.92, deltaTime);
+        this.warningPulse *= Math.pow(0.95, deltaTime);
 
         // Update star twinkle
-        this.stars.forEach(s => s.twinkle += 0.03);
+        this.stars.forEach(s => s.twinkle += 0.03 * deltaTime);
     }
 
     draw(ctx: CanvasRenderingContext2D) {

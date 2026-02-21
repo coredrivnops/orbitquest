@@ -193,7 +193,7 @@ export class UranusGameLogic {
         this.targetY = y;
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver) return;
 
         this.frameCount++;
@@ -206,7 +206,7 @@ export class UranusGameLogic {
         }
 
         // --- SEASON CYCLE ---
-        this.seasonTimer++;
+        this.seasonTimer += deltaTime;
 
         const currentDuration = this.isSummer ? this.summerDuration : this.winterDuration;
 
@@ -222,7 +222,8 @@ export class UranusGameLogic {
 
         // Smooth brightness transition
         const targetBrightness = this.isSummer ? 1 : 0.12;
-        this.screenBrightness += (targetBrightness - this.screenBrightness) * 0.15;
+        const lerpFactor = 1 - Math.pow(1 - 0.15, deltaTime);
+        this.screenBrightness += (targetBrightness - this.screenBrightness) * lerpFactor;
 
         // --- MOVEMENT ---
         const prevX = this.playerX;
@@ -230,8 +231,9 @@ export class UranusGameLogic {
 
         // Only move during summer
         if (this.isSummer) {
-            this.playerX += (this.targetX - this.playerX) * 0.12;
-            this.playerY += (this.targetY - this.playerY) * 0.12;
+            const moveLerp = 1 - Math.pow(1 - 0.12, deltaTime);
+            this.playerX += (this.targetX - this.playerX) * moveLerp;
+            this.playerY += (this.targetY - this.playerY) * moveLerp;
         }
 
         // Clamp to bounds
@@ -296,10 +298,10 @@ export class UranusGameLogic {
         // --- PARTICLES ---
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const p = this.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.1; // Gravity
-            p.life -= 0.02;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vy += 0.1 * deltaTime; // Gravity
+            p.life -= 0.02 * deltaTime;
             if (p.life <= 0) {
                 this.particles.splice(i, 1);
             }

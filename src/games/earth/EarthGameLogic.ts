@@ -467,7 +467,7 @@ export class EarthGameLogic {
         return nearest;
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver || this.showLevelUp || this.showTrivia) return;
 
         this.gameTime++;
@@ -475,8 +475,9 @@ export class EarthGameLogic {
         // Move player towards target smoothly
         const dx = this.targetX - this.playerX;
         const dy = this.targetY - this.playerY;
-        this.playerX += dx * 0.1;
-        this.playerY += dy * 0.1;
+        const moveLerp = 1 - Math.pow(1 - 0.1, deltaTime);
+        this.playerX += dx * moveLerp;
+        this.playerY += dy * moveLerp;
 
         // Keep player in bounds
         this.playerX = Math.max(30, Math.min(this.width - 30, this.playerX));
@@ -487,11 +488,11 @@ export class EarthGameLogic {
 
         // Update orbitals
         for (const orbital of this.orbitals) {
-            orbital.angle += orbital.speed;
+            orbital.angle += orbital.speed * deltaTime;
         }
 
         // Spawn aliens - starts slow, gets faster
-        this.alienSpawnTimer++;
+        this.alienSpawnTimer += deltaTime;
         const spawnRate = Math.max(40, 120 - this.gameTime / 100); // Slower initially
         if (this.alienSpawnTimer >= spawnRate) {
             this.alienSpawnTimer = 0;
@@ -509,28 +510,28 @@ export class EarthGameLogic {
         }
 
         // Update aliens
-        this.updateAliens();
+        this.updateAliens(deltaTime);
 
         // Update projectiles
-        this.updateProjectiles();
+        this.updateProjectiles(deltaTime);
 
         // Collect XP orbs
-        this.collectXP();
+        this.collectXP(deltaTime);
 
         // Update particles
-        this.updateParticles();
+        this.updateParticles(deltaTime);
 
         // Combo timer
         if (this.comboTimer > 0) {
-            this.comboTimer--;
+            this.comboTimer -= deltaTime;
             if (this.comboTimer <= 0) {
                 this.combo = 0;
             }
         }
 
         // Decay effects
-        this.screenShake = Math.max(0, this.screenShake - 0.5);
-        this.flashIntensity = Math.max(0, this.flashIntensity - 0.02);
+        this.screenShake = Math.max(0, this.screenShake - 0.5 * deltaTime);
+        this.flashIntensity = Math.max(0, this.flashIntensity - 0.02 * deltaTime);
 
         // Score over time
         if (this.gameTime % 60 === 0) {
@@ -541,18 +542,18 @@ export class EarthGameLogic {
         this.waveNumber = 1 + Math.floor(this.gameTime / 1800);
     }
 
-    updateAliens() {
+    updateAliens(deltaTime: number = 1) {
         for (const alien of this.aliens) {
             // Move towards center (Earth)
             const centerX = this.width / 2;
             const centerY = this.height / 2;
             const angle = Math.atan2(centerY - alien.y, centerX - alien.x);
-            alien.x += Math.cos(angle) * alien.speed;
-            alien.y += Math.sin(angle) * alien.speed;
+            alien.x += Math.cos(angle) * alien.speed * deltaTime;
+            alien.y += Math.sin(angle) * alien.speed * deltaTime;
             alien.angle = angle;
 
             // Alien shooting
-            alien.shootTimer--;
+            alien.shootTimer -= deltaTime;
             if (alien.shootTimer <= 0 && (alien.type === 'cruiser' || alien.type === 'bomber' || alien.type === 'elite' || alien.type === 'boss')) {
                 alien.shootTimer = alien.type === 'boss' ? 30 : 90;
                 const shootAngle = Math.atan2(this.playerY - alien.y, this.playerX - alien.x);
@@ -599,10 +600,10 @@ export class EarthGameLogic {
         }
     }
 
-    updateProjectiles() {
+    updateProjectiles(deltaTime: number = 1) {
         for (const proj of this.projectiles) {
-            proj.x += proj.vx;
-            proj.y += proj.vy;
+            proj.x += proj.vx * deltaTime;
+            proj.y += proj.vy * deltaTime;
 
             // Missile homing
             if (proj.type === 'missile') {
@@ -730,7 +731,7 @@ export class EarthGameLogic {
         this.onScoreUpdate?.(this.score);
     }
 
-    collectXP() {
+    collectXP(deltaTime: number = 1) {
         const magnetRange = 100 + this.level * 10;
 
         for (const orb of this.xpOrbs) {
@@ -742,8 +743,8 @@ export class EarthGameLogic {
 
             if (orb.magnetized) {
                 const angle = Math.atan2(this.playerY - orb.y, this.playerX - orb.x);
-                orb.x += Math.cos(angle) * 8;
-                orb.y += Math.sin(angle) * 8;
+                orb.x += Math.cos(angle) * 8 * deltaTime;
+                orb.y += Math.sin(angle) * 8 * deltaTime;
             }
 
             if (dist < 20) {
@@ -770,12 +771,12 @@ export class EarthGameLogic {
         this.xpOrbs = this.xpOrbs.filter(o => o.value > 0);
     }
 
-    updateParticles() {
+    updateParticles(deltaTime: number = 1) {
         for (const p of this.particles) {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.05; // gravity
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vy += 0.05 * deltaTime; // gravity
+            p.life -= deltaTime;
         }
         this.particles = this.particles.filter(p => p.life > 0);
     }

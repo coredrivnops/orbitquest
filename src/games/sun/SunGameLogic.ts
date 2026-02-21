@@ -302,15 +302,15 @@ export class SunGameLogic {
         }, 2500);
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver || this.isVictory || this.showTrivia) return;
 
         // Shoot cooldown
-        if (this.shootCooldown > 0) this.shootCooldown--;
+        if (this.shootCooldown > 0) this.shootCooldown -= deltaTime;
 
         // Power-up timer
         if (this.powerUpTimer > 0) {
-            this.powerUpTimer--;
+            this.powerUpTimer -= deltaTime;
             if (this.powerUpTimer <= 0) {
                 this.shieldActive = false;
                 this.rapidFireActive = false;
@@ -320,8 +320,8 @@ export class SunGameLogic {
 
         // Update projectiles
         this.projectiles = this.projectiles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
             return p.y > -20 && p.y < this.height + 20 && p.x > -20 && p.x < this.width + 20;
         });
 
@@ -338,7 +338,7 @@ export class SunGameLogic {
 
         // Update power-ups
         this.powerUps = this.powerUps.filter(p => {
-            p.y += 2;
+            p.y += 2 * deltaTime;
             return p.y < this.height + 30;
         });
 
@@ -347,15 +347,15 @@ export class SunGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.1;
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vy += 0.1 * deltaTime;
+            p.life -= deltaTime;
             return p.life > 0;
         });
 
         // Screen shake decay
-        this.screenShake = Math.max(0, this.screenShake - 0.5);
+        this.screenShake = Math.max(0, this.screenShake - 0.5 * deltaTime);
 
         // Check wave completion
         if (this.aliens.length === 0 && !this.isGameOver) {

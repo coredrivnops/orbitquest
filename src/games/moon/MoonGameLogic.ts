@@ -340,14 +340,14 @@ export class MoonGameLogic {
         }
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.showTrivia || this.isLanded || this.isCrashed) return;
 
         // Screen shake decay
-        if (this.screenShake > 0) this.screenShake *= 0.9;
+        if (this.screenShake > 0) this.screenShake *= Math.pow(0.9, deltaTime);
 
         // Gravity
-        this.landerVY += this.gravity;
+        this.landerVY += this.gravity * deltaTime;
 
         // Rotation
         if (this.rotatingLeft) {
@@ -356,16 +356,16 @@ export class MoonGameLogic {
         if (this.rotatingRight) {
             this.landerAngularVel += this.rotationSpeed;
         }
-        this.landerAngularVel *= 0.98; // Angular damping
-        this.landerAngle += this.landerAngularVel;
+        this.landerAngularVel *= Math.pow(0.98, deltaTime); // Angular damping
+        this.landerAngle += this.landerAngularVel * deltaTime;
 
         // Thrust
         if (this.isThrusting && this.fuel > 0) {
             const thrustX = Math.sin(this.landerAngle) * this.thrustPower;
             const thrustY = -Math.cos(this.landerAngle) * this.thrustPower;
-            this.landerVX += thrustX;
-            this.landerVY += thrustY;
-            this.fuel -= this.fuelConsumption;
+            this.landerVX += thrustX * deltaTime;
+            this.landerVY += thrustY * deltaTime;
+            this.fuel -= this.fuelConsumption * deltaTime;
             soundManager.playThrust();
 
             // Thrust particles
@@ -384,8 +384,8 @@ export class MoonGameLogic {
         }
 
         // Apply velocity
-        this.landerX += this.landerVX;
-        this.landerY += this.landerVY;
+        this.landerX += this.landerVX * deltaTime;
+        this.landerY += this.landerVY * deltaTime;
 
         // Screen bounds (wrap horizontally)
         if (this.landerX < 0) this.landerX = this.width;
@@ -463,10 +463,10 @@ export class MoonGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.05; // Light gravity on particles
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vy += 0.05 * deltaTime; // Light gravity on particles
+            p.life -= deltaTime;
             return p.life > 0;
         });
 

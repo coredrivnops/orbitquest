@@ -25,12 +25,12 @@ export default function UranusGamePage() {
         };
     }, []);
 
-    const handleGameLoop = (ctx: CanvasRenderingContext2D, frameCount: number) => {
+    const handleGameLoop = (ctx: CanvasRenderingContext2D, frameCount: number, deltaTime: number) => {
         const game = gameLogicRef.current;
         if (!game) return;
 
         if (isPlaying) {
-            game.update();
+            game.update(deltaTime);
         }
         game.draw(ctx);
 

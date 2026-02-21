@@ -278,11 +278,11 @@ export class SaturnGameLogic {
         }, 2500);
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.isGameOver || this.isPaused) return;
 
         this.frameCount++;
-        this.distance += this.scrollSpeed;
+        this.distance += this.scrollSpeed * deltaTime;
 
         // Level progression
         if (this.distance > this.level * 3000) {
@@ -302,20 +302,20 @@ export class SaturnGameLogic {
         }
 
         // Apply gravity (low gravity!)
-        this.playerVy += this.gravity;
+        this.playerVy += this.gravity * deltaTime;
 
         // Variable jump height
         if (this.jumpHeld && this.playerVy < 0) {
-            this.playerVy += this.gravity * 0.3; // Slower fall while holding
+            this.playerVy += this.gravity * 0.3 * deltaTime; // Slower fall while holding
         }
 
         this.playerVy = Math.min(this.maxFallSpeed, this.playerVy);
-        this.playerY += this.playerVy;
+        this.playerY += this.playerVy * deltaTime;
 
         // Move platforms left (auto-scroll)
         this.isOnGround = false;
         for (const segment of this.ringSegments) {
-            segment.x -= this.scrollSpeed;
+            segment.x -= this.scrollSpeed * deltaTime;
 
             // Collision detection
             if (this.playerVy >= 0 &&
@@ -336,9 +336,9 @@ export class SaturnGameLogic {
 
                 // Crumbling platform
                 if (segment.type === 'crumbling') {
-                    segment.crumbleTimer = (segment.crumbleTimer || 0) + 1;
+                    segment.crumbleTimer = (segment.crumbleTimer || 0) + deltaTime;
                     if (segment.crumbleTimer > 30) {
-                        segment.y += 15; // Falls away
+                        segment.y += 15 * deltaTime; // Falls away
                     }
                 }
             }
@@ -400,7 +400,7 @@ export class SaturnGameLogic {
 
         // Move and check collectibles
         for (const c of this.collectibles) {
-            c.x -= this.scrollSpeed;
+            c.x -= this.scrollSpeed * deltaTime;
 
             if (!c.collected) {
                 const dx = this.playerX - c.x;
@@ -433,8 +433,8 @@ export class SaturnGameLogic {
 
         // Move and check hazards
         for (const h of this.hazards) {
-            h.x -= this.scrollSpeed;
-            h.rotation += 0.05;
+            h.x -= this.scrollSpeed * deltaTime;
+            h.rotation += 0.05 * deltaTime;
 
             const dx = this.playerX - h.x;
             const dy = this.playerY - h.y;
@@ -450,10 +450,10 @@ export class SaturnGameLogic {
         // Update particles
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const p = this.particles[i];
-            p.x += p.vx - this.scrollSpeed * 0.3;
-            p.y += p.vy;
-            p.vy += 0.1;
-            p.life -= 0.025;
+            p.x += (p.vx - this.scrollSpeed * 0.3) * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vy += 0.1 * deltaTime;
+            p.life -= 0.025 * deltaTime;
             if (p.life <= 0) this.particles.splice(i, 1);
         }
 
@@ -463,7 +463,7 @@ export class SaturnGameLogic {
         }
 
         // Distance bonus (REDUCED: every 1000 instead of 500)
-        if (Math.floor(this.distance / 1000) > Math.floor((this.distance - this.scrollSpeed) / 1000)) {
+        if (Math.floor(this.distance / 1000) > Math.floor((this.distance - this.scrollSpeed * deltaTime) / 1000)) {
             this.score += 50 * this.level;
             // Respect session cap
             if (this.stardustCollected < this.STARDUST_CAP) {
@@ -473,7 +473,7 @@ export class SaturnGameLogic {
 
         // Decay combo over time
         if (Date.now() - this.lastCollectTime > 3000) {
-            this.combo = Math.max(1, this.combo - 0.005);
+            this.combo = Math.max(1, this.combo - 0.005 * deltaTime);
         }
     }
 

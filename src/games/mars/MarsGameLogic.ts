@@ -323,11 +323,11 @@ export class MarsGameLogic {
         });
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.showTrivia || this.isGameOver) return;
 
         this.gameTime++;
-        this.backgroundOffset += 0.5;
+        this.backgroundOffset += 0.5 * deltaTime;
 
         // Level up
         if (this.gameTime % 600 === 0) {
@@ -335,29 +335,29 @@ export class MarsGameLogic {
         }
 
         // Effects decay
-        if (this.screenShake > 0) this.screenShake *= 0.9;
-        if (this.flashAlpha > 0) this.flashAlpha -= 0.05;
+        if (this.screenShake > 0) this.screenShake *= Math.pow(0.9, deltaTime);
+        if (this.flashAlpha > 0) this.flashAlpha -= 0.05 * deltaTime;
         if (this.comboTimer > 0) {
-            this.comboTimer--;
+            this.comboTimer -= deltaTime;
             if (this.comboTimer <= 0) this.combo = 1;
         }
 
         // Move rover based on input
         if (this.movingLeft) {
-            this.roverX -= this.roverSpeed;
-            this.roverTilt = Math.max(-0.2, this.roverTilt - 0.05);
+            this.roverX -= this.roverSpeed * deltaTime;
+            this.roverTilt = Math.max(-0.2, this.roverTilt - 0.05 * deltaTime);
         } else if (this.movingRight) {
-            this.roverX += this.roverSpeed;
-            this.roverTilt = Math.min(0.2, this.roverTilt + 0.05);
+            this.roverX += this.roverSpeed * deltaTime;
+            this.roverTilt = Math.min(0.2, this.roverTilt + 0.05 * deltaTime);
         } else {
-            this.roverTilt *= 0.9;
+            this.roverTilt *= Math.pow(0.9, deltaTime);
         }
 
         // Clamp rover position
         this.roverX = Math.max(this.roverWidth / 2, Math.min(this.width - this.roverWidth / 2, this.roverX));
 
         // Spawn objects
-        this.spawnTimer--;
+        this.spawnTimer -= deltaTime;
         if (this.spawnTimer <= 0) {
             this.spawnObject();
             this.spawnTimer = Math.max(20, this.baseSpawnRate - this.level * 5);
@@ -369,7 +369,7 @@ export class MarsGameLogic {
             this.dustStormTimer = 300;
         }
         if (this.dustStormActive) {
-            this.dustStormTimer--;
+            this.dustStormTimer -= deltaTime;
             if (this.dustStormTimer <= 0) {
                 this.dustStormActive = false;
             }
@@ -377,14 +377,14 @@ export class MarsGameLogic {
 
         // Update dust particles
         this.dustParticles.forEach(p => {
-            p.x += this.dustStormActive ? p.speed * 3 : p.speed * 0.5;
+            p.x += this.dustStormActive ? p.speed * 3 * deltaTime : p.speed * 0.5 * deltaTime;
             if (p.x > this.width + 20) p.x = -20;
         });
 
         // Update falling objects
         this.objects = this.objects.filter(obj => {
-            obj.y += obj.speed;
-            obj.rotation += 0.05;
+            obj.y += obj.speed * deltaTime;
+            obj.rotation += 0.05 * deltaTime;
 
             // Check collision with rover
             const dx = obj.x - this.roverX;
@@ -439,10 +439,10 @@ export class MarsGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.1; // Gravity
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vy += 0.1 * deltaTime; // Gravity
+            p.life -= deltaTime;
             return p.life > 0;
         });
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface GameCanvasProps {
-    onGameLoop: (ctx: CanvasRenderingContext2D, frameCount: number) => void;
+    onGameLoop: (ctx: CanvasRenderingContext2D, frameCount: number, deltaTime: number) => void;
     onMount?: (canvas: HTMLCanvasElement) => void;
     onCleanup?: () => void;
     onMouseMove?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -32,6 +32,7 @@ export default function GameCanvas({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const requestRef = useRef<number>();
     const frameCountRef = useRef<number>(0);
+    const lastTimestampRef = useRef<number>(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showLandscapeHint, setShowLandscapeHint] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -174,8 +175,15 @@ export default function GameCanvas({
             onMount(canvas);
         }
 
-        const animate = () => {
-            onGameLoop(ctx, frameCountRef.current);
+        const animate = (timestamp: number) => {
+            // Compute delta-time normalized to 60fps (1.0 = 16.67ms)
+            if (lastTimestampRef.current === 0) lastTimestampRef.current = timestamp;
+            const rawDt = (timestamp - lastTimestampRef.current) / 16.667;
+            // Clamp to prevent physics explosion after tab-away (max 3 frames)
+            const deltaTime = Math.min(rawDt, 3);
+            lastTimestampRef.current = timestamp;
+
+            onGameLoop(ctx, frameCountRef.current, deltaTime);
             frameCountRef.current++;
             requestRef.current = requestAnimationFrame(animate);
         };

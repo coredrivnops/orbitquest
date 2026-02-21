@@ -292,12 +292,12 @@ export class MercuryGameLogic {
         return Math.abs(angleDiff) < this.shadowWidth / 2;
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.showTrivia || this.isGameOver) return;
 
         this.gameTime++;
         this.timeAlive++;
-        this.distance += this.playerSpeed * 100;
+        this.distance += this.playerSpeed * 100 * deltaTime;
 
         // Level up - sun gets faster
         if (this.gameTime % 600 === 0) {
@@ -307,11 +307,11 @@ export class MercuryGameLogic {
         }
 
         // Player always moves forward (clockwise)
-        this.playerAngle += this.playerSpeed;
+        this.playerAngle += this.playerSpeed * deltaTime;
         if (this.playerAngle > Math.PI * 2) this.playerAngle -= Math.PI * 2;
 
         // Sun also moves (chasing player)
-        this.sunAngle += this.sunSpeed;
+        this.sunAngle += this.sunSpeed * deltaTime;
         if (this.sunAngle > Math.PI * 2) this.sunAngle -= Math.PI * 2;
 
         // Heat management
@@ -319,18 +319,18 @@ export class MercuryGameLogic {
 
         if (inShadow) {
             // Cooling in shadow - recharge shield too!
-            this.heat = Math.max(0, this.heat - this.coolRate);
-            this.shieldPower = Math.min(this.maxShield, this.shieldPower + 0.3); // Recharge shield in shadow
+            this.heat = Math.max(0, this.heat - this.coolRate * deltaTime);
+            this.shieldPower = Math.min(this.maxShield, this.shieldPower + 0.3 * deltaTime); // Recharge shield in shadow
             this.shieldActive = false;
         } else {
             // Heating in sunlight - AUTO-ACTIVATE SHIELD when available!
             if (this.shieldPower > 0) {
                 this.shieldActive = true;
-                this.shieldPower -= 0.4;
-                this.heat += this.heatRate * 0.25; // Shield protects a lot!
+                this.shieldPower -= 0.4 * deltaTime;
+                this.heat += this.heatRate * 0.25 * deltaTime; // Shield protects a lot!
             } else {
                 this.shieldActive = false;
-                this.heat += this.heatRate;
+                this.heat += this.heatRate * deltaTime;
             }
         }
 
@@ -386,7 +386,7 @@ export class MercuryGameLogic {
                 this.createCollectEffect(crater);
             }
         });
-        this.nextCraterSpawn--;
+        this.nextCraterSpawn -= deltaTime;
         if (this.nextCraterSpawn <= 0) {
             this.spawnCrater();
             this.nextCraterSpawn = 100 + Math.random() * 100;
@@ -399,9 +399,9 @@ export class MercuryGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.life -= deltaTime;
             return p.life > 0;
         });
 

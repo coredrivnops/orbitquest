@@ -444,43 +444,43 @@ export class PlutoGameLogic {
         soundManager.playCollect(); // Powerup collect sound
     }
 
-    update() {
+    update(deltaTime: number = 1) {
         if (this.showTrivia || this.isGameOver) return;
 
         this.gameTime++;
-        this.pulsePhase += 0.03;
-        this.gridOffset = (this.gridOffset + 0.5) % 50;
-        this.plutoRotation += 0.01;
+        this.pulsePhase += 0.03 * deltaTime;
+        this.gridOffset = (this.gridOffset + 0.5 * deltaTime) % 50;
+        this.plutoRotation += 0.01 * deltaTime;
 
         // Decrease screen shake
-        if (this.screenShake > 0) this.screenShake *= 0.9;
+        if (this.screenShake > 0) this.screenShake *= Math.pow(0.9, deltaTime);
 
         // Cooldowns
-        if (this.shootCooldown > 0) this.shootCooldown--;
+        if (this.shootCooldown > 0) this.shootCooldown -= deltaTime;
         if (this.spreadShotTimer > 0) {
-            this.spreadShotTimer--;
+            this.spreadShotTimer -= deltaTime;
             if (this.spreadShotTimer <= 0) this.spreadShot = false;
         }
         if (this.freezeTimer > 0) {
-            this.freezeTimer--;
+            this.freezeTimer -= deltaTime;
             if (this.freezeTimer <= 0) this.freezeActive = false;
         }
 
         // Combo timer
         if (this.comboTimer > 0) {
-            this.comboTimer--;
+            this.comboTimer -= deltaTime;
             if (this.comboTimer <= 0) this.combo = 1;
         }
 
         // Wave management
         if (this.betweenWaves) {
-            this.waveTimer--;
+            this.waveTimer -= deltaTime;
             if (this.waveTimer <= 0) {
                 this.startNextWave();
             }
         } else {
             // Spawn enemies
-            this.spawnTimer--;
+            this.spawnTimer -= deltaTime;
             if (this.spawnTimer <= 0 && this.enemiesSpawned < this.enemiesPerWave) {
                 this.spawnEnemy();
                 this.spawnTimer = Math.max(30, 60 - this.waveNumber * 5);
@@ -501,10 +501,10 @@ export class PlutoGameLogic {
 
         // Update moons (orbit around Pluto)
         this.moons.forEach(moon => {
-            moon.angle += this.moonOrbitSpeed;
-            moon.pulsePhase += 0.05;
+            moon.angle += this.moonOrbitSpeed * deltaTime;
+            moon.pulsePhase += 0.05 * deltaTime;
             if (!moon.alive) {
-                moon.respawnTimer--;
+                moon.respawnTimer -= deltaTime;
                 if (moon.respawnTimer <= 0 && Math.random() < 0.001) {
                     moon.alive = true;
                 }
@@ -513,13 +513,13 @@ export class PlutoGameLogic {
 
         // Update projectiles
         this.projectiles = this.projectiles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
 
             // Trail
             p.trail.push({ x: p.x, y: p.y, alpha: 1 });
             if (p.trail.length > 10) p.trail.shift();
-            p.trail.forEach(t => t.alpha *= 0.8);
+            p.trail.forEach(t => t.alpha *= Math.pow(0.8, deltaTime));
 
             // Check collision with enemies
             for (let i = this.enemies.length - 1; i >= 0; i--) {
@@ -568,9 +568,9 @@ export class PlutoGameLogic {
         // Update enemies
         const freezeMultiplier = this.freezeActive ? 0.2 : 1;
         this.enemies.forEach(enemy => {
-            enemy.x += enemy.vx * freezeMultiplier;
-            enemy.y += enemy.vy * freezeMultiplier;
-            enemy.rotation += enemy.rotationSpeed * freezeMultiplier;
+            enemy.x += enemy.vx * freezeMultiplier * deltaTime;
+            enemy.y += enemy.vy * freezeMultiplier * deltaTime;
+            enemy.rotation += enemy.rotationSpeed * freezeMultiplier * deltaTime;
 
             // Check collision with moons
             this.moons.forEach(moon => {
@@ -624,11 +624,11 @@ export class PlutoGameLogic {
 
         // Update power-ups
         this.powerUps = this.powerUps.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vx *= 0.98;
-            p.vy *= 0.98;
-            p.pulsePhase += 0.1;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vx *= Math.pow(0.98, deltaTime);
+            p.vy *= Math.pow(0.98, deltaTime);
+            p.pulsePhase += 0.1 * deltaTime;
 
             // Check collection (near Pluto)
             const dx = p.x - this.centerX;
@@ -646,11 +646,11 @@ export class PlutoGameLogic {
 
         // Update particles
         this.particles = this.particles.filter(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vx *= 0.96;
-            p.vy *= 0.96;
-            p.life--;
+            p.x += p.vx * deltaTime;
+            p.y += p.vy * deltaTime;
+            p.vx *= Math.pow(0.96, deltaTime);
+            p.vy *= Math.pow(0.96, deltaTime);
+            p.life -= deltaTime;
             return p.life > 0;
         });
     }

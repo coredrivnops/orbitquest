@@ -78,12 +78,12 @@ export default function JupiterGamePage() {
         gameLogicRef.current?.setRising(false);
     }, []);
 
-    const handleGameLoop = useCallback((ctx: CanvasRenderingContext2D, frameCount: number) => {
+    const handleGameLoop = useCallback((ctx: CanvasRenderingContext2D, frameCount: number, deltaTime: number) => {
         const game = gameLogicRef.current;
         if (!game) return;
 
         if (isPlaying && !showTrivia) {
-            game.update();
+            game.update(deltaTime);
         }
         game.draw(ctx);
 
